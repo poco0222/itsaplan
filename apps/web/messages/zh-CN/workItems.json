@@ -1,8 +1,8 @@
 {
   "deadline": {
-    "dueWithinThreeDays": "3 日内到期",
-    "dueWithinFiveDays": "5 日内到期",
-    "completedLate": "延期完成 · 实际 {date}"
+    "dueWithinThreeDays": "3日内到期",
+    "dueWithinFiveDays": "5日内到期",
+    "completedLate": "延期完成 · {date}"
   },
   "newIssue": "新建工作项",
   "addWorkItem": "添加工作项",

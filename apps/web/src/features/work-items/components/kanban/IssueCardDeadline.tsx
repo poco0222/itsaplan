@@ -2,10 +2,11 @@ import { useContext } from 'react';
 import { CalendarClock } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Badge } from '@/components/ui/badge';
-import { DateBadge, PILL } from '@/features/issue/components/shared/IssueBadges';
+import { DateBadge, OVERDUE_PILL, PILL } from '@/features/issue/components/shared/IssueBadges';
 import type { StateType } from '@/lib/api/endpoints/columns';
 import type { BoardIssue } from '@/lib/api/endpoints/issues';
 import { daysBetween, formatShortDate, parseDate, toDateStr } from '@/utils/dates';
+import { STATUS_META } from '@/utils/initiativeMeta';
 import { cn } from '@/lib/utils';
 import { KanbanDeadlineContext } from '../../context/kanbanDeadlineContext';
 
@@ -49,17 +50,18 @@ export function IssueCardDeadline({
       {upcoming && (
         <Badge
           variant="outline"
+          style={urgent ? { backgroundColor: STATUS_META.active.color } : undefined}
           className={cn(
             PILL,
-            'text-warning',
-            urgent && 'border-transparent bg-warning/15 font-medium',
+            'border-transparent',
+            urgent ? 'text-pro-foreground' : 'bg-blue-500/10 text-blue-700 dark:text-blue-400',
           )}
         >
           {urgent ? t('deadline.dueWithinThreeDays') : t('deadline.dueWithinFiveDays')}
         </Badge>
       )}
       {actual && due && actual > due && (
-        <Badge variant="outline" className={cn(PILL, 'text-warning')}>
+        <Badge variant="outline" className={cn(PILL, OVERDUE_PILL)}>
           {t('deadline.completedLate', { date: formatShortDate(toDateStr(actual)) })}
         </Badge>
       )}

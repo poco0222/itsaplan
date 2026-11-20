@@ -13,6 +13,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 
 // Outline pill styling shared by the label and date badges and the board card's pills.
 export const PILL = 'text-muted-foreground rounded-full px-1.5 py-0.5 text-[10px]';
+export const OVERDUE_PILL = 'border-transparent bg-overdue font-medium text-destructive-text';
 
 // Priority glyph with a "<priority> priority" tooltip.
 export function PriorityBadge({
@@ -63,13 +64,7 @@ export function DateBadge({
   overdue?: boolean;
 }) {
   const badge = (
-    <Badge
-      variant="outline"
-      className={cn(
-        PILL,
-        overdue && 'border-transparent bg-overdue font-medium text-destructive-text',
-      )}
-    >
+    <Badge variant="outline" className={cn(PILL, overdue && OVERDUE_PILL)}>
       {icon}
       {formatShortDate(date)}
     </Badge>
