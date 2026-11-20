@@ -1,4 +1,4 @@
-import { db, issueStatus, projectColumn } from '@repo/db';
+import { db, issue, issueStatus, projectColumn } from '@repo/db';
 import { and, asc, eq, inArray, isNull, sql } from 'drizzle-orm';
 import { iso } from '#shared/lib';
 
@@ -18,6 +18,19 @@ export async function recordStatusChange(
   enteredAt?: Date,
 ): Promise<void> {
   if (issueIds.length === 0) return;
+  const managed = (
+    await db
+      .select({ id: issue.id })
+      .from(issue)
+      .where(
+        and(
+          inArray(issue.id, issueIds),
+          sql`delivery_role(delivery_settings(${issue.projectId}), ${issue.typeId}) IS NOT NULL`,
+        ),
+      )
+  ).map(({ id }) => id);
+  const ordinary = issueIds.filter((id) => !managed.includes(id));
+  if (ordinary.length === 0) return;
   const [column] = await db
     .select({ name: projectColumn.name, stateType: projectColumn.stateType })
     .from(projectColumn)
@@ -27,9 +40,9 @@ export async function recordStatusChange(
     await tx
       .update(issueStatus)
       .set({ leftAt: at })
-      .where(and(inArray(issueStatus.issueId, issueIds), isNull(issueStatus.leftAt)));
+      .where(and(inArray(issueStatus.issueId, ordinary), isNull(issueStatus.leftAt)));
     await tx.insert(issueStatus).values(
-      issueIds.map((issueId) => ({
+      ordinary.map((issueId) => ({
         issueId,
         columnId,
         columnName: column.name,

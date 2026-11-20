@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import type { ProjectDetail } from '@/lib/api/endpoints/projects';
 import type { IssueRelations } from '@/lib/api/endpoints/issues';
+import type { DeliveryItem } from '@/lib/api/endpoints/deliveryWorkflow';
 import { usePermissions } from '@/hooks/usePermissions';
 import { MAX_SUBTASK_DEPTH, subtaskProgress } from '@/utils/subtasks';
 import { Button } from '@/components/ui/button';
@@ -33,11 +34,13 @@ import { useTranslations } from 'next-intl';
 export default function IssueSubtasksPanel({
   project,
   issue,
+  delivery,
   readOnly,
   onOpenIssue,
 }: {
   project: ProjectDetail;
   issue: IssueRelations;
+  delivery?: DeliveryItem | null;
   readOnly?: boolean;
   // Where a public share opens the parent or a subtask, which has no page of its
   // own to link to.
@@ -45,6 +48,7 @@ export default function IssueSubtasksPanel({
 }) {
   const tCommon = useTranslations('common');
   const t = useTranslations('issue.subtasks');
+  const tDelivery = useTranslations('issue.deliveryWorkflow');
   const { can } = usePermissions();
   const canEdit = !readOnly && can('work_items', 'edit');
   const canCreate = !readOnly && can('work_items', 'create');
@@ -57,7 +61,8 @@ export default function IssueSubtasksPanel({
 
   const parent = issue.parent;
   if (readOnly && !parent && issue.subtasks.length === 0) return null;
-  const canNest = issue.ancestors.length + 1 < MAX_SUBTASK_DEPTH;
+  const childType = project.issueTypes.find((type) => type.id === delivery?.childTypeId);
+  const canNest = delivery ? Boolean(childType) : issue.ancestors.length + 1 < MAX_SUBTASK_DEPTH;
   const showSubtasks = !parent || issue.subtasks.length > 0 || (!readOnly && canNest);
 
   const progress = subtaskProgress(issue.subtasks, new Map(project.columns.map((c) => [c.id, c])));
@@ -176,7 +181,7 @@ export default function IssueSubtasksPanel({
         <IssuePickerDialog
           projectKey={project.project.ref}
           title={t('addExisting')}
-          prompt={t('searchPrompt')}
+          prompt={childType ? tDelivery('attachType', { type: childType.name }) : t('searchPrompt')}
           // The API rejects a pick that would nest too deep with a message of its own.
           exclude={(hit) =>
             hit.id === issue.id ||
@@ -188,6 +193,7 @@ export default function IssueSubtasksPanel({
               projectKey: project.project.ref,
               issueId: hit.id,
               parentId: issue.id,
+              typeId: childType?.id,
               previousParentId: hit.parentId,
             });
             setAttaching(false);
@@ -201,7 +207,7 @@ export default function IssueSubtasksPanel({
           project={project}
           defaults={{
             parentId: issue.id,
-            typeId: issue.typeId,
+            typeId: childType?.id ?? issue.typeId,
             initiativeId: issue.initiative?.id ?? null,
             assigneeUserId: issue.assigneeUserId,
             delegateUserId: null,

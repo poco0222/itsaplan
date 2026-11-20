@@ -1,4 +1,20 @@
 {
+  "deliveryWorkflow": {
+    "title": "Delivery workflow",
+    "description": "Assign work item types and numeric fields for delivery and maintenance.",
+    "loadError": "Delivery settings could not be loaded.",
+    "moduleTypeId": "Module type",
+    "nodeTypeId": "Delivery node type",
+    "taskTypeId": "Execution task type",
+    "maintenanceTypeId": "Maintenance item type",
+    "nodeWeightId": "Node weight field",
+    "taskWeightId": "Task weight field",
+    "nodeProgressId": "Manual node progress field",
+    "taskProgressId": "Task progress field",
+    "choose": "Choose an option",
+    "enable": "Enable delivery workflow",
+    "saved": "Delivery workflow saved."
+  },
   "schedules": {
     "newTitle": "Новое расписание",
     "editTitle": "Редактировать расписание",

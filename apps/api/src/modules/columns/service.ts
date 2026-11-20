@@ -6,6 +6,7 @@ import {
   issueLabel,
   issueFieldValue,
   issueFieldOption,
+  lockIssueTree,
 } from '@repo/db';
 import { and, eq, inArray, isNull, sql } from 'drizzle-orm';
 import { HttpError } from '#shared/lib';
@@ -254,6 +255,7 @@ export async function deleteColumn(
   }
 
   const columnIssueIds = await db.transaction(async (tx) => {
+    await lockIssueTree(tx, projectId);
     if (column.stateType === 'backlog') {
       // Serialize backlog deletions so concurrent requests cannot remove the last two.
       await tx

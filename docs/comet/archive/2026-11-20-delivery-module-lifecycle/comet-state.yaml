@@ -1,0 +1,2584 @@
+# comet-execution: managed-run
+schema: comet.native.v4
+name: delivery-module-lifecycle
+language: en
+phase: archive
+status: done
+state_version: 8
+brief: brief.md
+document_constraints_version: 3
+spec_changes:
+  - capability: delivery-module-lifecycle
+    operation: create
+    source: specs/delivery-module-lifecycle/spec.md
+workspace:
+  isolation: current
+  change_branch: main
+  target_branch: main
+  finish: null
+loop:
+  stage: done
+  goal_cycle: 1
+  iteration: 1
+  attempt: 1
+  retry_epoch: 0
+  failed_iteration_count: 0
+  no_progress_count: 0
+  execution_failure_count: 0
+  previous_unresolved_ids: []
+  next_action: null
+acceptance:
+  - id: A1
+    source: specs/delivery-module-lifecycle/spec.md
+    text: A project can explicitly bind four distinct work item roles and reusable
+      numeric fields. The module contains delivery nodes and maintenance items
+      directly, and delivery nodes contain execution tasks. Existing records can
+      be attached explicitly with their data preserved. Projects without
+      configuration keep standard behavior.
+    result: passed
+    reason:
+      text: A PostgreSQL integration test rejected duplicate bindings and invalid
+        parent placement, and attached an existing item with a combined
+        parent/type patch while retaining its numeric field. Chrome showed all
+        four roles and field bindings. Regression fixtures exercised projects
+        without this setting.
+      truncated: false
+  - id: A2
+    source: specs/delivery-module-lifecycle/spec.md
+    text: The work item workflow shows effective progress from both weighted levels.
+      Open execution tasks use the entered value or zero, completed work
+      contributes 100 percent, and delivery nodes with no contributing tasks
+      allow manual progress. Weight groups require values summing to exactly 100
+      percent, and invalid groups visibly propagate unavailable progress.
+    result: passed
+    reason:
+      text: The database fixture produced 30% for a blank execution rate, 58% for a
+        30/70 weighted node and 54.4% after a second manually managed node. An
+        80% allocation propagated unavailable progress. Chrome displayed 100% on
+        the complete module and the allocation warning on the incomplete module.
+      truncated: false
+  - id: A3
+    source: specs/delivery-module-lifecycle/spec.md
+    text: Canceled records remain accessible and exit the calculation and completion
+      gates. A parent with contributing children completes only when each child
+      is completed and weights are valid, including after weight redistribution.
+      Before handoff, reopening a completed execution task moves its completed
+      node and module into In progress and recalculates their progress.
+    result: passed
+    reason:
+      text: The cancellation fixture preserved the canceled item, kept both parents
+        open pending reallocation and completed them at valid weight. Reopening
+        the task then reopened the node and module and recalculated the module
+        to the task's entered 50%. The baseline subtask and status-history suite
+        passed.
+      truncated: false
+  - id: A4
+    source: specs/delivery-module-lifecycle/spec.md
+    text: A permitted user can transfer the whole module to maintenance only after
+      delivery completion. The activity records who confirmed and when, repeated
+      confirmations create one handoff, and active handoff protects the delivery
+      result. Maintenance items remain under the module and are excluded from
+      delivery metrics.
+    result: passed
+    reason:
+      text: The API refused premature handoff, returned the same handoff id to
+        concurrent confirmations, allowed a maintenance child, and refused
+        attempts to reopen, change a weight, change an occupied status category
+        or cascade-delete the active delivery. Chrome showed the phase change
+        and audit event.
+      truncated: false
+  - id: A5
+    source: specs/delivery-module-lifecycle/spec.md
+    text: An authorized reversal with a reason records the actor, time and reason,
+      restores the delivery phase and preserves prior handoffs and existing
+      maintenance items.
+    result: passed
+    reason:
+      text: The API rejected a blank reason and returned the module to delivery for an
+        authorized reversal. The maintenance issue retained its parent, and
+        Chrome showed the original confirmation and the reversal with the
+        supplied reason and actor and time.
+      truncated: false
+  - id: A6
+    source: specs/delivery-module-lifecycle/spec.md
+    text: Planned due dates stay separate from the system completion period.
+      Identified legacy imports remain completed with an unknown effective
+      completion date, count in completion totals and stay out of date
+      comparisons. A genuine completion after reopening uses the new timestamp.
+    result: passed
+    reason:
+      text: The legacy fixture marked the existing completion period as unknown while
+        the original completion state and due date remained. Reopening and
+        completing again produced a new visible completion timestamp. The Kanban
+        test checked the known-date badge and its absence for unknown dates.
+      truncated: false
+  - id: A7
+    source: brief.md
+    text: Work item and workflow permissions are enforced server-side for setup,
+      writes, handoff and reversal. Concurrent edits and phase changes keep
+      eligibility, progress and recorded actions consistent. Verification uses
+      test data and preserves the current weekly report contract and saved
+      reports.
+    result: passed
+    reason:
+      text: Owner and restricted-member tests verified the two permission checks. The
+        simultaneous handoff and reopen fixture passed with a single permitted
+        outcome and consistent phase and progress. The fresh migration,
+        weekly-report tests, worker import regressions, source checks and local
+        Chrome preview passed.
+      truncated: false
+builder_handoff:
+  candidate_id: delivery-module-lifecycle:3
+  identity_provider: skill-coordinated
+  builder_execution_ref: 01a1f7b4-2343-7a83-a911-f00de72f4681
+  iteration: 1
+  summary:
+    text: Implemented the opt-in delivery workflow on native work items. The project
+      bindings, effective progress, guarded hierarchy, transactional status
+      rollup, maintenance phase and reversal audit are available in the normal
+      work item workflow. Legacy completion markers preserve the original
+      timeline.
+    truncated: false
+  addressed_acceptance_ids:
+    - A1
+    - A2
+    - A3
+    - A4
+    - A5
+    - A6
+    - A7
+  checks:
+    - name:
+        text: bun run typecheck · repository root
+        truncated: false
+      result: passed
+      note:
+        text: All 13 workspace tasks plus the root TypeScript check passed.
+        truncated: false
+    - name:
+        text: bun run lint · repository root
+        truncated: false
+      result: passed
+      note:
+        text: All 13 workspace lint tasks passed, including message keys.
+        truncated: false
+    - name:
+        text: Prettier source check and git diff --check · repository root
+        truncated: false
+      result: passed
+      note:
+        text: Checked the repository with only the active Runtime-owned comet-state.yaml
+          excluded. The plain format:check reports that generated file.
+        truncated: false
+    - name:
+        text: bun --env-file=.env.test.example packages/db/src/migrate.ts · repository
+          root
+        truncated: false
+      result: passed
+      note:
+        text: Applied the migration chain to fresh PostgreSQL 17 databases inside the
+          isolated delivery test container.
+        truncated: false
+    - name:
+        text: bun test --env-file=../../.env.test.example src/modules/delivery-workflow
+          src/modules/weekly-reports
+          src/modules/issues/__tests__/integration/{issues,subtasks,activity,status-history,move}.test.ts
+          src/modules/columns · apps/api
+        truncated: false
+      result: passed
+      note:
+        text: 311 tests passed on the isolated fixture database, including direct
+          enrollment, exact weight sums, rollback, authorization, conflicting
+          handoff and reopen, and unchanged weekly snapshots.
+        truncated: false
+    - name:
+        text: bun test --preload ./test/setup.ts src/features/work-items
+          src/features/issue · apps/web
+        truncated: false
+      result: passed
+      note:
+        text: 56 tests passed, including workflow completion dates and suppression of
+          late badges for unknown legacy dates.
+        truncated: false
+    - name:
+        text: bun --cwd apps/worker test --env-file=../../.env.test.example
+          src/__tests__/integration/import-create.test.ts · repository root
+        truncated: false
+      result: passed
+      note:
+        text: 7 import regression tests passed on their own fixture database.
+        truncated: false
+    - name:
+        text: Chrome extension task tab · isolated local preview
+        truncated: false
+      result: passed
+      note:
+        text: Reviewed bound types and fields, 100 percent delivery, invalid weights and
+          the late date badge. Confirmed and reversed a handoff in the UI and
+          checked the actor, times and reversal reason.
+        truncated: false
+  checks_truncated: false
+  known_limits:
+    - text: Validation used isolated fixture databases and a Chrome preview. Live
+        project enrollment and deployment are outside the confirmed scope.
+      truncated: false
+    - text: The repository-wide source format check excludes the active Runtime-owned
+        Comet state file.
+      truncated: false
+  known_limits_truncated: false
+  review: null
+  submitted_at: 2026-11-20T07:23:30.158Z
+blockers: []
+verification:
+  candidate_id: delivery-module-lifecycle:3
+  identity_provider: skill-coordinated
+  verifier_execution_ref: 01a1f7b4-2343-7a83-a911-f00de72f4681
+  iteration: 1
+  attempt: 1
+  assurance: self-reviewed
+  verdict: pass
+  checks: []
+  reported_checks:
+    - name:
+        text: bun run typecheck · repository root
+        truncated: false
+      result: passed
+      note:
+        text: All 13 workspace tasks plus the root TypeScript check passed.
+        truncated: false
+    - name:
+        text: bun run lint · repository root
+        truncated: false
+      result: passed
+      note:
+        text: All 13 workspace lint tasks passed, including message keys.
+        truncated: false
+    - name:
+        text: Prettier source check and git diff --check · repository root
+        truncated: false
+      result: passed
+      note:
+        text: Checked the repository with only the active Runtime-owned comet-state.yaml
+          excluded. The plain format:check reports that generated file.
+        truncated: false
+    - name:
+        text: bun --env-file=.env.test.example packages/db/src/migrate.ts · repository
+          root
+        truncated: false
+      result: passed
+      note:
+        text: Applied the migration chain to fresh PostgreSQL 17 databases inside the
+          isolated delivery test container.
+        truncated: false
+    - name:
+        text: bun test --env-file=../../.env.test.example src/modules/delivery-workflow
+          src/modules/weekly-reports
+          src/modules/issues/__tests__/integration/{issues,subtasks,activity,status-history,move}.test.ts
+          src/modules/columns · apps/api
+        truncated: false
+      result: passed
+      note:
+        text: 311 tests passed on the isolated fixture database, including direct
+          enrollment, exact weight sums, rollback, authorization, conflicting
+          handoff and reopen, and unchanged weekly snapshots.
+        truncated: false
+    - name:
+        text: bun test --preload ./test/setup.ts src/features/work-items
+          src/features/issue · apps/web
+        truncated: false
+      result: passed
+      note:
+        text: 56 tests passed, including workflow completion dates and suppression of
+          late badges for unknown legacy dates.
+        truncated: false
+    - name:
+        text: bun --cwd apps/worker test --env-file=../../.env.test.example
+          src/__tests__/integration/import-create.test.ts · repository root
+        truncated: false
+      result: passed
+      note:
+        text: 7 import regression tests passed on their own fixture database.
+        truncated: false
+    - name:
+        text: Chrome extension task tab · isolated local preview
+        truncated: false
+      result: passed
+      note:
+        text: Reviewed bound types and fields, 100 percent delivery, invalid weights and
+          the late date badge. Confirmed and reversed a handoff in the UI and
+          checked the actor, times and reversal reason.
+        truncated: false
+  summary:
+    text: All seven acceptance items passed on the candidate. The work item, report
+      and import regressions passed and the delivery controls were exercised in
+      the Chrome fixture.
+    truncated: false
+  risks:
+    - text: Trial project data enrollment and deployment are separate from this
+        locally verified change.
+      truncated: false
+    - text: The plain repository format check reports the active Runtime-owned state
+        file. The source format check passed with that file excluded.
+      truncated: false
+  risks_truncated: false
+  completed_at: 2026-11-20T07:23:44.155Z
+history:
+  - goal_cycle: 1
+    iteration: 1
+    attempt: 1
+    outcome: pass
+    unresolved_ids: []
+    summary:
+      text: All seven acceptance items passed on the candidate. The work item, report
+        and import regressions passed and the delivery controls were exercised
+        in the Chrome fixture.
+      truncated: false
+    completed_at: 2026-11-20T07:23:44.155Z
+history_overflow:
+  dropped_entries: 0
+  first_dropped_at: null
+  last_dropped_at: null
+  outcome_counts:
+    pass: 0
+    fail: 0
+    blocked: 0
+    execution-error: 0
+    recovery: 0
+verification_result: pass
+verification_report: verification.md
+archived: true
+created_at: 2026-11-20T07:12:58.227Z
+archive_receipt:
+  runId: delivery-module-lifecycle
+  change: delivery-module-lifecycle
+  archiveRef: 2026-11-20-delivery-module-lifecycle
+  transactionId: f6fc07c2-3cb3-476d-88e7-b43af6125795
+  stateVersion: 8
+  specs:
+    - capability: delivery-module-lifecycle
+      operation: create
+run_checkpoint:
+  {
+    'schema': 'comet.workflow-run-checkpoint.v2',
+    'hash': '9718d6081543436a1cd43f59aaea8dbf891091b6f9b9b3cd21d6ee4b70b0cf05',
+    'run':
+      {
+        'protocolVersion': 1,
+        'schemaVersion': 1,
+        'runId': 'delivery-module-lifecycle',
+        'revision': 1,
+        'workflow':
+          {
+            'id': 'comet-native',
+            'version': '4',
+            'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+          },
+        'definitionHashes':
+          {
+            '["comet-native","4"]': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+          },
+        'initialStateHash': '885e27d12414e32510e3b29c5b701ce50fce6d262ec425e726fabd6bb638b85f',
+        'input':
+          {
+            'artifactRootRef': 'docs',
+            'name': 'delivery-module-lifecycle',
+            'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 那就开始吧',
+          },
+        'state':
+          {
+            'acceptance':
+              [
+                {
+                  'id': 'A1',
+                  'reason':
+                    {
+                      'text': 'A PostgreSQL integration test rejected duplicate bindings and invalid parent placement, and attached an existing item with a combined parent/type patch while retaining its numeric field. Chrome showed all four roles and field bindings. Regression fixtures exercised projects without this setting.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'specs/delivery-module-lifecycle/spec.md',
+                  'text': 'A project can explicitly bind four distinct work item roles and reusable numeric fields. The module contains delivery nodes and maintenance items directly, and delivery nodes contain execution tasks. Existing records can be attached explicitly with their data preserved. Projects without configuration keep standard behavior.',
+                },
+                {
+                  'id': 'A2',
+                  'reason':
+                    {
+                      'text': 'The database fixture produced 30% for a blank execution rate, 58% for a 30/70 weighted node and 54.4% after a second manually managed node. An 80% allocation propagated unavailable progress. Chrome displayed 100% on the complete module and the allocation warning on the incomplete module.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'specs/delivery-module-lifecycle/spec.md',
+                  'text': 'The work item workflow shows effective progress from both weighted levels. Open execution tasks use the entered value or zero, completed work contributes 100 percent, and delivery nodes with no contributing tasks allow manual progress. Weight groups require values summing to exactly 100 percent, and invalid groups visibly propagate unavailable progress.',
+                },
+                {
+                  'id': 'A3',
+                  'reason':
+                    {
+                      'text': "The cancellation fixture preserved the canceled item, kept both parents open pending reallocation and completed them at valid weight. Reopening the task then reopened the node and module and recalculated the module to the task's entered 50%. The baseline subtask and status-history suite passed.",
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'specs/delivery-module-lifecycle/spec.md',
+                  'text': 'Canceled records remain accessible and exit the calculation and completion gates. A parent with contributing children completes only when each child is completed and weights are valid, including after weight redistribution. Before handoff, reopening a completed execution task moves its completed node and module into In progress and recalculates their progress.',
+                },
+                {
+                  'id': 'A4',
+                  'reason':
+                    {
+                      'text': 'The API refused premature handoff, returned the same handoff id to concurrent confirmations, allowed a maintenance child, and refused attempts to reopen, change a weight, change an occupied status category or cascade-delete the active delivery. Chrome showed the phase change and audit event.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'specs/delivery-module-lifecycle/spec.md',
+                  'text': 'A permitted user can transfer the whole module to maintenance only after delivery completion. The activity records who confirmed and when, repeated confirmations create one handoff, and active handoff protects the delivery result. Maintenance items remain under the module and are excluded from delivery metrics.',
+                },
+                {
+                  'id': 'A5',
+                  'reason':
+                    {
+                      'text': 'The API rejected a blank reason and returned the module to delivery for an authorized reversal. The maintenance issue retained its parent, and Chrome showed the original confirmation and the reversal with the supplied reason and actor and time.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'specs/delivery-module-lifecycle/spec.md',
+                  'text': 'An authorized reversal with a reason records the actor, time and reason, restores the delivery phase and preserves prior handoffs and existing maintenance items.',
+                },
+                {
+                  'id': 'A6',
+                  'reason':
+                    {
+                      'text': 'The legacy fixture marked the existing completion period as unknown while the original completion state and due date remained. Reopening and completing again produced a new visible completion timestamp. The Kanban test checked the known-date badge and its absence for unknown dates.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'specs/delivery-module-lifecycle/spec.md',
+                  'text': 'Planned due dates stay separate from the system completion period. Identified legacy imports remain completed with an unknown effective completion date, count in completion totals and stay out of date comparisons. A genuine completion after reopening uses the new timestamp.',
+                },
+                {
+                  'id': 'A7',
+                  'reason':
+                    {
+                      'text': 'Owner and restricted-member tests verified the two permission checks. The simultaneous handoff and reopen fixture passed with a single permitted outcome and consistent phase and progress. The fresh migration, weekly-report tests, worker import regressions, source checks and local Chrome preview passed.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'Work item and workflow permissions are enforced server-side for setup, writes, handoff and reversal. Concurrent edits and phase changes keep eligibility, progress and recorded actions consistent. Verification uses test data and preserves the current weekly report contract and saved reports.',
+                },
+              ],
+            'archived': true,
+            'blockers': [],
+            'brief': 'brief.md',
+            'builder_handoff':
+              {
+                'addressed_acceptance_ids': ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7'],
+                'builder_execution_ref': '01a1f7b4-2343-7a83-a911-f00de72f4681',
+                'candidate_id': 'delivery-module-lifecycle:3',
+                'checks':
+                  [
+                    {
+                      'name': { 'text': 'bun run typecheck · repository root', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'All 13 workspace tasks plus the root TypeScript check passed.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name': { 'text': 'bun run lint · repository root', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'All 13 workspace lint tasks passed, including message keys.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Prettier source check and git diff --check · repository root',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'Checked the repository with only the active Runtime-owned comet-state.yaml excluded. The plain format:check reports that generated file.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'bun --env-file=.env.test.example packages/db/src/migrate.ts · repository root',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'Applied the migration chain to fresh PostgreSQL 17 databases inside the isolated delivery test container.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'bun test --env-file=../../.env.test.example src/modules/delivery-workflow src/modules/weekly-reports src/modules/issues/__tests__/integration/{issues,subtasks,activity,status-history,move}.test.ts src/modules/columns · apps/api',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': '311 tests passed on the isolated fixture database, including direct enrollment, exact weight sums, rollback, authorization, conflicting handoff and reopen, and unchanged weekly snapshots.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'bun test --preload ./test/setup.ts src/features/work-items src/features/issue · apps/web',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': '56 tests passed, including workflow completion dates and suppression of late badges for unknown legacy dates.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'bun --cwd apps/worker test --env-file=../../.env.test.example src/__tests__/integration/import-create.test.ts · repository root',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': '7 import regression tests passed on their own fixture database.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Chrome extension task tab · isolated local preview',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'Reviewed bound types and fields, 100 percent delivery, invalid weights and the late date badge. Confirmed and reversed a handoff in the UI and checked the actor, times and reversal reason.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                  ],
+                'checks_truncated': false,
+                'identity_provider': 'skill-coordinated',
+                'iteration': 1,
+                'known_limits':
+                  [
+                    {
+                      'text': 'Validation used isolated fixture databases and a Chrome preview. Live project enrollment and deployment are outside the confirmed scope.',
+                      'truncated': false,
+                    },
+                    {
+                      'text': 'The repository-wide source format check excludes the active Runtime-owned Comet state file.',
+                      'truncated': false,
+                    },
+                  ],
+                'known_limits_truncated': false,
+                'review': null,
+                'submitted_at': '2026-11-20T07:23:30.158Z',
+                'summary':
+                  {
+                    'text': 'Implemented the opt-in delivery workflow on native work items. The project bindings, effective progress, guarded hierarchy, transactional status rollup, maintenance phase and reversal audit are available in the normal work item workflow. Legacy completion markers preserve the original timeline.',
+                    'truncated': false,
+                  },
+              },
+            'created_at': '2026-11-20T07:12:58.227Z',
+            'document_constraints_version': 3,
+            'history':
+              [
+                {
+                  'attempt': 1,
+                  'completed_at': '2026-11-20T07:23:44.155Z',
+                  'goal_cycle': 1,
+                  'iteration': 1,
+                  'outcome': 'pass',
+                  'summary':
+                    {
+                      'text': 'All seven acceptance items passed on the candidate. The work item, report and import regressions passed and the delivery controls were exercised in the Chrome fixture.',
+                      'truncated': false,
+                    },
+                  'unresolved_ids': [],
+                },
+              ],
+            'history_overflow':
+              {
+                'dropped_entries': 0,
+                'first_dropped_at': null,
+                'last_dropped_at': null,
+                'outcome_counts':
+                  { 'blocked': 0, 'execution-error': 0, 'fail': 0, 'pass': 0, 'recovery': 0 },
+              },
+            'language': 'en',
+            'loop':
+              {
+                'attempt': 1,
+                'execution_failure_count': 0,
+                'failed_iteration_count': 0,
+                'goal_cycle': 1,
+                'iteration': 1,
+                'next_action': null,
+                'no_progress_count': 0,
+                'previous_unresolved_ids': [],
+                'retry_epoch': 0,
+                'stage': 'done',
+              },
+            'name': 'delivery-module-lifecycle',
+            'phase': 'archive',
+            'schema': 'comet.native.v4',
+            'spec_changes':
+              [
+                {
+                  'capability': 'delivery-module-lifecycle',
+                  'operation': 'create',
+                  'source': 'specs/delivery-module-lifecycle/spec.md',
+                },
+              ],
+            'state_version': 8,
+            'status': 'done',
+            'verification':
+              {
+                'assurance': 'self-reviewed',
+                'attempt': 1,
+                'candidate_id': 'delivery-module-lifecycle:3',
+                'checks': [],
+                'completed_at': '2026-11-20T07:23:44.155Z',
+                'identity_provider': 'skill-coordinated',
+                'iteration': 1,
+                'reported_checks':
+                  [
+                    {
+                      'name': { 'text': 'bun run typecheck · repository root', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'All 13 workspace tasks plus the root TypeScript check passed.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name': { 'text': 'bun run lint · repository root', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'All 13 workspace lint tasks passed, including message keys.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Prettier source check and git diff --check · repository root',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'Checked the repository with only the active Runtime-owned comet-state.yaml excluded. The plain format:check reports that generated file.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'bun --env-file=.env.test.example packages/db/src/migrate.ts · repository root',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'Applied the migration chain to fresh PostgreSQL 17 databases inside the isolated delivery test container.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'bun test --env-file=../../.env.test.example src/modules/delivery-workflow src/modules/weekly-reports src/modules/issues/__tests__/integration/{issues,subtasks,activity,status-history,move}.test.ts src/modules/columns · apps/api',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': '311 tests passed on the isolated fixture database, including direct enrollment, exact weight sums, rollback, authorization, conflicting handoff and reopen, and unchanged weekly snapshots.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'bun test --preload ./test/setup.ts src/features/work-items src/features/issue · apps/web',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': '56 tests passed, including workflow completion dates and suppression of late badges for unknown legacy dates.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'bun --cwd apps/worker test --env-file=../../.env.test.example src/__tests__/integration/import-create.test.ts · repository root',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': '7 import regression tests passed on their own fixture database.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Chrome extension task tab · isolated local preview',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'Reviewed bound types and fields, 100 percent delivery, invalid weights and the late date badge. Confirmed and reversed a handoff in the UI and checked the actor, times and reversal reason.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                  ],
+                'risks':
+                  [
+                    {
+                      'text': 'Trial project data enrollment and deployment are separate from this locally verified change.',
+                      'truncated': false,
+                    },
+                    {
+                      'text': 'The plain repository format check reports the active Runtime-owned state file. The source format check passed with that file excluded.',
+                      'truncated': false,
+                    },
+                  ],
+                'risks_truncated': false,
+                'summary':
+                  {
+                    'text': 'All seven acceptance items passed on the candidate. The work item, report and import regressions passed and the delivery controls were exercised in the Chrome fixture.',
+                    'truncated': false,
+                  },
+                'verdict': 'pass',
+                'verifier_execution_ref': '01a1f7b4-2343-7a83-a911-f00de72f4681',
+              },
+            'verification_report': 'verification.md',
+            'verification_result': 'pass',
+            'workspace':
+              {
+                'change_branch': 'main',
+                'finish': null,
+                'isolation': 'current',
+                'target_branch': 'main',
+              },
+          },
+        'status': 'completed',
+        'sequence': 8,
+        'actions':
+          [
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a1f7b4-2343-7a83-a911-f00de72f4681',
+                  'token': 'portable-8ed4171bd32cc16a865acb116abb230edfa6bbef3a343eedf602969c76dd0273',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'delivery-module-lifecycle:1',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'delivery-module-lifecycle',
+                      'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 那就开始吧',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '493b7cc37ab2a83025bce65f2a9bb2b297d78017bef63125dea6978f6070bc8a',
+              'outcome':
+                {
+                  'actionId': 'delivery-module-lifecycle:1',
+                  'attempt': 1,
+                  'claimToken': 'portable-8ed4171bd32cc16a865acb116abb230edfa6bbef3a343eedf602969c76dd0273',
+                  'inputHash': '493b7cc37ab2a83025bce65f2a9bb2b297d78017bef63125dea6978f6070bc8a',
+                  'outcomeId': 'native-result-b11493d6b9d82e4b5466b13269a729a5c64215ebdae28b3a8f9ab991dad776c1',
+                  'output':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'source': 'specs/delivery-module-lifecycle/spec.md',
+                            'text': 'A project can explicitly bind four distinct work item roles and reusable numeric fields. The module contains delivery nodes and maintenance items directly, and delivery nodes contain execution tasks. Existing records can be attached explicitly with their data preserved. Projects without configuration keep standard behavior.',
+                          },
+                          {
+                            'id': 'A2',
+                            'source': 'specs/delivery-module-lifecycle/spec.md',
+                            'text': 'The work item workflow shows effective progress from both weighted levels. Open execution tasks use the entered value or zero, completed work contributes 100 percent, and delivery nodes with no contributing tasks allow manual progress. Weight groups require values summing to exactly 100 percent, and invalid groups visibly propagate unavailable progress.',
+                          },
+                          {
+                            'id': 'A3',
+                            'source': 'specs/delivery-module-lifecycle/spec.md',
+                            'text': 'Canceled records remain accessible and exit the calculation and completion gates. A parent with contributing children completes only when each child is completed and weights are valid, including after weight redistribution. Before handoff, reopening a completed execution task moves its completed node and module into In progress and recalculates their progress.',
+                          },
+                          {
+                            'id': 'A4',
+                            'source': 'specs/delivery-module-lifecycle/spec.md',
+                            'text': 'A permitted user can transfer the whole module to maintenance only after delivery completion. The activity records who confirmed and when, repeated confirmations create one handoff, and active handoff protects the delivery result. Maintenance items remain under the module and are excluded from delivery metrics.',
+                          },
+                          {
+                            'id': 'A5',
+                            'source': 'specs/delivery-module-lifecycle/spec.md',
+                            'text': 'An authorized reversal with a reason records the actor, time and reason, restores the delivery phase and preserves prior handoffs and existing maintenance items.',
+                          },
+                          {
+                            'id': 'A6',
+                            'source': 'specs/delivery-module-lifecycle/spec.md',
+                            'text': 'Planned due dates stay separate from the system completion period. Identified legacy imports remain completed with an unknown effective completion date, count in completion totals and stay out of date comparisons. A genuine completion after reopening uses the new timestamp.',
+                          },
+                          {
+                            'id': 'A7',
+                            'source': 'brief.md',
+                            'text': 'Work item and workflow permissions are enforced server-side for setup, writes, handoff and reversal. Concurrent edits and phase changes keep eligibility, progress and recorded actions consistent. Verification uses test data and preserves the current weekly report contract and saved reports.',
+                          },
+                        ],
+                      'children': null,
+                      'specChanges':
+                        [
+                          {
+                            'capability': 'delivery-module-lifecycle',
+                            'operation': 'create',
+                            'source': 'specs/delivery-module-lifecycle/spec.md',
+                          },
+                        ],
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '4b7b77231a087261f1ad84a5306e456b124c145603650d47c264244ff9cf1bea',
+                    'outcomeId': 'native-result-b11493d6b9d82e4b5466b13269a729a5c64215ebdae28b3a8f9ab991dad776c1',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-shape-prepare',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'delivery-module-lifecycle',
+              'status': 'succeeded',
+              'stepId': 'shape.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a1f7b4-2343-7a83-a911-f00de72f4681',
+                  'token': 'portable-54e4e241f5505cb8180125ef77fbc2b01595531407086b9c69df6c65b2bd4a5b',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'delivery-module-lifecycle:3',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'delivery-module-lifecycle',
+                      'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 那就开始吧',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': 'fa149ab07b9184acc6d9e7fd927468b0d4038bbcf0b5a983b6d4471010d6c1f7',
+              'outcome':
+                {
+                  'actionId': 'delivery-module-lifecycle:3',
+                  'attempt': 1,
+                  'claimToken': 'portable-54e4e241f5505cb8180125ef77fbc2b01595531407086b9c69df6c65b2bd4a5b',
+                  'inputHash': 'fa149ab07b9184acc6d9e7fd927468b0d4038bbcf0b5a983b6d4471010d6c1f7',
+                  'outcomeId': 'native-result-ecf76d2b3aacb7b85d4ab9769659e30694f5037e2fe4099253961d55572ea54b',
+                  'output':
+                    {
+                      'addressedAcceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7'],
+                      'checks':
+                        [
+                          {
+                            'name': 'bun run typecheck · repository root',
+                            'note': 'All 13 workspace tasks plus the root TypeScript check passed.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun run lint · repository root',
+                            'note': 'All 13 workspace lint tasks passed, including message keys.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Prettier source check and git diff --check · repository root',
+                            'note': 'Checked the repository with only the active Runtime-owned comet-state.yaml excluded. The plain format:check reports that generated file.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun --env-file=.env.test.example packages/db/src/migrate.ts · repository root',
+                            'note': 'Applied the migration chain to fresh PostgreSQL 17 databases inside the isolated delivery test container.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun test --env-file=../../.env.test.example src/modules/delivery-workflow src/modules/weekly-reports src/modules/issues/__tests__/integration/{issues,subtasks,activity,status-history,move}.test.ts src/modules/columns · apps/api',
+                            'note': '311 tests passed on the isolated fixture database, including direct enrollment, exact weight sums, rollback, authorization, conflicting handoff and reopen, and unchanged weekly snapshots.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun test --preload ./test/setup.ts src/features/work-items src/features/issue · apps/web',
+                            'note': '56 tests passed, including workflow completion dates and suppression of late badges for unknown legacy dates.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun --cwd apps/worker test --env-file=../../.env.test.example src/__tests__/integration/import-create.test.ts · repository root',
+                            'note': '7 import regression tests passed on their own fixture database.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Chrome extension task tab · isolated local preview',
+                            'note': 'Reviewed bound types and fields, 100 percent delivery, invalid weights and the late date badge. Confirmed and reversed a handoff in the UI and checked the actor, times and reversal reason.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'knownLimits':
+                        [
+                          'Validation used isolated fixture databases and a Chrome preview. Live project enrollment and deployment are outside the confirmed scope.',
+                          'The repository-wide source format check excludes the active Runtime-owned Comet state file.',
+                        ],
+                      'requireIndependentReview': false,
+                      'summary': 'Implemented the opt-in delivery workflow on native work items. The project bindings, effective progress, guarded hierarchy, transactional status rollup, maintenance phase and reversal audit are available in the normal work item workflow. Legacy completion markers preserve the original timeline.',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'e25868a0980ddc8096a2100e204ecc8815fb9c48990300035ec66bec3f0c66b6',
+                    'outcomeId': 'native-result-ecf76d2b3aacb7b85d4ab9769659e30694f5037e2fe4099253961d55572ea54b',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-builder',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'delivery-module-lifecycle',
+              'status': 'succeeded',
+              'stepId': 'build.builder',
+              'type': 'handoff',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a1f7b4-2343-7a83-a911-f00de72f4681',
+                  'token': 'portable-df299950f0b964ceee9fe883673e953d26a615d945697928c82b9350b0029e49',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'delivery-module-lifecycle:4',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'delivery-module-lifecycle',
+                      'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 那就开始吧',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': 'b608b06bdab95db00491435ba8a04a25f9129d40255412059f02317b367755ba',
+              'outcome':
+                {
+                  'actionId': 'delivery-module-lifecycle:4',
+                  'attempt': 1,
+                  'claimToken': 'portable-df299950f0b964ceee9fe883673e953d26a615d945697928c82b9350b0029e49',
+                  'inputHash': 'b608b06bdab95db00491435ba8a04a25f9129d40255412059f02317b367755ba',
+                  'outcomeId': 'native-result-c7b51dbf5f29c9cf90360d6edde4f8bc84e6b44e2d256544ae3be2a8c55f8a3f',
+                  'output':
+                    {
+                      'candidateId': 'delivery-module-lifecycle:3',
+                      'checks':
+                        [
+                          {
+                            'name': 'bun run typecheck · repository root',
+                            'note': 'All 13 workspace tasks plus the root TypeScript check passed.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun run lint · repository root',
+                            'note': 'All 13 workspace lint tasks passed, including message keys.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Prettier source check and git diff --check · repository root',
+                            'note': 'Checked the repository with only the active Runtime-owned comet-state.yaml excluded. The plain format:check reports that generated file.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun --env-file=.env.test.example packages/db/src/migrate.ts · repository root',
+                            'note': 'Applied the migration chain to fresh PostgreSQL 17 databases inside the isolated delivery test container.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun test --env-file=../../.env.test.example src/modules/delivery-workflow src/modules/weekly-reports src/modules/issues/__tests__/integration/{issues,subtasks,activity,status-history,move}.test.ts src/modules/columns · apps/api',
+                            'note': '311 tests passed on the isolated fixture database, including direct enrollment, exact weight sums, rollback, authorization, conflicting handoff and reopen, and unchanged weekly snapshots.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun test --preload ./test/setup.ts src/features/work-items src/features/issue · apps/web',
+                            'note': '56 tests passed, including workflow completion dates and suppression of late badges for unknown legacy dates.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun --cwd apps/worker test --env-file=../../.env.test.example src/__tests__/integration/import-create.test.ts · repository root',
+                            'note': '7 import regression tests passed on their own fixture database.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Chrome extension task tab · isolated local preview',
+                            'note': 'Reviewed bound types and fields, 100 percent delivery, invalid weights and the late date badge. Confirmed and reversed a handoff in the UI and checked the actor, times and reversal reason.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'response':
+                        {
+                          'kind': 'final-result',
+                          'result':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'reason': 'A PostgreSQL integration test rejected duplicate bindings and invalid parent placement, and attached an existing item with a combined parent/type patch while retaining its numeric field. Chrome showed all four roles and field bindings. Regression fixtures exercised projects without this setting.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'reason': 'The database fixture produced 30% for a blank execution rate, 58% for a 30/70 weighted node and 54.4% after a second manually managed node. An 80% allocation propagated unavailable progress. Chrome displayed 100% on the complete module and the allocation warning on the incomplete module.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'reason': "The cancellation fixture preserved the canceled item, kept both parents open pending reallocation and completed them at valid weight. Reopening the task then reopened the node and module and recalculated the module to the task's entered 50%. The baseline subtask and status-history suite passed.",
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A4',
+                                    'reason': 'The API refused premature handoff, returned the same handoff id to concurrent confirmations, allowed a maintenance child, and refused attempts to reopen, change a weight, change an occupied status category or cascade-delete the active delivery. Chrome showed the phase change and audit event.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A5',
+                                    'reason': 'The API rejected a blank reason and returned the module to delivery for an authorized reversal. The maintenance issue retained its parent, and Chrome showed the original confirmation and the reversal with the supplied reason and actor and time.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A6',
+                                    'reason': 'The legacy fixture marked the existing completion period as unknown while the original completion state and due date remained. Reopening and completing again produced a new visible completion timestamp. The Kanban test checked the known-date badge and its absence for unknown dates.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A7',
+                                    'reason': 'Owner and restricted-member tests verified the two permission checks. The simultaneous handoff and reopen fixture passed with a single permitted outcome and consistent phase and progress. The fresh migration, weekly-report tests, worker import regressions, source checks and local Chrome preview passed.',
+                                    'result': 'passed',
+                                  },
+                                ],
+                              'attempt': 1,
+                              'iteration': 1,
+                              'requestReview':
+                                {
+                                  'reason': 'The implementation follows the approved hierarchy, weighted progress, status propagation, handoff, reversal, legacy date handling and local-only scope in the complete Shape the user expressly confirmed. The existing weekly report contract was verified against regression tests.',
+                                  'result': 'aligned',
+                                },
+                              'risks':
+                                [
+                                  'Trial project data enrollment and deployment are separate from this locally verified change.',
+                                  'The plain repository format check reports the active Runtime-owned state file. The source format check passed with that file excluded.',
+                                ],
+                              'summary': 'All seven acceptance items passed on the candidate. The work item, report and import regressions passed and the delivery controls were exercised in the Chrome fixture.',
+                              'verdict': 'pass',
+                            },
+                        },
+                      'verifierExecutionRef': '01a1f7b4-2343-7a83-a911-f00de72f4681',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '6b24bcd433ffe36ca1bd6566bd0f69aae847d6539b3364435fa1813dbc6f3f14',
+                    'outcomeId': 'native-result-c7b51dbf5f29c9cf90360d6edde4f8bc84e6b44e2d256544ae3be2a8c55f8a3f',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-verifier',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'delivery-module-lifecycle',
+              'status': 'succeeded',
+              'stepId': 'verify.verifier',
+              'type': 'handoff',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-preflight',
+                  'token': 'portable-c809156784f5fa21a7890f43dc584ec2eca17893d3ddea2be9631806371c1d74',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'delivery-module-lifecycle:6',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'delivery-module-lifecycle',
+                      'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 那就开始吧',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '148feef5396b7f5b9ad4d44a3213e6a83cf9b06a30c10609064d4d6e84638efd',
+              'outcome':
+                {
+                  'actionId': 'delivery-module-lifecycle:6',
+                  'attempt': 1,
+                  'claimToken': 'portable-c809156784f5fa21a7890f43dc584ec2eca17893d3ddea2be9631806371c1d74',
+                  'inputHash': '148feef5396b7f5b9ad4d44a3213e6a83cf9b06a30c10609064d4d6e84638efd',
+                  'outcomeId': 'delivery-module-lifecycle:6:1:executor-result',
+                  'output':
+                    {
+                      'archiveDirRef': 'docs/comet/archive/2026-11-20-delivery-module-lifecycle',
+                      'blockers': [],
+                      'candidateId': 'delivery-module-lifecycle:3',
+                      'capabilityPeers': [],
+                      'ready': true,
+                      'reportRef': 'docs/comet/changes/delivery-module-lifecycle/verification.md',
+                      'reportStateVersion': 6,
+                      'requiresReverification': false,
+                      'specPreview':
+                        [
+                          {
+                            'capability': 'delivery-module-lifecycle',
+                            'operation': 'create',
+                            'source': 'specs/delivery-module-lifecycle/spec.md',
+                          },
+                        ],
+                      'stateVersion': 7,
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '5b8525c3152ef61dddb1f4d54240c17fe09d6717914d8cd69f32877296b47c56',
+                    'outcomeId': 'delivery-module-lifecycle:6:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive-preflight',
+              'requiredCapabilities': [],
+              'retry': 'idempotent',
+              'runId': 'delivery-module-lifecycle',
+              'status': 'succeeded',
+              'stepId': 'archive.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-apply',
+                  'token': 'portable-995aeb245290d00a1b7163d4385539d092a624f856f7f4d5c09b83bcd8391938',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'delivery-module-lifecycle:7',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'delivery-module-lifecycle',
+                      'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 那就开始吧',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '40e97e04e00e405e0e45a6d004bad58cc018ed9aa099d38a02101ddea979980b',
+              'outcome':
+                {
+                  'actionId': 'delivery-module-lifecycle:7',
+                  'attempt': 1,
+                  'claimToken': 'portable-995aeb245290d00a1b7163d4385539d092a624f856f7f4d5c09b83bcd8391938',
+                  'inputHash': '40e97e04e00e405e0e45a6d004bad58cc018ed9aa099d38a02101ddea979980b',
+                  'outcomeId': 'delivery-module-lifecycle:7:1:executor-result',
+                  'output':
+                    {
+                      'archiveRef': '2026-11-20-delivery-module-lifecycle',
+                      'specCount': 1,
+                      'stateVersion': 7,
+                      'transactionId': 'f6fc07c2-3cb3-476d-88e7-b43af6125795',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '0c7ef329740d3a78b8378e8f1fdce54391a06fe93cfdeaabc3c7283c27f8c55e',
+                    'outcomeId': 'delivery-module-lifecycle:7:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'delivery-module-lifecycle',
+              'status': 'succeeded',
+              'stepId': 'archive.execute',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-finalize',
+                  'token': 'portable-fe1a9a16078cdc8d7a62c35bf6088ca26e7472c7714bbe84a6f36f4c69e238ab',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'delivery-module-lifecycle:8',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'delivery-module-lifecycle',
+                      'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 那就开始吧',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '44d7a1e2f66e17caddb0ed743eff2a6bf4fa492b0fc363367504320cd4a40139',
+              'outcome':
+                {
+                  'actionId': 'delivery-module-lifecycle:8',
+                  'attempt': 1,
+                  'claimToken': 'portable-fe1a9a16078cdc8d7a62c35bf6088ca26e7472c7714bbe84a6f36f4c69e238ab',
+                  'inputHash': '44d7a1e2f66e17caddb0ed743eff2a6bf4fa492b0fc363367504320cd4a40139',
+                  'outcomeId': 'delivery-module-lifecycle:8:1:executor-result',
+                  'output':
+                    {
+                      'archiveRef': '2026-11-20-delivery-module-lifecycle',
+                      'change': 'delivery-module-lifecycle',
+                      'runId': 'delivery-module-lifecycle',
+                      'specs':
+                        [{ 'capability': 'delivery-module-lifecycle', 'operation': 'create' }],
+                      'stateVersion': 8,
+                      'transactionId': 'f6fc07c2-3cb3-476d-88e7-b43af6125795',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'a7a6a1ff7f06a394ed9b38a86f4d617bc21023d66c351ce485a5d84ffb805103',
+                    'outcomeId': 'delivery-module-lifecycle:8:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive-finalize',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'delivery-module-lifecycle',
+              'status': 'succeeded',
+              'stepId': 'archive.finalize',
+              'type': 'call_tool',
+            },
+          ],
+        'actionContexts':
+          {
+            'delivery-module-lifecycle:1': { 'results': {}, 'sequence': 1 },
+            'delivery-module-lifecycle:3': { 'results': {}, 'sequence': 3 },
+            'delivery-module-lifecycle:4': { 'results': {}, 'sequence': 4 },
+            'delivery-module-lifecycle:6': { 'results': {}, 'sequence': 6 },
+            'delivery-module-lifecycle:7': { 'results': {}, 'sequence': 7 },
+            'delivery-module-lifecycle:8': { 'results': {}, 'sequence': 8 },
+          },
+        'waits':
+          [
+            {
+              'id': 'delivery-module-lifecycle:2',
+              'stepId': 'shape.confirm',
+              'sequence': 2,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'delivery-module-lifecycle',
+                      'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 那就开始吧',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'specs/delivery-module-lifecycle/spec.md',
+                                'text': 'A project can explicitly bind four distinct work item roles and reusable numeric fields. The module contains delivery nodes and maintenance items directly, and delivery nodes contain execution tasks. Existing records can be attached explicitly with their data preserved. Projects without configuration keep standard behavior.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'specs/delivery-module-lifecycle/spec.md',
+                                'text': 'The work item workflow shows effective progress from both weighted levels. Open execution tasks use the entered value or zero, completed work contributes 100 percent, and delivery nodes with no contributing tasks allow manual progress. Weight groups require values summing to exactly 100 percent, and invalid groups visibly propagate unavailable progress.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'specs/delivery-module-lifecycle/spec.md',
+                                'text': 'Canceled records remain accessible and exit the calculation and completion gates. A parent with contributing children completes only when each child is completed and weights are valid, including after weight redistribution. Before handoff, reopening a completed execution task moves its completed node and module into In progress and recalculates their progress.',
+                              },
+                              {
+                                'id': 'A4',
+                                'source': 'specs/delivery-module-lifecycle/spec.md',
+                                'text': 'A permitted user can transfer the whole module to maintenance only after delivery completion. The activity records who confirmed and when, repeated confirmations create one handoff, and active handoff protects the delivery result. Maintenance items remain under the module and are excluded from delivery metrics.',
+                              },
+                              {
+                                'id': 'A5',
+                                'source': 'specs/delivery-module-lifecycle/spec.md',
+                                'text': 'An authorized reversal with a reason records the actor, time and reason, restores the delivery phase and preserves prior handoffs and existing maintenance items.',
+                              },
+                              {
+                                'id': 'A6',
+                                'source': 'specs/delivery-module-lifecycle/spec.md',
+                                'text': 'Planned due dates stay separate from the system completion period. Identified legacy imports remain completed with an unknown effective completion date, count in completion totals and stay out of date comparisons. A genuine completion after reopening uses the new timestamp.',
+                              },
+                              {
+                                'id': 'A7',
+                                'source': 'brief.md',
+                                'text': 'Work item and workflow permissions are enforced server-side for setup, writes, handoff and reversal. Concurrent edits and phase changes keep eligibility, progress and recorded actions consistent. Verification uses test data and preserves the current weekly report contract and saved reports.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges':
+                            [
+                              {
+                                'capability': 'delivery-module-lifecycle',
+                                'operation': 'create',
+                                'source': 'specs/delivery-module-lifecycle/spec.md',
+                              },
+                            ],
+                        },
+                    },
+                },
+              'proposalHash': '992ceee70bf27af3dab5c05d95a511f4f4c44e166174d9b57ce0ce8f31c19952',
+              'choices': ['approved', 'rejected'],
+              'results': {},
+              'decision':
+                {
+                  'id': '41146917478615f95c87dc25e02d10396de2b13cdac1064b98b14389d6b200e1',
+                  'choice': 'approved',
+                  'proposalHash': '992ceee70bf27af3dab5c05d95a511f4f4c44e166174d9b57ce0ce8f31c19952',
+                },
+            },
+            {
+              'id': 'delivery-module-lifecycle:5',
+              'stepId': 'verify.confirm',
+              'sequence': 5,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'activation':
+                    {
+                      'report':
+                        {
+                          'attempt': 1,
+                          'candidateId': 'delivery-module-lifecycle:3',
+                          'iteration': 1,
+                          'reportRef': 'docs/comet/changes/delivery-module-lifecycle/verification.md',
+                          'stateVersion': 6,
+                        },
+                    },
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'delivery-module-lifecycle',
+                      'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 那就开始吧',
+                    },
+                  'outputs':
+                    {
+                      'verify.verifier':
+                        {
+                          'candidateId': 'delivery-module-lifecycle:3',
+                          'checks':
+                            [
+                              {
+                                'name': 'bun run typecheck · repository root',
+                                'note': 'All 13 workspace tasks plus the root TypeScript check passed.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun run lint · repository root',
+                                'note': 'All 13 workspace lint tasks passed, including message keys.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Prettier source check and git diff --check · repository root',
+                                'note': 'Checked the repository with only the active Runtime-owned comet-state.yaml excluded. The plain format:check reports that generated file.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun --env-file=.env.test.example packages/db/src/migrate.ts · repository root',
+                                'note': 'Applied the migration chain to fresh PostgreSQL 17 databases inside the isolated delivery test container.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun test --env-file=../../.env.test.example src/modules/delivery-workflow src/modules/weekly-reports src/modules/issues/__tests__/integration/{issues,subtasks,activity,status-history,move}.test.ts src/modules/columns · apps/api',
+                                'note': '311 tests passed on the isolated fixture database, including direct enrollment, exact weight sums, rollback, authorization, conflicting handoff and reopen, and unchanged weekly snapshots.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun test --preload ./test/setup.ts src/features/work-items src/features/issue · apps/web',
+                                'note': '56 tests passed, including workflow completion dates and suppression of late badges for unknown legacy dates.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun --cwd apps/worker test --env-file=../../.env.test.example src/__tests__/integration/import-create.test.ts · repository root',
+                                'note': '7 import regression tests passed on their own fixture database.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Chrome extension task tab · isolated local preview',
+                                'note': 'Reviewed bound types and fields, 100 percent delivery, invalid weights and the late date badge. Confirmed and reversed a handoff in the UI and checked the actor, times and reversal reason.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'response':
+                            {
+                              'kind': 'final-result',
+                              'result':
+                                {
+                                  'acceptance':
+                                    [
+                                      {
+                                        'id': 'A1',
+                                        'reason': 'A PostgreSQL integration test rejected duplicate bindings and invalid parent placement, and attached an existing item with a combined parent/type patch while retaining its numeric field. Chrome showed all four roles and field bindings. Regression fixtures exercised projects without this setting.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A2',
+                                        'reason': 'The database fixture produced 30% for a blank execution rate, 58% for a 30/70 weighted node and 54.4% after a second manually managed node. An 80% allocation propagated unavailable progress. Chrome displayed 100% on the complete module and the allocation warning on the incomplete module.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A3',
+                                        'reason': "The cancellation fixture preserved the canceled item, kept both parents open pending reallocation and completed them at valid weight. Reopening the task then reopened the node and module and recalculated the module to the task's entered 50%. The baseline subtask and status-history suite passed.",
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A4',
+                                        'reason': 'The API refused premature handoff, returned the same handoff id to concurrent confirmations, allowed a maintenance child, and refused attempts to reopen, change a weight, change an occupied status category or cascade-delete the active delivery. Chrome showed the phase change and audit event.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A5',
+                                        'reason': 'The API rejected a blank reason and returned the module to delivery for an authorized reversal. The maintenance issue retained its parent, and Chrome showed the original confirmation and the reversal with the supplied reason and actor and time.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A6',
+                                        'reason': 'The legacy fixture marked the existing completion period as unknown while the original completion state and due date remained. Reopening and completing again produced a new visible completion timestamp. The Kanban test checked the known-date badge and its absence for unknown dates.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A7',
+                                        'reason': 'Owner and restricted-member tests verified the two permission checks. The simultaneous handoff and reopen fixture passed with a single permitted outcome and consistent phase and progress. The fresh migration, weekly-report tests, worker import regressions, source checks and local Chrome preview passed.',
+                                        'result': 'passed',
+                                      },
+                                    ],
+                                  'attempt': 1,
+                                  'iteration': 1,
+                                  'requestReview':
+                                    {
+                                      'reason': 'The implementation follows the approved hierarchy, weighted progress, status propagation, handoff, reversal, legacy date handling and local-only scope in the complete Shape the user expressly confirmed. The existing weekly report contract was verified against regression tests.',
+                                      'result': 'aligned',
+                                    },
+                                  'risks':
+                                    [
+                                      'Trial project data enrollment and deployment are separate from this locally verified change.',
+                                      'The plain repository format check reports the active Runtime-owned state file. The source format check passed with that file excluded.',
+                                    ],
+                                  'summary': 'All seven acceptance items passed on the candidate. The work item, report and import regressions passed and the delivery controls were exercised in the Chrome fixture.',
+                                  'verdict': 'pass',
+                                },
+                            },
+                          'verifierExecutionRef': '01a1f7b4-2343-7a83-a911-f00de72f4681',
+                        },
+                    },
+                },
+              'proposalHash': 'bf5a7eda1f981581d40d5ec400cc18d6c2bd5e1ce20ea58eb7c3a32f213186bf',
+              'choices': ['approved', 'rejected', 'reverify'],
+              'results': {},
+              'decision':
+                {
+                  'id': 'b7a1d4587313eab59defe1016233d63a93b5d157b72ceee1b633521714b2e52c',
+                  'choice': 'approved',
+                  'proposalHash': 'bf5a7eda1f981581d40d5ec400cc18d6c2bd5e1ce20ea58eb7c3a32f213186bf',
+                  'reason': 'User accepted the verified result and authorized commit, push, pull request, merge after checks, and local deployment.',
+                },
+            },
+          ],
+        'ready': [],
+        'joins': {},
+        'outputs': {},
+        'children': [],
+        'lineage': [],
+      },
+    'sourceRevision': 15,
+    'sourceHash': 'b4852b4fed86802b8558066547d455999de71889cbfec9bfa8627f3ae0c3c919',
+    'pool':
+      {
+        'version': 3,
+        'values':
+          [
+            {
+              'choice': 'approved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'delivery-module-lifecycle',
+                      'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 那就开始吧',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'specs/delivery-module-lifecycle/spec.md',
+                                'text': 'A project can explicitly bind four distinct work item roles and reusable numeric fields. The module contains delivery nodes and maintenance items directly, and delivery nodes contain execution tasks. Existing records can be attached explicitly with their data preserved. Projects without configuration keep standard behavior.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'specs/delivery-module-lifecycle/spec.md',
+                                'text': 'The work item workflow shows effective progress from both weighted levels. Open execution tasks use the entered value or zero, completed work contributes 100 percent, and delivery nodes with no contributing tasks allow manual progress. Weight groups require values summing to exactly 100 percent, and invalid groups visibly propagate unavailable progress.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'specs/delivery-module-lifecycle/spec.md',
+                                'text': 'Canceled records remain accessible and exit the calculation and completion gates. A parent with contributing children completes only when each child is completed and weights are valid, including after weight redistribution. Before handoff, reopening a completed execution task moves its completed node and module into In progress and recalculates their progress.',
+                              },
+                              {
+                                'id': 'A4',
+                                'source': 'specs/delivery-module-lifecycle/spec.md',
+                                'text': 'A permitted user can transfer the whole module to maintenance only after delivery completion. The activity records who confirmed and when, repeated confirmations create one handoff, and active handoff protects the delivery result. Maintenance items remain under the module and are excluded from delivery metrics.',
+                              },
+                              {
+                                'id': 'A5',
+                                'source': 'specs/delivery-module-lifecycle/spec.md',
+                                'text': 'An authorized reversal with a reason records the actor, time and reason, restores the delivery phase and preserves prior handoffs and existing maintenance items.',
+                              },
+                              {
+                                'id': 'A6',
+                                'source': 'specs/delivery-module-lifecycle/spec.md',
+                                'text': 'Planned due dates stay separate from the system completion period. Identified legacy imports remain completed with an unknown effective completion date, count in completion totals and stay out of date comparisons. A genuine completion after reopening uses the new timestamp.',
+                              },
+                              {
+                                'id': 'A7',
+                                'source': 'brief.md',
+                                'text': 'Work item and workflow permissions are enforced server-side for setup, writes, handoff and reversal. Concurrent edits and phase changes keep eligibility, progress and recorded actions consistent. Verification uses test data and preserves the current weekly report contract and saved reports.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges':
+                            [
+                              {
+                                'capability': 'delivery-module-lifecycle',
+                                'operation': 'create',
+                                'source': 'specs/delivery-module-lifecycle/spec.md',
+                              },
+                            ],
+                        },
+                    },
+                },
+            },
+            {
+              'acceptance':
+                [
+                  {
+                    'id': 'A1',
+                    'source': 'specs/delivery-module-lifecycle/spec.md',
+                    'text': 'A project can explicitly bind four distinct work item roles and reusable numeric fields. The module contains delivery nodes and maintenance items directly, and delivery nodes contain execution tasks. Existing records can be attached explicitly with their data preserved. Projects without configuration keep standard behavior.',
+                  },
+                  {
+                    'id': 'A2',
+                    'source': 'specs/delivery-module-lifecycle/spec.md',
+                    'text': 'The work item workflow shows effective progress from both weighted levels. Open execution tasks use the entered value or zero, completed work contributes 100 percent, and delivery nodes with no contributing tasks allow manual progress. Weight groups require values summing to exactly 100 percent, and invalid groups visibly propagate unavailable progress.',
+                  },
+                  {
+                    'id': 'A3',
+                    'source': 'specs/delivery-module-lifecycle/spec.md',
+                    'text': 'Canceled records remain accessible and exit the calculation and completion gates. A parent with contributing children completes only when each child is completed and weights are valid, including after weight redistribution. Before handoff, reopening a completed execution task moves its completed node and module into In progress and recalculates their progress.',
+                  },
+                  {
+                    'id': 'A4',
+                    'source': 'specs/delivery-module-lifecycle/spec.md',
+                    'text': 'A permitted user can transfer the whole module to maintenance only after delivery completion. The activity records who confirmed and when, repeated confirmations create one handoff, and active handoff protects the delivery result. Maintenance items remain under the module and are excluded from delivery metrics.',
+                  },
+                  {
+                    'id': 'A5',
+                    'source': 'specs/delivery-module-lifecycle/spec.md',
+                    'text': 'An authorized reversal with a reason records the actor, time and reason, restores the delivery phase and preserves prior handoffs and existing maintenance items.',
+                  },
+                  {
+                    'id': 'A6',
+                    'source': 'specs/delivery-module-lifecycle/spec.md',
+                    'text': 'Planned due dates stay separate from the system completion period. Identified legacy imports remain completed with an unknown effective completion date, count in completion totals and stay out of date comparisons. A genuine completion after reopening uses the new timestamp.',
+                  },
+                  {
+                    'id': 'A7',
+                    'source': 'brief.md',
+                    'text': 'Work item and workflow permissions are enforced server-side for setup, writes, handoff and reversal. Concurrent edits and phase changes keep eligibility, progress and recorded actions consistent. Verification uses test data and preserves the current weekly report contract and saved reports.',
+                  },
+                ],
+              'children': null,
+              'specChanges':
+                [
+                  {
+                    'capability': 'delivery-module-lifecycle',
+                    'operation': 'create',
+                    'source': 'specs/delivery-module-lifecycle/spec.md',
+                  },
+                ],
+            },
+            {
+              'addressedAcceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7'],
+              'checks':
+                [
+                  {
+                    'name': 'bun run typecheck · repository root',
+                    'note': 'All 13 workspace tasks plus the root TypeScript check passed.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun run lint · repository root',
+                    'note': 'All 13 workspace lint tasks passed, including message keys.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Prettier source check and git diff --check · repository root',
+                    'note': 'Checked the repository with only the active Runtime-owned comet-state.yaml excluded. The plain format:check reports that generated file.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun --env-file=.env.test.example packages/db/src/migrate.ts · repository root',
+                    'note': 'Applied the migration chain to fresh PostgreSQL 17 databases inside the isolated delivery test container.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun test --env-file=../../.env.test.example src/modules/delivery-workflow src/modules/weekly-reports src/modules/issues/__tests__/integration/{issues,subtasks,activity,status-history,move}.test.ts src/modules/columns · apps/api',
+                    'note': '311 tests passed on the isolated fixture database, including direct enrollment, exact weight sums, rollback, authorization, conflicting handoff and reopen, and unchanged weekly snapshots.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun test --preload ./test/setup.ts src/features/work-items src/features/issue · apps/web',
+                    'note': '56 tests passed, including workflow completion dates and suppression of late badges for unknown legacy dates.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun --cwd apps/worker test --env-file=../../.env.test.example src/__tests__/integration/import-create.test.ts · repository root',
+                    'note': '7 import regression tests passed on their own fixture database.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Chrome extension task tab · isolated local preview',
+                    'note': 'Reviewed bound types and fields, 100 percent delivery, invalid weights and the late date badge. Confirmed and reversed a handoff in the UI and checked the actor, times and reversal reason.',
+                    'result': 'passed',
+                  },
+                ],
+              'knownLimits':
+                [
+                  'Validation used isolated fixture databases and a Chrome preview. Live project enrollment and deployment are outside the confirmed scope.',
+                  'The repository-wide source format check excludes the active Runtime-owned Comet state file.',
+                ],
+              'requireIndependentReview': false,
+              'summary': 'Implemented the opt-in delivery workflow on native work items. The project bindings, effective progress, guarded hierarchy, transactional status rollup, maintenance phase and reversal audit are available in the normal work item workflow. Legacy completion markers preserve the original timeline.',
+            },
+            {
+              'choice': 'approved',
+              'proposal':
+                {
+                  'activation':
+                    {
+                      'report':
+                        {
+                          'attempt': 1,
+                          'candidateId': 'delivery-module-lifecycle:3',
+                          'iteration': 1,
+                          'reportRef': 'docs/comet/changes/delivery-module-lifecycle/verification.md',
+                          'stateVersion': 6,
+                        },
+                    },
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'delivery-module-lifecycle',
+                      'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 那就开始吧',
+                    },
+                  'outputs':
+                    {
+                      'verify.verifier':
+                        {
+                          'candidateId': 'delivery-module-lifecycle:3',
+                          'checks':
+                            [
+                              {
+                                'name': 'bun run typecheck · repository root',
+                                'note': 'All 13 workspace tasks plus the root TypeScript check passed.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun run lint · repository root',
+                                'note': 'All 13 workspace lint tasks passed, including message keys.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Prettier source check and git diff --check · repository root',
+                                'note': 'Checked the repository with only the active Runtime-owned comet-state.yaml excluded. The plain format:check reports that generated file.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun --env-file=.env.test.example packages/db/src/migrate.ts · repository root',
+                                'note': 'Applied the migration chain to fresh PostgreSQL 17 databases inside the isolated delivery test container.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun test --env-file=../../.env.test.example src/modules/delivery-workflow src/modules/weekly-reports src/modules/issues/__tests__/integration/{issues,subtasks,activity,status-history,move}.test.ts src/modules/columns · apps/api',
+                                'note': '311 tests passed on the isolated fixture database, including direct enrollment, exact weight sums, rollback, authorization, conflicting handoff and reopen, and unchanged weekly snapshots.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun test --preload ./test/setup.ts src/features/work-items src/features/issue · apps/web',
+                                'note': '56 tests passed, including workflow completion dates and suppression of late badges for unknown legacy dates.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun --cwd apps/worker test --env-file=../../.env.test.example src/__tests__/integration/import-create.test.ts · repository root',
+                                'note': '7 import regression tests passed on their own fixture database.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Chrome extension task tab · isolated local preview',
+                                'note': 'Reviewed bound types and fields, 100 percent delivery, invalid weights and the late date badge. Confirmed and reversed a handoff in the UI and checked the actor, times and reversal reason.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'response':
+                            {
+                              'kind': 'final-result',
+                              'result':
+                                {
+                                  'acceptance':
+                                    [
+                                      {
+                                        'id': 'A1',
+                                        'reason': 'A PostgreSQL integration test rejected duplicate bindings and invalid parent placement, and attached an existing item with a combined parent/type patch while retaining its numeric field. Chrome showed all four roles and field bindings. Regression fixtures exercised projects without this setting.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A2',
+                                        'reason': 'The database fixture produced 30% for a blank execution rate, 58% for a 30/70 weighted node and 54.4% after a second manually managed node. An 80% allocation propagated unavailable progress. Chrome displayed 100% on the complete module and the allocation warning on the incomplete module.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A3',
+                                        'reason': "The cancellation fixture preserved the canceled item, kept both parents open pending reallocation and completed them at valid weight. Reopening the task then reopened the node and module and recalculated the module to the task's entered 50%. The baseline subtask and status-history suite passed.",
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A4',
+                                        'reason': 'The API refused premature handoff, returned the same handoff id to concurrent confirmations, allowed a maintenance child, and refused attempts to reopen, change a weight, change an occupied status category or cascade-delete the active delivery. Chrome showed the phase change and audit event.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A5',
+                                        'reason': 'The API rejected a blank reason and returned the module to delivery for an authorized reversal. The maintenance issue retained its parent, and Chrome showed the original confirmation and the reversal with the supplied reason and actor and time.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A6',
+                                        'reason': 'The legacy fixture marked the existing completion period as unknown while the original completion state and due date remained. Reopening and completing again produced a new visible completion timestamp. The Kanban test checked the known-date badge and its absence for unknown dates.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A7',
+                                        'reason': 'Owner and restricted-member tests verified the two permission checks. The simultaneous handoff and reopen fixture passed with a single permitted outcome and consistent phase and progress. The fresh migration, weekly-report tests, worker import regressions, source checks and local Chrome preview passed.',
+                                        'result': 'passed',
+                                      },
+                                    ],
+                                  'attempt': 1,
+                                  'iteration': 1,
+                                  'requestReview':
+                                    {
+                                      'reason': 'The implementation follows the approved hierarchy, weighted progress, status propagation, handoff, reversal, legacy date handling and local-only scope in the complete Shape the user expressly confirmed. The existing weekly report contract was verified against regression tests.',
+                                      'result': 'aligned',
+                                    },
+                                  'risks':
+                                    [
+                                      'Trial project data enrollment and deployment are separate from this locally verified change.',
+                                      'The plain repository format check reports the active Runtime-owned state file. The source format check passed with that file excluded.',
+                                    ],
+                                  'summary': 'All seven acceptance items passed on the candidate. The work item, report and import regressions passed and the delivery controls were exercised in the Chrome fixture.',
+                                  'verdict': 'pass',
+                                },
+                            },
+                          'verifierExecutionRef': '01a1f7b4-2343-7a83-a911-f00de72f4681',
+                        },
+                    },
+                },
+            },
+            {
+              'candidateId': 'delivery-module-lifecycle:3',
+              'checks':
+                [
+                  {
+                    'name': 'bun run typecheck · repository root',
+                    'note': 'All 13 workspace tasks plus the root TypeScript check passed.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun run lint · repository root',
+                    'note': 'All 13 workspace lint tasks passed, including message keys.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Prettier source check and git diff --check · repository root',
+                    'note': 'Checked the repository with only the active Runtime-owned comet-state.yaml excluded. The plain format:check reports that generated file.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun --env-file=.env.test.example packages/db/src/migrate.ts · repository root',
+                    'note': 'Applied the migration chain to fresh PostgreSQL 17 databases inside the isolated delivery test container.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun test --env-file=../../.env.test.example src/modules/delivery-workflow src/modules/weekly-reports src/modules/issues/__tests__/integration/{issues,subtasks,activity,status-history,move}.test.ts src/modules/columns · apps/api',
+                    'note': '311 tests passed on the isolated fixture database, including direct enrollment, exact weight sums, rollback, authorization, conflicting handoff and reopen, and unchanged weekly snapshots.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun test --preload ./test/setup.ts src/features/work-items src/features/issue · apps/web',
+                    'note': '56 tests passed, including workflow completion dates and suppression of late badges for unknown legacy dates.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun --cwd apps/worker test --env-file=../../.env.test.example src/__tests__/integration/import-create.test.ts · repository root',
+                    'note': '7 import regression tests passed on their own fixture database.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Chrome extension task tab · isolated local preview',
+                    'note': 'Reviewed bound types and fields, 100 percent delivery, invalid weights and the late date badge. Confirmed and reversed a handoff in the UI and checked the actor, times and reversal reason.',
+                    'result': 'passed',
+                  },
+                ],
+              'response':
+                {
+                  'kind': 'final-result',
+                  'result':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'reason': 'A PostgreSQL integration test rejected duplicate bindings and invalid parent placement, and attached an existing item with a combined parent/type patch while retaining its numeric field. Chrome showed all four roles and field bindings. Regression fixtures exercised projects without this setting.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A2',
+                            'reason': 'The database fixture produced 30% for a blank execution rate, 58% for a 30/70 weighted node and 54.4% after a second manually managed node. An 80% allocation propagated unavailable progress. Chrome displayed 100% on the complete module and the allocation warning on the incomplete module.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A3',
+                            'reason': "The cancellation fixture preserved the canceled item, kept both parents open pending reallocation and completed them at valid weight. Reopening the task then reopened the node and module and recalculated the module to the task's entered 50%. The baseline subtask and status-history suite passed.",
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A4',
+                            'reason': 'The API refused premature handoff, returned the same handoff id to concurrent confirmations, allowed a maintenance child, and refused attempts to reopen, change a weight, change an occupied status category or cascade-delete the active delivery. Chrome showed the phase change and audit event.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A5',
+                            'reason': 'The API rejected a blank reason and returned the module to delivery for an authorized reversal. The maintenance issue retained its parent, and Chrome showed the original confirmation and the reversal with the supplied reason and actor and time.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A6',
+                            'reason': 'The legacy fixture marked the existing completion period as unknown while the original completion state and due date remained. Reopening and completing again produced a new visible completion timestamp. The Kanban test checked the known-date badge and its absence for unknown dates.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A7',
+                            'reason': 'Owner and restricted-member tests verified the two permission checks. The simultaneous handoff and reopen fixture passed with a single permitted outcome and consistent phase and progress. The fresh migration, weekly-report tests, worker import regressions, source checks and local Chrome preview passed.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'attempt': 1,
+                      'iteration': 1,
+                      'requestReview':
+                        {
+                          'reason': 'The implementation follows the approved hierarchy, weighted progress, status propagation, handoff, reversal, legacy date handling and local-only scope in the complete Shape the user expressly confirmed. The existing weekly report contract was verified against regression tests.',
+                          'result': 'aligned',
+                        },
+                      'risks':
+                        [
+                          'Trial project data enrollment and deployment are separate from this locally verified change.',
+                          'The plain repository format check reports the active Runtime-owned state file. The source format check passed with that file excluded.',
+                        ],
+                      'summary': 'All seven acceptance items passed on the candidate. The work item, report and import regressions passed and the delivery controls were exercised in the Chrome fixture.',
+                      'verdict': 'pass',
+                    },
+                },
+              'verifierExecutionRef': '01a1f7b4-2343-7a83-a911-f00de72f4681',
+            },
+            {
+              'archiveDirRef': 'docs/comet/archive/2026-11-20-delivery-module-lifecycle',
+              'blockers': [],
+              'candidateId': 'delivery-module-lifecycle:3',
+              'capabilityPeers': [],
+              'ready': true,
+              'reportRef': 'docs/comet/changes/delivery-module-lifecycle/verification.md',
+              'reportStateVersion': 6,
+              'requiresReverification': false,
+              'specPreview':
+                [
+                  {
+                    'capability': 'delivery-module-lifecycle',
+                    'operation': 'create',
+                    'source': 'specs/delivery-module-lifecycle/spec.md',
+                  },
+                ],
+              'stateVersion': 7,
+            },
+            {
+              'archiveRef': '2026-11-20-delivery-module-lifecycle',
+              'specCount': 1,
+              'stateVersion': 7,
+              'transactionId': 'f6fc07c2-3cb3-476d-88e7-b43af6125795',
+            },
+            {
+              'sequence': 2,
+              'value':
+                {
+                  'choice': 'approved',
+                  'proposal':
+                    {
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'delivery-module-lifecycle',
+                          'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 那就开始吧',
+                        },
+                      'outputs':
+                        {
+                          'shape.prepare':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'source': 'specs/delivery-module-lifecycle/spec.md',
+                                    'text': 'A project can explicitly bind four distinct work item roles and reusable numeric fields. The module contains delivery nodes and maintenance items directly, and delivery nodes contain execution tasks. Existing records can be attached explicitly with their data preserved. Projects without configuration keep standard behavior.',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'source': 'specs/delivery-module-lifecycle/spec.md',
+                                    'text': 'The work item workflow shows effective progress from both weighted levels. Open execution tasks use the entered value or zero, completed work contributes 100 percent, and delivery nodes with no contributing tasks allow manual progress. Weight groups require values summing to exactly 100 percent, and invalid groups visibly propagate unavailable progress.',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'source': 'specs/delivery-module-lifecycle/spec.md',
+                                    'text': 'Canceled records remain accessible and exit the calculation and completion gates. A parent with contributing children completes only when each child is completed and weights are valid, including after weight redistribution. Before handoff, reopening a completed execution task moves its completed node and module into In progress and recalculates their progress.',
+                                  },
+                                  {
+                                    'id': 'A4',
+                                    'source': 'specs/delivery-module-lifecycle/spec.md',
+                                    'text': 'A permitted user can transfer the whole module to maintenance only after delivery completion. The activity records who confirmed and when, repeated confirmations create one handoff, and active handoff protects the delivery result. Maintenance items remain under the module and are excluded from delivery metrics.',
+                                  },
+                                  {
+                                    'id': 'A5',
+                                    'source': 'specs/delivery-module-lifecycle/spec.md',
+                                    'text': 'An authorized reversal with a reason records the actor, time and reason, restores the delivery phase and preserves prior handoffs and existing maintenance items.',
+                                  },
+                                  {
+                                    'id': 'A6',
+                                    'source': 'specs/delivery-module-lifecycle/spec.md',
+                                    'text': 'Planned due dates stay separate from the system completion period. Identified legacy imports remain completed with an unknown effective completion date, count in completion totals and stay out of date comparisons. A genuine completion after reopening uses the new timestamp.',
+                                  },
+                                  {
+                                    'id': 'A7',
+                                    'source': 'brief.md',
+                                    'text': 'Work item and workflow permissions are enforced server-side for setup, writes, handoff and reversal. Concurrent edits and phase changes keep eligibility, progress and recorded actions consistent. Verification uses test data and preserves the current weekly report contract and saved reports.',
+                                  },
+                                ],
+                              'children': null,
+                              'specChanges':
+                                [
+                                  {
+                                    'capability': 'delivery-module-lifecycle',
+                                    'operation': 'create',
+                                    'source': 'specs/delivery-module-lifecycle/spec.md',
+                                  },
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 1,
+              'value':
+                {
+                  'acceptance':
+                    [
+                      {
+                        'id': 'A1',
+                        'source': 'specs/delivery-module-lifecycle/spec.md',
+                        'text': 'A project can explicitly bind four distinct work item roles and reusable numeric fields. The module contains delivery nodes and maintenance items directly, and delivery nodes contain execution tasks. Existing records can be attached explicitly with their data preserved. Projects without configuration keep standard behavior.',
+                      },
+                      {
+                        'id': 'A2',
+                        'source': 'specs/delivery-module-lifecycle/spec.md',
+                        'text': 'The work item workflow shows effective progress from both weighted levels. Open execution tasks use the entered value or zero, completed work contributes 100 percent, and delivery nodes with no contributing tasks allow manual progress. Weight groups require values summing to exactly 100 percent, and invalid groups visibly propagate unavailable progress.',
+                      },
+                      {
+                        'id': 'A3',
+                        'source': 'specs/delivery-module-lifecycle/spec.md',
+                        'text': 'Canceled records remain accessible and exit the calculation and completion gates. A parent with contributing children completes only when each child is completed and weights are valid, including after weight redistribution. Before handoff, reopening a completed execution task moves its completed node and module into In progress and recalculates their progress.',
+                      },
+                      {
+                        'id': 'A4',
+                        'source': 'specs/delivery-module-lifecycle/spec.md',
+                        'text': 'A permitted user can transfer the whole module to maintenance only after delivery completion. The activity records who confirmed and when, repeated confirmations create one handoff, and active handoff protects the delivery result. Maintenance items remain under the module and are excluded from delivery metrics.',
+                      },
+                      {
+                        'id': 'A5',
+                        'source': 'specs/delivery-module-lifecycle/spec.md',
+                        'text': 'An authorized reversal with a reason records the actor, time and reason, restores the delivery phase and preserves prior handoffs and existing maintenance items.',
+                      },
+                      {
+                        'id': 'A6',
+                        'source': 'specs/delivery-module-lifecycle/spec.md',
+                        'text': 'Planned due dates stay separate from the system completion period. Identified legacy imports remain completed with an unknown effective completion date, count in completion totals and stay out of date comparisons. A genuine completion after reopening uses the new timestamp.',
+                      },
+                      {
+                        'id': 'A7',
+                        'source': 'brief.md',
+                        'text': 'Work item and workflow permissions are enforced server-side for setup, writes, handoff and reversal. Concurrent edits and phase changes keep eligibility, progress and recorded actions consistent. Verification uses test data and preserves the current weekly report contract and saved reports.',
+                      },
+                    ],
+                  'children': null,
+                  'specChanges':
+                    [
+                      {
+                        'capability': 'delivery-module-lifecycle',
+                        'operation': 'create',
+                        'source': 'specs/delivery-module-lifecycle/spec.md',
+                      },
+                    ],
+                },
+            },
+            {
+              'sequence': 3,
+              'value':
+                {
+                  'addressedAcceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7'],
+                  'checks':
+                    [
+                      {
+                        'name': 'bun run typecheck · repository root',
+                        'note': 'All 13 workspace tasks plus the root TypeScript check passed.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun run lint · repository root',
+                        'note': 'All 13 workspace lint tasks passed, including message keys.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Prettier source check and git diff --check · repository root',
+                        'note': 'Checked the repository with only the active Runtime-owned comet-state.yaml excluded. The plain format:check reports that generated file.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun --env-file=.env.test.example packages/db/src/migrate.ts · repository root',
+                        'note': 'Applied the migration chain to fresh PostgreSQL 17 databases inside the isolated delivery test container.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun test --env-file=../../.env.test.example src/modules/delivery-workflow src/modules/weekly-reports src/modules/issues/__tests__/integration/{issues,subtasks,activity,status-history,move}.test.ts src/modules/columns · apps/api',
+                        'note': '311 tests passed on the isolated fixture database, including direct enrollment, exact weight sums, rollback, authorization, conflicting handoff and reopen, and unchanged weekly snapshots.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun test --preload ./test/setup.ts src/features/work-items src/features/issue · apps/web',
+                        'note': '56 tests passed, including workflow completion dates and suppression of late badges for unknown legacy dates.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun --cwd apps/worker test --env-file=../../.env.test.example src/__tests__/integration/import-create.test.ts · repository root',
+                        'note': '7 import regression tests passed on their own fixture database.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Chrome extension task tab · isolated local preview',
+                        'note': 'Reviewed bound types and fields, 100 percent delivery, invalid weights and the late date badge. Confirmed and reversed a handoff in the UI and checked the actor, times and reversal reason.',
+                        'result': 'passed',
+                      },
+                    ],
+                  'knownLimits':
+                    [
+                      'Validation used isolated fixture databases and a Chrome preview. Live project enrollment and deployment are outside the confirmed scope.',
+                      'The repository-wide source format check excludes the active Runtime-owned Comet state file.',
+                    ],
+                  'requireIndependentReview': false,
+                  'summary': 'Implemented the opt-in delivery workflow on native work items. The project bindings, effective progress, guarded hierarchy, transactional status rollup, maintenance phase and reversal audit are available in the normal work item workflow. Legacy completion markers preserve the original timeline.',
+                },
+            },
+            {
+              'sequence': 5,
+              'value':
+                {
+                  'choice': 'approved',
+                  'proposal':
+                    {
+                      'activation':
+                        {
+                          'report':
+                            {
+                              'attempt': 1,
+                              'candidateId': 'delivery-module-lifecycle:3',
+                              'iteration': 1,
+                              'reportRef': 'docs/comet/changes/delivery-module-lifecycle/verification.md',
+                              'stateVersion': 6,
+                            },
+                        },
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'delivery-module-lifecycle',
+                          'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 那就开始吧',
+                        },
+                      'outputs':
+                        {
+                          'verify.verifier':
+                            {
+                              'candidateId': 'delivery-module-lifecycle:3',
+                              'checks':
+                                [
+                                  {
+                                    'name': 'bun run typecheck · repository root',
+                                    'note': 'All 13 workspace tasks plus the root TypeScript check passed.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'bun run lint · repository root',
+                                    'note': 'All 13 workspace lint tasks passed, including message keys.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Prettier source check and git diff --check · repository root',
+                                    'note': 'Checked the repository with only the active Runtime-owned comet-state.yaml excluded. The plain format:check reports that generated file.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'bun --env-file=.env.test.example packages/db/src/migrate.ts · repository root',
+                                    'note': 'Applied the migration chain to fresh PostgreSQL 17 databases inside the isolated delivery test container.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'bun test --env-file=../../.env.test.example src/modules/delivery-workflow src/modules/weekly-reports src/modules/issues/__tests__/integration/{issues,subtasks,activity,status-history,move}.test.ts src/modules/columns · apps/api',
+                                    'note': '311 tests passed on the isolated fixture database, including direct enrollment, exact weight sums, rollback, authorization, conflicting handoff and reopen, and unchanged weekly snapshots.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'bun test --preload ./test/setup.ts src/features/work-items src/features/issue · apps/web',
+                                    'note': '56 tests passed, including workflow completion dates and suppression of late badges for unknown legacy dates.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'bun --cwd apps/worker test --env-file=../../.env.test.example src/__tests__/integration/import-create.test.ts · repository root',
+                                    'note': '7 import regression tests passed on their own fixture database.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Chrome extension task tab · isolated local preview',
+                                    'note': 'Reviewed bound types and fields, 100 percent delivery, invalid weights and the late date badge. Confirmed and reversed a handoff in the UI and checked the actor, times and reversal reason.',
+                                    'result': 'passed',
+                                  },
+                                ],
+                              'response':
+                                {
+                                  'kind': 'final-result',
+                                  'result':
+                                    {
+                                      'acceptance':
+                                        [
+                                          {
+                                            'id': 'A1',
+                                            'reason': 'A PostgreSQL integration test rejected duplicate bindings and invalid parent placement, and attached an existing item with a combined parent/type patch while retaining its numeric field. Chrome showed all four roles and field bindings. Regression fixtures exercised projects without this setting.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A2',
+                                            'reason': 'The database fixture produced 30% for a blank execution rate, 58% for a 30/70 weighted node and 54.4% after a second manually managed node. An 80% allocation propagated unavailable progress. Chrome displayed 100% on the complete module and the allocation warning on the incomplete module.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A3',
+                                            'reason': "The cancellation fixture preserved the canceled item, kept both parents open pending reallocation and completed them at valid weight. Reopening the task then reopened the node and module and recalculated the module to the task's entered 50%. The baseline subtask and status-history suite passed.",
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A4',
+                                            'reason': 'The API refused premature handoff, returned the same handoff id to concurrent confirmations, allowed a maintenance child, and refused attempts to reopen, change a weight, change an occupied status category or cascade-delete the active delivery. Chrome showed the phase change and audit event.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A5',
+                                            'reason': 'The API rejected a blank reason and returned the module to delivery for an authorized reversal. The maintenance issue retained its parent, and Chrome showed the original confirmation and the reversal with the supplied reason and actor and time.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A6',
+                                            'reason': 'The legacy fixture marked the existing completion period as unknown while the original completion state and due date remained. Reopening and completing again produced a new visible completion timestamp. The Kanban test checked the known-date badge and its absence for unknown dates.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A7',
+                                            'reason': 'Owner and restricted-member tests verified the two permission checks. The simultaneous handoff and reopen fixture passed with a single permitted outcome and consistent phase and progress. The fresh migration, weekly-report tests, worker import regressions, source checks and local Chrome preview passed.',
+                                            'result': 'passed',
+                                          },
+                                        ],
+                                      'attempt': 1,
+                                      'iteration': 1,
+                                      'requestReview':
+                                        {
+                                          'reason': 'The implementation follows the approved hierarchy, weighted progress, status propagation, handoff, reversal, legacy date handling and local-only scope in the complete Shape the user expressly confirmed. The existing weekly report contract was verified against regression tests.',
+                                          'result': 'aligned',
+                                        },
+                                      'risks':
+                                        [
+                                          'Trial project data enrollment and deployment are separate from this locally verified change.',
+                                          'The plain repository format check reports the active Runtime-owned state file. The source format check passed with that file excluded.',
+                                        ],
+                                      'summary': 'All seven acceptance items passed on the candidate. The work item, report and import regressions passed and the delivery controls were exercised in the Chrome fixture.',
+                                      'verdict': 'pass',
+                                    },
+                                },
+                              'verifierExecutionRef': '01a1f7b4-2343-7a83-a911-f00de72f4681',
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 4,
+              'value':
+                {
+                  'candidateId': 'delivery-module-lifecycle:3',
+                  'checks':
+                    [
+                      {
+                        'name': 'bun run typecheck · repository root',
+                        'note': 'All 13 workspace tasks plus the root TypeScript check passed.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun run lint · repository root',
+                        'note': 'All 13 workspace lint tasks passed, including message keys.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Prettier source check and git diff --check · repository root',
+                        'note': 'Checked the repository with only the active Runtime-owned comet-state.yaml excluded. The plain format:check reports that generated file.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun --env-file=.env.test.example packages/db/src/migrate.ts · repository root',
+                        'note': 'Applied the migration chain to fresh PostgreSQL 17 databases inside the isolated delivery test container.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun test --env-file=../../.env.test.example src/modules/delivery-workflow src/modules/weekly-reports src/modules/issues/__tests__/integration/{issues,subtasks,activity,status-history,move}.test.ts src/modules/columns · apps/api',
+                        'note': '311 tests passed on the isolated fixture database, including direct enrollment, exact weight sums, rollback, authorization, conflicting handoff and reopen, and unchanged weekly snapshots.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun test --preload ./test/setup.ts src/features/work-items src/features/issue · apps/web',
+                        'note': '56 tests passed, including workflow completion dates and suppression of late badges for unknown legacy dates.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun --cwd apps/worker test --env-file=../../.env.test.example src/__tests__/integration/import-create.test.ts · repository root',
+                        'note': '7 import regression tests passed on their own fixture database.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Chrome extension task tab · isolated local preview',
+                        'note': 'Reviewed bound types and fields, 100 percent delivery, invalid weights and the late date badge. Confirmed and reversed a handoff in the UI and checked the actor, times and reversal reason.',
+                        'result': 'passed',
+                      },
+                    ],
+                  'response':
+                    {
+                      'kind': 'final-result',
+                      'result':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'reason': 'A PostgreSQL integration test rejected duplicate bindings and invalid parent placement, and attached an existing item with a combined parent/type patch while retaining its numeric field. Chrome showed all four roles and field bindings. Regression fixtures exercised projects without this setting.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A2',
+                                'reason': 'The database fixture produced 30% for a blank execution rate, 58% for a 30/70 weighted node and 54.4% after a second manually managed node. An 80% allocation propagated unavailable progress. Chrome displayed 100% on the complete module and the allocation warning on the incomplete module.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A3',
+                                'reason': "The cancellation fixture preserved the canceled item, kept both parents open pending reallocation and completed them at valid weight. Reopening the task then reopened the node and module and recalculated the module to the task's entered 50%. The baseline subtask and status-history suite passed.",
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A4',
+                                'reason': 'The API refused premature handoff, returned the same handoff id to concurrent confirmations, allowed a maintenance child, and refused attempts to reopen, change a weight, change an occupied status category or cascade-delete the active delivery. Chrome showed the phase change and audit event.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A5',
+                                'reason': 'The API rejected a blank reason and returned the module to delivery for an authorized reversal. The maintenance issue retained its parent, and Chrome showed the original confirmation and the reversal with the supplied reason and actor and time.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A6',
+                                'reason': 'The legacy fixture marked the existing completion period as unknown while the original completion state and due date remained. Reopening and completing again produced a new visible completion timestamp. The Kanban test checked the known-date badge and its absence for unknown dates.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A7',
+                                'reason': 'Owner and restricted-member tests verified the two permission checks. The simultaneous handoff and reopen fixture passed with a single permitted outcome and consistent phase and progress. The fresh migration, weekly-report tests, worker import regressions, source checks and local Chrome preview passed.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'attempt': 1,
+                          'iteration': 1,
+                          'requestReview':
+                            {
+                              'reason': 'The implementation follows the approved hierarchy, weighted progress, status propagation, handoff, reversal, legacy date handling and local-only scope in the complete Shape the user expressly confirmed. The existing weekly report contract was verified against regression tests.',
+                              'result': 'aligned',
+                            },
+                          'risks':
+                            [
+                              'Trial project data enrollment and deployment are separate from this locally verified change.',
+                              'The plain repository format check reports the active Runtime-owned state file. The source format check passed with that file excluded.',
+                            ],
+                          'summary': 'All seven acceptance items passed on the candidate. The work item, report and import regressions passed and the delivery controls were exercised in the Chrome fixture.',
+                          'verdict': 'pass',
+                        },
+                    },
+                  'verifierExecutionRef': '01a1f7b4-2343-7a83-a911-f00de72f4681',
+                },
+            },
+            {
+              'sequence': 6,
+              'value':
+                {
+                  'archiveDirRef': 'docs/comet/archive/2026-11-20-delivery-module-lifecycle',
+                  'blockers': [],
+                  'candidateId': 'delivery-module-lifecycle:3',
+                  'capabilityPeers': [],
+                  'ready': true,
+                  'reportRef': 'docs/comet/changes/delivery-module-lifecycle/verification.md',
+                  'reportStateVersion': 6,
+                  'requiresReverification': false,
+                  'specPreview':
+                    [
+                      {
+                        'capability': 'delivery-module-lifecycle',
+                        'operation': 'create',
+                        'source': 'specs/delivery-module-lifecycle/spec.md',
+                      },
+                    ],
+                  'stateVersion': 7,
+                },
+            },
+            {
+              'sequence': 7,
+              'value':
+                {
+                  'archiveRef': '2026-11-20-delivery-module-lifecycle',
+                  'specCount': 1,
+                  'stateVersion': 7,
+                  'transactionId': 'f6fc07c2-3cb3-476d-88e7-b43af6125795',
+                },
+            },
+            {
+              'sequence': 8,
+              'value':
+                {
+                  'archiveRef': '2026-11-20-delivery-module-lifecycle',
+                  'change': 'delivery-module-lifecycle',
+                  'runId': 'delivery-module-lifecycle',
+                  'specs': [{ 'capability': 'delivery-module-lifecycle', 'operation': 'create' }],
+                  'stateVersion': 8,
+                  'transactionId': 'f6fc07c2-3cb3-476d-88e7-b43af6125795',
+                },
+            },
+          ],
+        'nodes':
+          [
+            { 'key': 'shape.prepare', 'value': 1, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': null, 'right': 0, 'height': 2 },
+            { 'key': 'build.builder', 'value': 2, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 2, 'right': 0, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 1, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 4, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.confirm', 'value': 3, 'left': 4, 'right': 5, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 2, 'right': 6, 'height': 3 },
+            { 'key': 'archive.prepare', 'value': 5, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 2, 'left': 8, 'right': null, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 9, 'right': 6, 'height': 3 },
+            { 'key': 'archive.execute', 'value': 6, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 2, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.prepare', 'value': 5, 'left': 11, 'right': 12, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 13, 'right': 6, 'height': 3 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': null, 'right': 15, 'height': 2 },
+            { 'key': 'build.builder', 'value': 9, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 17, 'right': 15, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 11, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.confirm', 'value': 10, 'left': 19, 'right': 20, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 17, 'right': 21, 'height': 3 },
+            { 'key': 'archive.prepare', 'value': 12, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 9, 'left': 23, 'right': null, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 24, 'right': 21, 'height': 3 },
+            { 'key': 'archive.execute', 'value': 13, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 9, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.prepare', 'value': 12, 'left': 26, 'right': 27, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 28, 'right': 21, 'height': 3 },
+            { 'key': 'archive.finalize', 'value': 14, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.execute', 'value': 13, 'left': null, 'right': 30, 'height': 2 },
+            { 'key': 'archive.prepare', 'value': 12, 'left': 31, 'right': 27, 'height': 3 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 32, 'right': 21, 'height': 4 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 9, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 11, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': 36, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 35, 'right': 37, 'height': 3 },
+          ],
+        'maps': [null, 1, 3, 7, 10, 14, 16, 18, 22, 25, 29, 33, 34, 38],
+        'bindings':
+          [
+            { 'path': ['actions', '0', 'input', 'outputs'], 'map': 0 },
+            { 'path': ['actions', '1', 'input', 'outputs'], 'map': 1 },
+            { 'path': ['actions', '2', 'input', 'outputs'], 'map': 2 },
+            { 'path': ['actions', '3', 'input', 'outputs'], 'map': 3 },
+            { 'path': ['actions', '4', 'input', 'outputs'], 'map': 4 },
+            { 'path': ['actions', '5', 'input', 'outputs'], 'map': 5 },
+            { 'path': ['actionContexts', 'delivery-module-lifecycle:1', 'results'], 'map': 0 },
+            { 'path': ['actionContexts', 'delivery-module-lifecycle:3', 'results'], 'map': 6 },
+            { 'path': ['actionContexts', 'delivery-module-lifecycle:4', 'results'], 'map': 7 },
+            { 'path': ['actionContexts', 'delivery-module-lifecycle:6', 'results'], 'map': 8 },
+            { 'path': ['actionContexts', 'delivery-module-lifecycle:7', 'results'], 'map': 9 },
+            { 'path': ['actionContexts', 'delivery-module-lifecycle:8', 'results'], 'map': 10 },
+            { 'path': ['outputs'], 'map': 11 },
+            { 'path': ['waits', '0', 'results'], 'map': 12 },
+            { 'path': ['waits', '1', 'results'], 'map': 13 },
+          ],
+      },
+    'storageHash': '6e8545d0c42f2611ea1ea1ddc3f8d8786725cea15b735f77c5ffbc935b4cac08',
+  }

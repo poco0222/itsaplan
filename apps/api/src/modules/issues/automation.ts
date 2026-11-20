@@ -1,5 +1,5 @@
 import { db, issue, projectColumn } from '@repo/db';
-import { and, eq, inArray, isNull } from 'drizzle-orm';
+import { and, eq, inArray, isNull, sql } from 'drizzle-orm';
 import { getSubtaskAutomationSettings } from '#modules/projects/service';
 import { listSubtasks } from './subtasks';
 import { updateIssue, type IssueRow } from './service';
@@ -24,6 +24,17 @@ export async function applySubtaskAutomation(
 ): Promise<void> {
   const settings = await getSubtaskAutomationSettings(after.projectId);
   if (!settings.completeParent && !settings.closeSubtasks) return;
+  const [managed] = await db
+    .select({ id: issue.id })
+    .from(issue)
+    .where(
+      and(
+        inArray(issue.id, after.parentId === null ? [after.id] : [after.id, after.parentId]),
+        sql`delivery_role(delivery_settings(${issue.projectId}), ${issue.typeId}) IS NOT NULL`,
+      ),
+    )
+    .limit(1);
+  if (managed) return;
   if (!(await isClosedColumn(after.columnId))) return;
 
   if (settings.closeSubtasks) await closeSubtasks(after, actorUserId);

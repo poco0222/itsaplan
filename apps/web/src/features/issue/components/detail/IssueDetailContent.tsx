@@ -8,6 +8,7 @@ import { usePersistedWidth } from '@/hooks/usePersistedWidth';
 import { useProjectFeatures } from '@/hooks/useProjectFeatures';
 import ResizeGrip from '@/components/common/ResizeGrip';
 import { useIssueDetail } from '../../hooks/useIssueDetail';
+import { useDeliveryDetail } from '@/services/deliveryWorkflow.service';
 import { usePersistedOpen, usePersistedOpenGroups } from '@/hooks/usePersistedOpen';
 import { useFilePaste } from '../../hooks/useFilePaste';
 import IssueAttachmentsPanel from './IssueAttachmentsPanel';
@@ -24,6 +25,7 @@ import IssueStatusTimeline from './IssueStatusTimeline';
 import MarkdownEditor from '@/components/common/editor/MarkdownEditor';
 import IssueCustomFieldBody from '../fields/IssueCustomFieldBody';
 import IssueProperties from './IssueProperties';
+import IssueDeliveryWorkflow from './IssueDeliveryWorkflow';
 import IssueActionsBar from '../actions/IssueActionsBar';
 import {
   PROPERTIES_MAX_W,
@@ -79,6 +81,7 @@ export default function IssueDetailContent({
     setDescEditor,
     activityView,
   } = useIssueDetail(project, issueId, onIssueLoaded);
+  const delivery = useDeliveryDetail(project.project.ref, project.project.id, issueId);
   const permissions = usePermissions(project);
   const canReadAgentRuns =
     permissions.can('ai_agents', 'read') && permissions.can('work_items', 'read');
@@ -153,6 +156,7 @@ export default function IssueDetailContent({
         )}
       </div>
 
+      <IssueDeliveryWorkflow key={issueId} project={project} delivery={delivery} />
       {(canEdit || issue.description.trim() !== '') && (
         <MarkdownEditor
           className="mt-4"
@@ -201,7 +205,9 @@ export default function IssueDetailContent({
         readOnly={!canEdit}
       />
 
-      {features.subtasks && <IssueSubtasksPanel project={project} issue={issue} />}
+      {features.subtasks && (
+        <IssueSubtasksPanel project={project} issue={issue} delivery={delivery.query.data?.item} />
+      )}
 
       {features.checklists && <IssueChecklistsPanel issue={issue} />}
 

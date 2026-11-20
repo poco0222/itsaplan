@@ -1610,6 +1610,7 @@ export const issue = pgTable(
     estimateMinutes: integer('estimate_minutes'),
     startDate: date('start_date'),
     dueDate: date('due_date'),
+    deliveryUnknownCompletionId: integer('delivery_unknown_completion_id'),
     position: doublePrecision('position').notNull().default(0),
     // When set, the issue is archived: hidden from the board and lists but kept and
     // restorable. Set manually (archive action) or by the worker's auto-archive
@@ -1743,6 +1744,27 @@ export const issueStatus = pgTable(
     uniqueIndex('issue_status_open_idx')
       .on(t.issueId)
       .where(sql`${t.leftAt} IS NULL`),
+  ],
+);
+
+export const deliveryHandoff = pgTable(
+  'delivery_handoff',
+  {
+    id: serial('id').primaryKey(),
+    moduleId: integer('module_id')
+      .notNull()
+      .references(() => issue.id, { onDelete: 'cascade' }),
+    confirmedBy: text('confirmed_by').references(() => user.id, { onDelete: 'set null' }),
+    confirmedAt: timestamp('confirmed_at', { withTimezone: true }).notNull().defaultNow(),
+    reversedBy: text('reversed_by').references(() => user.id, { onDelete: 'set null' }),
+    reversedAt: timestamp('reversed_at', { withTimezone: true }),
+    reversalReason: text('reversal_reason'),
+  },
+  (t) => [
+    index('delivery_handoff_module_idx').on(t.moduleId, t.id),
+    uniqueIndex('delivery_handoff_active_idx')
+      .on(t.moduleId)
+      .where(sql`${t.reversedAt} IS NULL`),
   ],
 );
 

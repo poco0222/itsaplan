@@ -4,6 +4,7 @@ import { alias } from 'drizzle-orm/pg-core';
 import { HttpError } from '#shared/lib';
 import { archiveIssue, assertTreeLink, deleteIssue, restoreIssue, updateIssue } from './service';
 import type { AttachmentRow } from '#modules/attachments/service';
+import { assertDeliveryDeletionAllowed } from '#modules/delivery-workflow/service';
 
 // An issue's subtasks: issues carrying its id in parent_id. A subtask can have
 // subtasks of its own, down to MAX_SUBTASK_DEPTH levels (see assertParent in
@@ -163,6 +164,7 @@ export async function disposeSubtasksOf(
   disposition: SubtaskDisposition | undefined,
   actorUserId?: string | null,
 ): Promise<AttachmentRow[]> {
+  if (action === 'delete') await assertDeliveryDeletionAllowed(projectId, issueIds);
   const parents = await issuesWithSubtasks(projectId, issueIds);
   if (parents.length === 0) return [];
   if (!disposition)

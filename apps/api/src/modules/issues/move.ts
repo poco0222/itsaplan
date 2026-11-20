@@ -12,6 +12,7 @@ import {
   issueType,
   issueWatcher,
   label,
+  lockIssueTree,
   project as projectTable,
   projectColumn,
   projectDocumentIssue,
@@ -121,6 +122,8 @@ export async function moveIssue(
   const fields = await mapFields(movedIds, target.id);
 
   const canceledRuns = await db.transaction(async (tx) => {
+    await lockIssueTree(tx, Math.min(root.projectId, target.id));
+    await lockIssueTree(tx, Math.max(root.projectId, target.id));
     // Everything above was read without a lock. A concurrent move of the same issue, or
     // a subtask added since, would otherwise write over that state.
     const [locked] = await tx
