@@ -1,0 +1,2407 @@
+# comet-execution: managed-run
+schema: comet.native.v4
+name: table-nested-subtasks
+language: en
+phase: archive
+status: done
+state_version: 12
+brief: brief.md
+document_constraints_version: 3
+spec_changes: []
+workspace:
+  isolation: current
+  change_branch: main
+  target_branch: main
+  finish: null
+loop:
+  stage: done
+  goal_cycle: 1
+  iteration: 1
+  attempt: 1
+  retry_epoch: 0
+  failed_iteration_count: 0
+  no_progress_count: 0
+  execution_failure_count: 0
+  previous_unresolved_ids: []
+  next_action: null
+acceptance:
+  - id: A1
+    source: brief.md
+    text: With nested subtasks enabled and Default collapsed off, the table shows
+      all three levels without any clicks. In nested-only display, third-level
+      rows appear once, below and further indented under their own parent, with
+      the same configured cells as second-level rows.
+    result: passed
+    reason:
+      text: TableRowSubtasks.test.tsx:18 verifies the default expanded order with the
+        third-level issue once beneath its parent, deeper logical padding, and
+        the same six configured builtin and custom column values.
+        TableSubtaskRow.tsx:38 uses the existing subgrid layout.
+      truncated: false
+  - id: A2
+    source: brief.md
+    text: With Default collapsed on, the table initially shows top-level rows in
+      nested-only display. Expanding a top-level row reveals its second-level
+      rows with their branches folded. For branches with a subtask progress
+      count, that control on a second-level row expands or collapses its own
+      third-level rows by pointer or keyboard. Collapsing the top-level row
+      hides both levels. Changing Default collapsed reapplies the setting to the
+      table's subtask branches. Turning off nested subtasks hides the nested
+      rows.
+    result: passed
+    reason:
+      text: WorkItemsPage.tsx:273 and BoardLayout.tsx:61 pass the existing
+        collapseSubtasks setting. TableRow.tsx:169 renders task branches only
+        while the top-level fold is open. The shared fold and table regressions
+        verify folded initial state, independent expansion, setting reset, and
+        hidden rows when nested subtasks are disabled.
+      truncated: false
+  - id: A3
+    source: brief.md
+    text: Selecting a second- or third-level title opens that issue. Activating the
+      fold control only changes the branch and does not open an issue or
+      initiate dragging.
+    result: passed
+    reason:
+      text: TableRowSubtasks.test.tsx:150 confirms that second- and third-level titles
+        open IDs 2 and 4. The toggle changes only its own branch, and click,
+        pointer, and native button keyboard events do not reach the parent drag
+        or open handlers.
+      truncated: false
+builder_handoff:
+  candidate_id: table-nested-subtasks:7
+  identity_provider: skill-coordinated
+  builder_execution_ref: 01a1f7e7-8b27-7b41-8f30-adab806a1292
+  iteration: 1
+  summary:
+    text: Render third-level table rows under their second-level task using the
+      existing subtask provider and fold controls. Keep configured cells, detail
+      navigation, and drag event isolation.
+    truncated: false
+  addressed_acceptance_ids:
+    - A1
+    - A2
+    - A3
+  checks:
+    - name:
+        text: bun run --filter=web test
+        truncated: false
+      result: passed
+      note:
+        text: '/Users/poco/Projects/itsaplan; 757 passed across 154 files, 0 failed.
+          Includes table subtask, Kanban subtask, and shared folding
+          regressions. Log: /tmp/itsaplan-table-web-tests.GhEKzh.'
+        truncated: false
+    - name:
+        text: bun run --filter=web typecheck
+        truncated: false
+      result: passed
+      note:
+        text: /Users/poco/Projects/itsaplan; TypeScript exited 0.
+        truncated: false
+    - name:
+        text: bun run --filter=web lint
+        truncated: false
+      result: passed
+      note:
+        text: '/Users/poco/Projects/itsaplan; ESLint exited 0. Log:
+          /tmp/itsaplan-table-web-lint.mGUOCB.'
+        truncated: false
+    - name:
+        text: Prettier --check and git diff --check
+        truncated: false
+      result: passed
+      note:
+        text: /Users/poco/Projects/itsaplan; all three changed TypeScript files match
+          formatting, and git diff --check passed.
+        truncated: false
+    - name:
+        text: Focused code and security review
+        truncated: false
+      result: passed
+      note:
+        text: /Users/poco/Projects/itsaplan; reviewed the three changed source/test
+          files, existing table callers, and subtasks provider. No actionable
+          findings. The rows use existing scoped board data and do not introduce
+          requests or raw HTML.
+        truncated: false
+  checks_truncated: false
+  known_limits:
+    - text: No real-browser visual check was run. The regressions assert the row
+        order, shared grid cells, indent classes, native button state, and event
+        isolation in JSDOM.
+      truncated: false
+    - text: The fold button follows the existing progress rule and is absent if every
+        direct subtask is canceled.
+      truncated: false
+  known_limits_truncated: false
+  review: null
+  submitted_at: 2026-11-20T07:45:07.908Z
+blockers: []
+verification:
+  candidate_id: table-nested-subtasks:7
+  identity_provider: skill-coordinated
+  verifier_execution_ref: 01a1f7e7-8b27-7b41-8f30-adab806a1292
+  iteration: 1
+  attempt: 1
+  assurance: self-reviewed
+  verdict: pass
+  checks: []
+  reported_checks:
+    - name:
+        text: bun run --filter=web test
+        truncated: false
+      result: passed
+      note:
+        text: '/Users/poco/Projects/itsaplan; 757 passed across 154 files, 0 failed.
+          Includes table subtask, Kanban subtask, and shared folding
+          regressions. Log: /tmp/itsaplan-table-web-tests.GhEKzh.'
+        truncated: false
+    - name:
+        text: bun run --filter=web typecheck
+        truncated: false
+      result: passed
+      note:
+        text: /Users/poco/Projects/itsaplan; TypeScript exited 0.
+        truncated: false
+    - name:
+        text: bun run --filter=web lint
+        truncated: false
+      result: passed
+      note:
+        text: '/Users/poco/Projects/itsaplan; ESLint exited 0. Log:
+          /tmp/itsaplan-table-web-lint.mGUOCB.'
+        truncated: false
+    - name:
+        text: Prettier --check and git diff --check
+        truncated: false
+      result: passed
+      note:
+        text: /Users/poco/Projects/itsaplan; all three changed TypeScript files match
+          formatting, and git diff --check passed.
+        truncated: false
+    - name:
+        text: Focused code and security review
+        truncated: false
+      result: passed
+      note:
+        text: /Users/poco/Projects/itsaplan; reviewed the three changed source/test
+          files, existing table callers, and subtasks provider. No actionable
+          findings. The rows use existing scoped board data and do not introduce
+          requests or raw HTML.
+        truncated: false
+  summary:
+    text: All three acceptance items passed. The Web suite passed 757 tests, and
+      TypeScript, ESLint, and changed-file formatting checks passed.
+    truncated: false
+  risks:
+    - text: Rendered layout and keyboard events were checked through React DOM tests
+        with JSDOM. Browser layout was not inspected directly.
+      truncated: false
+    - text: The subtask progress control is absent when all direct children are
+        canceled, which follows the accepted existing progress rule.
+      truncated: false
+  risks_truncated: false
+  completed_at: 2026-11-20T07:45:15.928Z
+history:
+  - goal_cycle: 1
+    iteration: 1
+    attempt: 1
+    outcome: pass
+    unresolved_ids: []
+    summary:
+      text: All three acceptance items passed. The Web suite passed 757 tests, and
+        TypeScript, ESLint, and changed-file formatting checks passed.
+      truncated: false
+    completed_at: 2026-11-20T07:45:15.928Z
+history_overflow:
+  dropped_entries: 0
+  first_dropped_at: null
+  last_dropped_at: null
+  outcome_counts:
+    pass: 0
+    fail: 0
+    blocked: 0
+    execution-error: 0
+    recovery: 0
+verification_result: pass
+verification_report: verification.md
+archived: true
+created_at: 2026-11-20T07:42:05.828Z
+archive_receipt:
+  runId: table-nested-subtasks
+  change: table-nested-subtasks
+  archiveRef: 2026-11-20-table-nested-subtasks
+  transactionId: 17b23d4d-b58d-450d-b557-618b526e8140
+  stateVersion: 12
+  specs: []
+run_checkpoint:
+  {
+    'schema': 'comet.workflow-run-checkpoint.v2',
+    'hash': '855fbdff9a6d2287e5a521885f5728bb6a6dd6ac0eb18bfe81664ff9cf79b154',
+    'run':
+      {
+        'protocolVersion': 1,
+        'schemaVersion': 1,
+        'runId': 'table-nested-subtasks',
+        'revision': 1,
+        'workflow':
+          {
+            'id': 'comet-native',
+            'version': '4',
+            'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+          },
+        'definitionHashes':
+          {
+            '["comet-native","4"]': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+          },
+        'initialStateHash': '8d4f4265629d55d6c25a25ac1c90f22824d5a34e4f92419576bd5a5f9dca4fc0',
+        'input':
+          {
+            'artifactRootRef': 'docs',
+            'name': 'table-nested-subtasks',
+            'task': '看板里已经支持了展示三级任务, 表格也需要支持三级, 当前只看到两级',
+          },
+        'state':
+          {
+            'acceptance':
+              [
+                {
+                  'id': 'A1',
+                  'reason':
+                    {
+                      'text': 'TableRowSubtasks.test.tsx:18 verifies the default expanded order with the third-level issue once beneath its parent, deeper logical padding, and the same six configured builtin and custom column values. TableSubtaskRow.tsx:38 uses the existing subgrid layout.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'With nested subtasks enabled and Default collapsed off, the table shows all three levels without any clicks. In nested-only display, third-level rows appear once, below and further indented under their own parent, with the same configured cells as second-level rows.',
+                },
+                {
+                  'id': 'A2',
+                  'reason':
+                    {
+                      'text': 'WorkItemsPage.tsx:273 and BoardLayout.tsx:61 pass the existing collapseSubtasks setting. TableRow.tsx:169 renders task branches only while the top-level fold is open. The shared fold and table regressions verify folded initial state, independent expansion, setting reset, and hidden rows when nested subtasks are disabled.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': "With Default collapsed on, the table initially shows top-level rows in nested-only display. Expanding a top-level row reveals its second-level rows with their branches folded. For branches with a subtask progress count, that control on a second-level row expands or collapses its own third-level rows by pointer or keyboard. Collapsing the top-level row hides both levels. Changing Default collapsed reapplies the setting to the table's subtask branches. Turning off nested subtasks hides the nested rows.",
+                },
+                {
+                  'id': 'A3',
+                  'reason':
+                    {
+                      'text': 'TableRowSubtasks.test.tsx:150 confirms that second- and third-level titles open IDs 2 and 4. The toggle changes only its own branch, and click, pointer, and native button keyboard events do not reach the parent drag or open handlers.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'Selecting a second- or third-level title opens that issue. Activating the fold control only changes the branch and does not open an issue or initiate dragging.',
+                },
+              ],
+            'archived': true,
+            'blockers': [],
+            'brief': 'brief.md',
+            'builder_handoff':
+              {
+                'addressed_acceptance_ids': ['A1', 'A2', 'A3'],
+                'builder_execution_ref': '01a1f7e7-8b27-7b41-8f30-adab806a1292',
+                'candidate_id': 'table-nested-subtasks:7',
+                'checks':
+                  [
+                    {
+                      'name': { 'text': 'bun run --filter=web test', 'truncated': false },
+                      'note':
+                        {
+                          'text': '/Users/poco/Projects/itsaplan; 757 passed across 154 files, 0 failed. Includes table subtask, Kanban subtask, and shared folding regressions. Log: /tmp/itsaplan-table-web-tests.GhEKzh.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name': { 'text': 'bun run --filter=web typecheck', 'truncated': false },
+                      'note':
+                        {
+                          'text': '/Users/poco/Projects/itsaplan; TypeScript exited 0.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name': { 'text': 'bun run --filter=web lint', 'truncated': false },
+                      'note':
+                        {
+                          'text': '/Users/poco/Projects/itsaplan; ESLint exited 0. Log: /tmp/itsaplan-table-web-lint.mGUOCB.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        { 'text': 'Prettier --check and git diff --check', 'truncated': false },
+                      'note':
+                        {
+                          'text': '/Users/poco/Projects/itsaplan; all three changed TypeScript files match formatting, and git diff --check passed.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name': { 'text': 'Focused code and security review', 'truncated': false },
+                      'note':
+                        {
+                          'text': '/Users/poco/Projects/itsaplan; reviewed the three changed source/test files, existing table callers, and subtasks provider. No actionable findings. The rows use existing scoped board data and do not introduce requests or raw HTML.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                  ],
+                'checks_truncated': false,
+                'identity_provider': 'skill-coordinated',
+                'iteration': 1,
+                'known_limits':
+                  [
+                    {
+                      'text': 'No real-browser visual check was run. The regressions assert the row order, shared grid cells, indent classes, native button state, and event isolation in JSDOM.',
+                      'truncated': false,
+                    },
+                    {
+                      'text': 'The fold button follows the existing progress rule and is absent if every direct subtask is canceled.',
+                      'truncated': false,
+                    },
+                  ],
+                'known_limits_truncated': false,
+                'review': null,
+                'submitted_at': '2026-11-20T07:45:07.908Z',
+                'summary':
+                  {
+                    'text': 'Render third-level table rows under their second-level task using the existing subtask provider and fold controls. Keep configured cells, detail navigation, and drag event isolation.',
+                    'truncated': false,
+                  },
+              },
+            'created_at': '2026-11-20T07:42:05.828Z',
+            'document_constraints_version': 3,
+            'history':
+              [
+                {
+                  'attempt': 1,
+                  'completed_at': '2026-11-20T07:45:15.928Z',
+                  'goal_cycle': 1,
+                  'iteration': 1,
+                  'outcome': 'pass',
+                  'summary':
+                    {
+                      'text': 'All three acceptance items passed. The Web suite passed 757 tests, and TypeScript, ESLint, and changed-file formatting checks passed.',
+                      'truncated': false,
+                    },
+                  'unresolved_ids': [],
+                },
+              ],
+            'history_overflow':
+              {
+                'dropped_entries': 0,
+                'first_dropped_at': null,
+                'last_dropped_at': null,
+                'outcome_counts':
+                  { 'blocked': 0, 'execution-error': 0, 'fail': 0, 'pass': 0, 'recovery': 0 },
+              },
+            'language': 'en',
+            'loop':
+              {
+                'attempt': 1,
+                'execution_failure_count': 0,
+                'failed_iteration_count': 0,
+                'goal_cycle': 1,
+                'iteration': 1,
+                'next_action': null,
+                'no_progress_count': 0,
+                'previous_unresolved_ids': [],
+                'retry_epoch': 0,
+                'stage': 'done',
+              },
+            'name': 'table-nested-subtasks',
+            'phase': 'archive',
+            'schema': 'comet.native.v4',
+            'spec_changes': [],
+            'state_version': 12,
+            'status': 'done',
+            'verification':
+              {
+                'assurance': 'self-reviewed',
+                'attempt': 1,
+                'candidate_id': 'table-nested-subtasks:7',
+                'checks': [],
+                'completed_at': '2026-11-20T07:45:15.928Z',
+                'identity_provider': 'skill-coordinated',
+                'iteration': 1,
+                'reported_checks':
+                  [
+                    {
+                      'name': { 'text': 'bun run --filter=web test', 'truncated': false },
+                      'note':
+                        {
+                          'text': '/Users/poco/Projects/itsaplan; 757 passed across 154 files, 0 failed. Includes table subtask, Kanban subtask, and shared folding regressions. Log: /tmp/itsaplan-table-web-tests.GhEKzh.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name': { 'text': 'bun run --filter=web typecheck', 'truncated': false },
+                      'note':
+                        {
+                          'text': '/Users/poco/Projects/itsaplan; TypeScript exited 0.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name': { 'text': 'bun run --filter=web lint', 'truncated': false },
+                      'note':
+                        {
+                          'text': '/Users/poco/Projects/itsaplan; ESLint exited 0. Log: /tmp/itsaplan-table-web-lint.mGUOCB.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        { 'text': 'Prettier --check and git diff --check', 'truncated': false },
+                      'note':
+                        {
+                          'text': '/Users/poco/Projects/itsaplan; all three changed TypeScript files match formatting, and git diff --check passed.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name': { 'text': 'Focused code and security review', 'truncated': false },
+                      'note':
+                        {
+                          'text': '/Users/poco/Projects/itsaplan; reviewed the three changed source/test files, existing table callers, and subtasks provider. No actionable findings. The rows use existing scoped board data and do not introduce requests or raw HTML.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                  ],
+                'risks':
+                  [
+                    {
+                      'text': 'Rendered layout and keyboard events were checked through React DOM tests with JSDOM. Browser layout was not inspected directly.',
+                      'truncated': false,
+                    },
+                    {
+                      'text': 'The subtask progress control is absent when all direct children are canceled, which follows the accepted existing progress rule.',
+                      'truncated': false,
+                    },
+                  ],
+                'risks_truncated': false,
+                'summary':
+                  {
+                    'text': 'All three acceptance items passed. The Web suite passed 757 tests, and TypeScript, ESLint, and changed-file formatting checks passed.',
+                    'truncated': false,
+                  },
+                'verdict': 'pass',
+                'verifier_execution_ref': '01a1f7e7-8b27-7b41-8f30-adab806a1292',
+              },
+            'verification_report': 'verification.md',
+            'verification_result': 'pass',
+            'workspace':
+              {
+                'change_branch': 'main',
+                'finish': null,
+                'isolation': 'current',
+                'target_branch': 'main',
+              },
+          },
+        'status': 'completed',
+        'sequence': 12,
+        'actions':
+          [
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a1f7e7-8b27-7b41-8f30-adab806a1292',
+                  'token': 'portable-fb1964e712fa1449aede9bc3114e9841aa4df4b163640be4c927887389c2be13',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'table-nested-subtasks:1',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-nested-subtasks',
+                      'task': '看板里已经支持了展示三级任务, 表格也需要支持三级, 当前只看到两级',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': 'c28fa8b9381904000cd4c38e387bc5d1c6400847a042b2df6d30eb14f3e7deb5',
+              'outcome':
+                {
+                  'actionId': 'table-nested-subtasks:1',
+                  'attempt': 1,
+                  'claimToken': 'portable-fb1964e712fa1449aede9bc3114e9841aa4df4b163640be4c927887389c2be13',
+                  'inputHash': 'c28fa8b9381904000cd4c38e387bc5d1c6400847a042b2df6d30eb14f3e7deb5',
+                  'outcomeId': 'native-result-10372b0a059fe5fb2c41147065b545561fdb7b2e0f1bcffff2cfc23897beda4a',
+                  'output':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'source': 'brief.md',
+                            'text': 'With Subtasks enabled and Default collapsed off, the table shows a top-level issue, its direct subtasks, and their direct children. Third-level rows appear below and further indented under their own parent, use the same configured cells as second-level rows, and appear once.',
+                          },
+                          {
+                            'id': 'A2',
+                            'source': 'brief.md',
+                            'text': 'With Default collapsed on, opening a top-level issue reveals its second-level rows with their branches folded. For branches with a subtask progress count, that control on a second-level row expands or collapses its own third-level rows by pointer or keyboard. Collapsing the top-level row hides both levels. Turning off Subtasks hides the subtask rows.',
+                          },
+                          {
+                            'id': 'A3',
+                            'source': 'brief.md',
+                            'text': 'Selecting a second- or third-level title opens that issue. Activating the fold control only changes the branch and does not open an issue or initiate dragging.',
+                          },
+                        ],
+                      'children': null,
+                      'specChanges': [],
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '1907c981cb858b80d1280b87377479e6b678aee9c80201d4cb6af70ae85eceb7',
+                    'outcomeId': 'native-result-10372b0a059fe5fb2c41147065b545561fdb7b2e0f1bcffff2cfc23897beda4a',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-shape-prepare',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'table-nested-subtasks',
+              'status': 'succeeded',
+              'stepId': 'shape.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-cli',
+                  'token': 'portable-c6585b85da3c026fad13594d45b898a6c34bc608fe0290f6fc95743e37350ad9',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'table-nested-subtasks:3',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-nested-subtasks',
+                      'task': '看板里已经支持了展示三级任务, 表格也需要支持三级, 当前只看到两级',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': 'bcc895588d20bdc17519c210fe0e78da74755e57dbcd2864dd928c7095fd2440',
+              'outcome':
+                {
+                  'actionId': 'table-nested-subtasks:3',
+                  'attempt': 1,
+                  'claimToken': 'portable-c6585b85da3c026fad13594d45b898a6c34bc608fe0290f6fc95743e37350ad9',
+                  'inputHash': 'bcc895588d20bdc17519c210fe0e78da74755e57dbcd2864dd928c7095fd2440',
+                  'outcomeId': '7027cf65-5985-412d-8b2f-8eefbe750c8a',
+                  'output':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'source': 'brief.md',
+                            'text': 'Opening a table with its default display settings in a project with subtasks enabled shows the first three levels without any clicks. In nested-only display, third-level rows appear once, below and further indented under their own parent, with the same configured cells as second-level rows.',
+                          },
+                          {
+                            'id': 'A2',
+                            'source': 'brief.md',
+                            'text': 'With Default collapsed on, opening a top-level issue reveals its second-level rows with their branches folded. For branches with a subtask progress count, that control on a second-level row expands or collapses its own third-level rows by pointer or keyboard. Collapsing the top-level row hides both levels. Turning off Subtasks hides the subtask rows.',
+                          },
+                          {
+                            'id': 'A3',
+                            'source': 'brief.md',
+                            'text': 'Selecting a second- or third-level title opens that issue. Activating the fold control only changes the branch and does not open an issue or initiate dragging.',
+                          },
+                        ],
+                      'children': null,
+                      'specChanges': [],
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'a590b9f2203fca4ad559fac9333b16fdf10e7074d179e4deea7fe184371bc24a',
+                    'outcomeId': '7027cf65-5985-412d-8b2f-8eefbe750c8a',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-shape-prepare',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'table-nested-subtasks',
+              'status': 'succeeded',
+              'stepId': 'shape.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-cli',
+                  'token': 'portable-0111b766d6f53d5a6c9151f42beddef32bea73c7e87afce2eac750d39e02134d',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'table-nested-subtasks:5',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-nested-subtasks',
+                      'task': '看板里已经支持了展示三级任务, 表格也需要支持三级, 当前只看到两级',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '6c1077470e787322bc74f7464d47dc5bde8a31461acfe57571a9485e74426245',
+              'outcome':
+                {
+                  'actionId': 'table-nested-subtasks:5',
+                  'attempt': 1,
+                  'claimToken': 'portable-0111b766d6f53d5a6c9151f42beddef32bea73c7e87afce2eac750d39e02134d',
+                  'inputHash': '6c1077470e787322bc74f7464d47dc5bde8a31461acfe57571a9485e74426245',
+                  'outcomeId': '0a4ae57f-2c18-423b-a8ea-39ad7d50659b',
+                  'output':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'source': 'brief.md',
+                            'text': 'With nested subtasks enabled and Default collapsed off, the table shows all three levels without any clicks. In nested-only display, third-level rows appear once, below and further indented under their own parent, with the same configured cells as second-level rows.',
+                          },
+                          {
+                            'id': 'A2',
+                            'source': 'brief.md',
+                            'text': "With Default collapsed on, the table initially shows top-level rows in nested-only display. Expanding a top-level row reveals its second-level rows with their branches folded. For branches with a subtask progress count, that control on a second-level row expands or collapses its own third-level rows by pointer or keyboard. Collapsing the top-level row hides both levels. Changing Default collapsed reapplies the setting to the table's subtask branches. Turning off nested subtasks hides the nested rows.",
+                          },
+                          {
+                            'id': 'A3',
+                            'source': 'brief.md',
+                            'text': 'Selecting a second- or third-level title opens that issue. Activating the fold control only changes the branch and does not open an issue or initiate dragging.',
+                          },
+                        ],
+                      'children': null,
+                      'specChanges': [],
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'fae83cde3105aee1ade796fdb5726d0c3577e85704eeae35c2011fb752e3176a',
+                    'outcomeId': '0a4ae57f-2c18-423b-a8ea-39ad7d50659b',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-shape-prepare',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'table-nested-subtasks',
+              'status': 'succeeded',
+              'stepId': 'shape.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a1f7e7-8b27-7b41-8f30-adab806a1292',
+                  'token': 'portable-2a3c8c04f13480c3a06bddbf991b8962a465362d0d2098249e49cd039ae561a6',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'table-nested-subtasks:7',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-nested-subtasks',
+                      'task': '看板里已经支持了展示三级任务, 表格也需要支持三级, 当前只看到两级',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '2e88f5f56bf44df57d2ed234e2cd1c02dded704cb1e1a1d5590b86e2a204c1f0',
+              'outcome':
+                {
+                  'actionId': 'table-nested-subtasks:7',
+                  'attempt': 1,
+                  'claimToken': 'portable-2a3c8c04f13480c3a06bddbf991b8962a465362d0d2098249e49cd039ae561a6',
+                  'inputHash': '2e88f5f56bf44df57d2ed234e2cd1c02dded704cb1e1a1d5590b86e2a204c1f0',
+                  'outcomeId': 'native-result-15abb12ef83e7da7fb2c8c1f1a035d3106dce7229e447a6d3f7f7d1a01dae1aa',
+                  'output':
+                    {
+                      'addressedAcceptanceIds': ['A1', 'A2', 'A3'],
+                      'checks':
+                        [
+                          {
+                            'name': 'bun run --filter=web test',
+                            'note': '/Users/poco/Projects/itsaplan; 757 passed across 154 files, 0 failed. Includes table subtask, Kanban subtask, and shared folding regressions. Log: /tmp/itsaplan-table-web-tests.GhEKzh.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun run --filter=web typecheck',
+                            'note': '/Users/poco/Projects/itsaplan; TypeScript exited 0.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun run --filter=web lint',
+                            'note': '/Users/poco/Projects/itsaplan; ESLint exited 0. Log: /tmp/itsaplan-table-web-lint.mGUOCB.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Prettier --check and git diff --check',
+                            'note': '/Users/poco/Projects/itsaplan; all three changed TypeScript files match formatting, and git diff --check passed.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Focused code and security review',
+                            'note': '/Users/poco/Projects/itsaplan; reviewed the three changed source/test files, existing table callers, and subtasks provider. No actionable findings. The rows use existing scoped board data and do not introduce requests or raw HTML.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'knownLimits':
+                        [
+                          'No real-browser visual check was run. The regressions assert the row order, shared grid cells, indent classes, native button state, and event isolation in JSDOM.',
+                          'The fold button follows the existing progress rule and is absent if every direct subtask is canceled.',
+                        ],
+                      'requireIndependentReview': false,
+                      'summary': 'Render third-level table rows under their second-level task using the existing subtask provider and fold controls. Keep configured cells, detail navigation, and drag event isolation.',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'c99421c86fc31231be866cdd9e092f487b0dcb458b2bb83941781099ff1df0ba',
+                    'outcomeId': 'native-result-15abb12ef83e7da7fb2c8c1f1a035d3106dce7229e447a6d3f7f7d1a01dae1aa',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-builder',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'table-nested-subtasks',
+              'status': 'succeeded',
+              'stepId': 'build.builder',
+              'type': 'handoff',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a1f7e7-8b27-7b41-8f30-adab806a1292',
+                  'token': 'portable-685a800b2f0ff5f88ae543a3df059939bc785255294b4ca3f9de1d9358846aab',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'table-nested-subtasks:8',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-nested-subtasks',
+                      'task': '看板里已经支持了展示三级任务, 表格也需要支持三级, 当前只看到两级',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': 'c20de93958f5fe54a21aeeeb29576cafed5805ee09276d3abc7d241b7db8d23a',
+              'outcome':
+                {
+                  'actionId': 'table-nested-subtasks:8',
+                  'attempt': 1,
+                  'claimToken': 'portable-685a800b2f0ff5f88ae543a3df059939bc785255294b4ca3f9de1d9358846aab',
+                  'inputHash': 'c20de93958f5fe54a21aeeeb29576cafed5805ee09276d3abc7d241b7db8d23a',
+                  'outcomeId': 'native-result-c0daea3e4961f18147fa3d3b0cc57ffe48bff3c9d7c8f5771b8ad269a0514287',
+                  'output':
+                    {
+                      'candidateId': 'table-nested-subtasks:7',
+                      'checks':
+                        [
+                          {
+                            'name': 'bun run --filter=web test',
+                            'note': '/Users/poco/Projects/itsaplan; 757 passed across 154 files, 0 failed. Includes table subtask, Kanban subtask, and shared folding regressions. Log: /tmp/itsaplan-table-web-tests.GhEKzh.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun run --filter=web typecheck',
+                            'note': '/Users/poco/Projects/itsaplan; TypeScript exited 0.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun run --filter=web lint',
+                            'note': '/Users/poco/Projects/itsaplan; ESLint exited 0. Log: /tmp/itsaplan-table-web-lint.mGUOCB.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Prettier --check and git diff --check',
+                            'note': '/Users/poco/Projects/itsaplan; all three changed TypeScript files match formatting, and git diff --check passed.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Focused code and security review',
+                            'note': '/Users/poco/Projects/itsaplan; reviewed the three changed source/test files, existing table callers, and subtasks provider. No actionable findings. The rows use existing scoped board data and do not introduce requests or raw HTML.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'response':
+                        {
+                          'kind': 'final-result',
+                          'result':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'reason': 'TableRowSubtasks.test.tsx:18 verifies the default expanded order with the third-level issue once beneath its parent, deeper logical padding, and the same six configured builtin and custom column values. TableSubtaskRow.tsx:38 uses the existing subgrid layout.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'reason': 'WorkItemsPage.tsx:273 and BoardLayout.tsx:61 pass the existing collapseSubtasks setting. TableRow.tsx:169 renders task branches only while the top-level fold is open. The shared fold and table regressions verify folded initial state, independent expansion, setting reset, and hidden rows when nested subtasks are disabled.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'reason': 'TableRowSubtasks.test.tsx:150 confirms that second- and third-level titles open IDs 2 and 4. The toggle changes only its own branch, and click, pointer, and native button keyboard events do not reach the parent drag or open handlers.',
+                                    'result': 'passed',
+                                  },
+                                ],
+                              'attempt': 1,
+                              'iteration': 1,
+                              'requestReview':
+                                {
+                                  'reason': 'The original request asks for the table to show the third task level already visible on Kanban. The user clarified that the existing Default collapsed setting should govern its initial visibility and explicitly confirmed the resulting brief. The candidate implements three levels, the existing setting, and table title navigation through the ordinary table renderer.',
+                                  'result': 'aligned',
+                                },
+                              'risks':
+                                [
+                                  'Rendered layout and keyboard events were checked through React DOM tests with JSDOM. Browser layout was not inspected directly.',
+                                  'The subtask progress control is absent when all direct children are canceled, which follows the accepted existing progress rule.',
+                                ],
+                              'summary': 'All three acceptance items passed. The Web suite passed 757 tests, and TypeScript, ESLint, and changed-file formatting checks passed.',
+                              'verdict': 'pass',
+                            },
+                        },
+                      'verifierExecutionRef': '01a1f7e7-8b27-7b41-8f30-adab806a1292',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'a27a35243f7cc0c2a3be808056f277dfdc22fa00289e699b38b3b40595256552',
+                    'outcomeId': 'native-result-c0daea3e4961f18147fa3d3b0cc57ffe48bff3c9d7c8f5771b8ad269a0514287',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-verifier',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'table-nested-subtasks',
+              'status': 'succeeded',
+              'stepId': 'verify.verifier',
+              'type': 'handoff',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-preflight',
+                  'token': 'portable-48dd2a1c1e68efddaaf545e85df906e3f591d871310bb50a59afa213f7562073',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'table-nested-subtasks:10',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-nested-subtasks',
+                      'task': '看板里已经支持了展示三级任务, 表格也需要支持三级, 当前只看到两级',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '18944b35cd88d844db958f357935509b8a5019041d3b072ebb468d9404ed5cdf',
+              'outcome':
+                {
+                  'actionId': 'table-nested-subtasks:10',
+                  'attempt': 1,
+                  'claimToken': 'portable-48dd2a1c1e68efddaaf545e85df906e3f591d871310bb50a59afa213f7562073',
+                  'inputHash': '18944b35cd88d844db958f357935509b8a5019041d3b072ebb468d9404ed5cdf',
+                  'outcomeId': 'table-nested-subtasks:10:1:executor-result',
+                  'output':
+                    {
+                      'archiveDirRef': 'docs/comet/archive/2026-11-20-table-nested-subtasks',
+                      'blockers': [],
+                      'candidateId': 'table-nested-subtasks:7',
+                      'capabilityPeers': [],
+                      'ready': true,
+                      'reportRef': 'docs/comet/changes/table-nested-subtasks/verification.md',
+                      'reportStateVersion': 10,
+                      'requiresReverification': false,
+                      'specPreview': [],
+                      'stateVersion': 11,
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '9bf8f489fb04c1d9368e6e266dfc87c7b108b4fd4d64dc4fd9c41fb6f569f2f6',
+                    'outcomeId': 'table-nested-subtasks:10:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive-preflight',
+              'requiredCapabilities': [],
+              'retry': 'idempotent',
+              'runId': 'table-nested-subtasks',
+              'status': 'succeeded',
+              'stepId': 'archive.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-apply',
+                  'token': 'portable-b62aa1b62ed0ca9270cdd049f876f22f24bee26869987704909f0a376ad13c7d',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'table-nested-subtasks:11',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-nested-subtasks',
+                      'task': '看板里已经支持了展示三级任务, 表格也需要支持三级, 当前只看到两级',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '65f127686bf351877ced6e05b6bc491a31e414f6204bbe3f4875a13d4ff7ee3a',
+              'outcome':
+                {
+                  'actionId': 'table-nested-subtasks:11',
+                  'attempt': 1,
+                  'claimToken': 'portable-b62aa1b62ed0ca9270cdd049f876f22f24bee26869987704909f0a376ad13c7d',
+                  'inputHash': '65f127686bf351877ced6e05b6bc491a31e414f6204bbe3f4875a13d4ff7ee3a',
+                  'outcomeId': 'table-nested-subtasks:11:1:executor-result',
+                  'output':
+                    {
+                      'archiveRef': '2026-11-20-table-nested-subtasks',
+                      'specCount': 0,
+                      'stateVersion': 11,
+                      'transactionId': '17b23d4d-b58d-450d-b557-618b526e8140',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '5ddb979737aac4298b3f3b650ec814c7167e712e2699b2ba49b6438f2cd9bfba',
+                    'outcomeId': 'table-nested-subtasks:11:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'table-nested-subtasks',
+              'status': 'succeeded',
+              'stepId': 'archive.execute',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-finalize',
+                  'token': 'portable-fccb605c6fc994ff2f86b661847c93bd43e7e772232676c5b1257f316f7b0006',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'table-nested-subtasks:12',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-nested-subtasks',
+                      'task': '看板里已经支持了展示三级任务, 表格也需要支持三级, 当前只看到两级',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '0c1abba562c63b30e3a7cccb1980051333c0a6a9dd1380e84a46cb5ae9a47838',
+              'outcome':
+                {
+                  'actionId': 'table-nested-subtasks:12',
+                  'attempt': 1,
+                  'claimToken': 'portable-fccb605c6fc994ff2f86b661847c93bd43e7e772232676c5b1257f316f7b0006',
+                  'inputHash': '0c1abba562c63b30e3a7cccb1980051333c0a6a9dd1380e84a46cb5ae9a47838',
+                  'outcomeId': 'table-nested-subtasks:12:1:executor-result',
+                  'output':
+                    {
+                      'archiveRef': '2026-11-20-table-nested-subtasks',
+                      'change': 'table-nested-subtasks',
+                      'runId': 'table-nested-subtasks',
+                      'specs': [],
+                      'stateVersion': 12,
+                      'transactionId': '17b23d4d-b58d-450d-b557-618b526e8140',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'cbdfe7ebc3b81c85b5a353199cfeb72aa6c0b2f87bab132fb1b1f0a397ee6fec',
+                    'outcomeId': 'table-nested-subtasks:12:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive-finalize',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'table-nested-subtasks',
+              'status': 'succeeded',
+              'stepId': 'archive.finalize',
+              'type': 'call_tool',
+            },
+          ],
+        'actionContexts':
+          {
+            'table-nested-subtasks:1': { 'results': {}, 'sequence': 1 },
+            'table-nested-subtasks:10': { 'results': {}, 'sequence': 10 },
+            'table-nested-subtasks:11': { 'results': {}, 'sequence': 11 },
+            'table-nested-subtasks:12': { 'results': {}, 'sequence': 12 },
+            'table-nested-subtasks:3': { 'results': {}, 'sequence': 3 },
+            'table-nested-subtasks:5': { 'results': {}, 'sequence': 5 },
+            'table-nested-subtasks:7': { 'results': {}, 'sequence': 7 },
+            'table-nested-subtasks:8': { 'results': {}, 'sequence': 8 },
+          },
+        'waits':
+          [
+            {
+              'id': 'table-nested-subtasks:2',
+              'stepId': 'shape.confirm',
+              'sequence': 2,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-nested-subtasks',
+                      'task': '看板里已经支持了展示三级任务, 表格也需要支持三级, 当前只看到两级',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'With Subtasks enabled and Default collapsed off, the table shows a top-level issue, its direct subtasks, and their direct children. Third-level rows appear below and further indented under their own parent, use the same configured cells as second-level rows, and appear once.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'With Default collapsed on, opening a top-level issue reveals its second-level rows with their branches folded. For branches with a subtask progress count, that control on a second-level row expands or collapses its own third-level rows by pointer or keyboard. Collapsing the top-level row hides both levels. Turning off Subtasks hides the subtask rows.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'Selecting a second- or third-level title opens that issue. Activating the fold control only changes the branch and does not open an issue or initiate dragging.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges': [],
+                        },
+                    },
+                },
+              'proposalHash': '7fce3d0f76c5d54b53af128b0a4d61367f81f87f86f7c18f06815aee09beb3fb',
+              'choices': ['approved', 'rejected'],
+              'results': {},
+              'decision':
+                {
+                  'id': '0185c5b651d2b9617f975bc01c8a9810499c8b93135ae2dbf2edc478274c51df',
+                  'choice': 'rejected',
+                  'proposalHash': '7fce3d0f76c5d54b53af128b0a4d61367f81f87f86f7c18f06815aee09beb3fb',
+                },
+            },
+            {
+              'id': 'table-nested-subtasks:4',
+              'stepId': 'shape.confirm',
+              'sequence': 4,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-nested-subtasks',
+                      'task': '看板里已经支持了展示三级任务, 表格也需要支持三级, 当前只看到两级',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'Opening a table with its default display settings in a project with subtasks enabled shows the first three levels without any clicks. In nested-only display, third-level rows appear once, below and further indented under their own parent, with the same configured cells as second-level rows.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'With Default collapsed on, opening a top-level issue reveals its second-level rows with their branches folded. For branches with a subtask progress count, that control on a second-level row expands or collapses its own third-level rows by pointer or keyboard. Collapsing the top-level row hides both levels. Turning off Subtasks hides the subtask rows.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'Selecting a second- or third-level title opens that issue. Activating the fold control only changes the branch and does not open an issue or initiate dragging.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges': [],
+                        },
+                    },
+                },
+              'proposalHash': '2128ec8339e7d0013c682382d8d8f2de877f659df5cc9b468ff90f376eb6969c',
+              'choices': ['approved', 'rejected'],
+              'results': {},
+              'decision':
+                {
+                  'id': '8748300c1ab823f266244cdadeb0d484841b02b35c02e1d053b1410e3ba3c089',
+                  'choice': 'rejected',
+                  'proposalHash': '2128ec8339e7d0013c682382d8d8f2de877f659df5cc9b468ff90f376eb6969c',
+                },
+            },
+            {
+              'id': 'table-nested-subtasks:6',
+              'stepId': 'shape.confirm',
+              'sequence': 6,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-nested-subtasks',
+                      'task': '看板里已经支持了展示三级任务, 表格也需要支持三级, 当前只看到两级',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'With nested subtasks enabled and Default collapsed off, the table shows all three levels without any clicks. In nested-only display, third-level rows appear once, below and further indented under their own parent, with the same configured cells as second-level rows.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': "With Default collapsed on, the table initially shows top-level rows in nested-only display. Expanding a top-level row reveals its second-level rows with their branches folded. For branches with a subtask progress count, that control on a second-level row expands or collapses its own third-level rows by pointer or keyboard. Collapsing the top-level row hides both levels. Changing Default collapsed reapplies the setting to the table's subtask branches. Turning off nested subtasks hides the nested rows.",
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'Selecting a second- or third-level title opens that issue. Activating the fold control only changes the branch and does not open an issue or initiate dragging.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges': [],
+                        },
+                    },
+                },
+              'proposalHash': '61ed14e99e1364cb30ef9af8234ef84bac53df08c457b71e657d3274cdfbbc9e',
+              'choices': ['approved', 'rejected'],
+              'results': {},
+              'decision':
+                {
+                  'id': '58bdddd4a239e029f66450335b5347b9984cd47b60529412fd9be58585e1fd90',
+                  'choice': 'approved',
+                  'proposalHash': '61ed14e99e1364cb30ef9af8234ef84bac53df08c457b71e657d3274cdfbbc9e',
+                },
+            },
+            {
+              'id': 'table-nested-subtasks:9',
+              'stepId': 'verify.confirm',
+              'sequence': 9,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'activation':
+                    {
+                      'report':
+                        {
+                          'attempt': 1,
+                          'candidateId': 'table-nested-subtasks:7',
+                          'iteration': 1,
+                          'reportRef': 'docs/comet/changes/table-nested-subtasks/verification.md',
+                          'stateVersion': 10,
+                        },
+                    },
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-nested-subtasks',
+                      'task': '看板里已经支持了展示三级任务, 表格也需要支持三级, 当前只看到两级',
+                    },
+                  'outputs':
+                    {
+                      'verify.verifier':
+                        {
+                          'candidateId': 'table-nested-subtasks:7',
+                          'checks':
+                            [
+                              {
+                                'name': 'bun run --filter=web test',
+                                'note': '/Users/poco/Projects/itsaplan; 757 passed across 154 files, 0 failed. Includes table subtask, Kanban subtask, and shared folding regressions. Log: /tmp/itsaplan-table-web-tests.GhEKzh.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun run --filter=web typecheck',
+                                'note': '/Users/poco/Projects/itsaplan; TypeScript exited 0.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun run --filter=web lint',
+                                'note': '/Users/poco/Projects/itsaplan; ESLint exited 0. Log: /tmp/itsaplan-table-web-lint.mGUOCB.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Prettier --check and git diff --check',
+                                'note': '/Users/poco/Projects/itsaplan; all three changed TypeScript files match formatting, and git diff --check passed.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Focused code and security review',
+                                'note': '/Users/poco/Projects/itsaplan; reviewed the three changed source/test files, existing table callers, and subtasks provider. No actionable findings. The rows use existing scoped board data and do not introduce requests or raw HTML.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'response':
+                            {
+                              'kind': 'final-result',
+                              'result':
+                                {
+                                  'acceptance':
+                                    [
+                                      {
+                                        'id': 'A1',
+                                        'reason': 'TableRowSubtasks.test.tsx:18 verifies the default expanded order with the third-level issue once beneath its parent, deeper logical padding, and the same six configured builtin and custom column values. TableSubtaskRow.tsx:38 uses the existing subgrid layout.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A2',
+                                        'reason': 'WorkItemsPage.tsx:273 and BoardLayout.tsx:61 pass the existing collapseSubtasks setting. TableRow.tsx:169 renders task branches only while the top-level fold is open. The shared fold and table regressions verify folded initial state, independent expansion, setting reset, and hidden rows when nested subtasks are disabled.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A3',
+                                        'reason': 'TableRowSubtasks.test.tsx:150 confirms that second- and third-level titles open IDs 2 and 4. The toggle changes only its own branch, and click, pointer, and native button keyboard events do not reach the parent drag or open handlers.',
+                                        'result': 'passed',
+                                      },
+                                    ],
+                                  'attempt': 1,
+                                  'iteration': 1,
+                                  'requestReview':
+                                    {
+                                      'reason': 'The original request asks for the table to show the third task level already visible on Kanban. The user clarified that the existing Default collapsed setting should govern its initial visibility and explicitly confirmed the resulting brief. The candidate implements three levels, the existing setting, and table title navigation through the ordinary table renderer.',
+                                      'result': 'aligned',
+                                    },
+                                  'risks':
+                                    [
+                                      'Rendered layout and keyboard events were checked through React DOM tests with JSDOM. Browser layout was not inspected directly.',
+                                      'The subtask progress control is absent when all direct children are canceled, which follows the accepted existing progress rule.',
+                                    ],
+                                  'summary': 'All three acceptance items passed. The Web suite passed 757 tests, and TypeScript, ESLint, and changed-file formatting checks passed.',
+                                  'verdict': 'pass',
+                                },
+                            },
+                          'verifierExecutionRef': '01a1f7e7-8b27-7b41-8f30-adab806a1292',
+                        },
+                    },
+                },
+              'proposalHash': '6c6a7b3c2dd2cff971eb223fd05147a08f8e3a2f7b71d9f85715a43451ed0353',
+              'choices': ['approved', 'rejected', 'reverify'],
+              'results': {},
+              'decision':
+                {
+                  'id': '34fcbd9179717fa6ff29a9d9561afcff482afb2e4956a54ca294fd4a3ca41149',
+                  'choice': 'approved',
+                  'proposalHash': '6c6a7b3c2dd2cff971eb223fd05147a08f8e3a2f7b71d9f85715a43451ed0353',
+                  'reason': 'User accepted the verified table subtask implementation and requested commit, push, pull request, merge after passing checks, and local deployment.',
+                },
+            },
+          ],
+        'ready': [],
+        'joins': {},
+        'outputs': {},
+        'children': [],
+        'lineage': [],
+      },
+    'sourceRevision': 19,
+    'sourceHash': '361da6d302f8d62aad219bf705360de47669a358bf064c6ecfad3bc08efef4e3',
+    'pool':
+      {
+        'version': 3,
+        'values':
+          [
+            {
+              'choice': 'rejected',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-nested-subtasks',
+                      'task': '看板里已经支持了展示三级任务, 表格也需要支持三级, 当前只看到两级',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'With Subtasks enabled and Default collapsed off, the table shows a top-level issue, its direct subtasks, and their direct children. Third-level rows appear below and further indented under their own parent, use the same configured cells as second-level rows, and appear once.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'With Default collapsed on, opening a top-level issue reveals its second-level rows with their branches folded. For branches with a subtask progress count, that control on a second-level row expands or collapses its own third-level rows by pointer or keyboard. Collapsing the top-level row hides both levels. Turning off Subtasks hides the subtask rows.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'Selecting a second- or third-level title opens that issue. Activating the fold control only changes the branch and does not open an issue or initiate dragging.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges': [],
+                        },
+                    },
+                },
+            },
+            {
+              'acceptance':
+                [
+                  {
+                    'id': 'A1',
+                    'source': 'brief.md',
+                    'text': 'With Subtasks enabled and Default collapsed off, the table shows a top-level issue, its direct subtasks, and their direct children. Third-level rows appear below and further indented under their own parent, use the same configured cells as second-level rows, and appear once.',
+                  },
+                  {
+                    'id': 'A2',
+                    'source': 'brief.md',
+                    'text': 'With Default collapsed on, opening a top-level issue reveals its second-level rows with their branches folded. For branches with a subtask progress count, that control on a second-level row expands or collapses its own third-level rows by pointer or keyboard. Collapsing the top-level row hides both levels. Turning off Subtasks hides the subtask rows.',
+                  },
+                  {
+                    'id': 'A3',
+                    'source': 'brief.md',
+                    'text': 'Selecting a second- or third-level title opens that issue. Activating the fold control only changes the branch and does not open an issue or initiate dragging.',
+                  },
+                ],
+              'children': null,
+              'specChanges': [],
+            },
+            {
+              'choice': 'rejected',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-nested-subtasks',
+                      'task': '看板里已经支持了展示三级任务, 表格也需要支持三级, 当前只看到两级',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'Opening a table with its default display settings in a project with subtasks enabled shows the first three levels without any clicks. In nested-only display, third-level rows appear once, below and further indented under their own parent, with the same configured cells as second-level rows.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'With Default collapsed on, opening a top-level issue reveals its second-level rows with their branches folded. For branches with a subtask progress count, that control on a second-level row expands or collapses its own third-level rows by pointer or keyboard. Collapsing the top-level row hides both levels. Turning off Subtasks hides the subtask rows.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'Selecting a second- or third-level title opens that issue. Activating the fold control only changes the branch and does not open an issue or initiate dragging.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges': [],
+                        },
+                    },
+                },
+            },
+            {
+              'acceptance':
+                [
+                  {
+                    'id': 'A1',
+                    'source': 'brief.md',
+                    'text': 'Opening a table with its default display settings in a project with subtasks enabled shows the first three levels without any clicks. In nested-only display, third-level rows appear once, below and further indented under their own parent, with the same configured cells as second-level rows.',
+                  },
+                  {
+                    'id': 'A2',
+                    'source': 'brief.md',
+                    'text': 'With Default collapsed on, opening a top-level issue reveals its second-level rows with their branches folded. For branches with a subtask progress count, that control on a second-level row expands or collapses its own third-level rows by pointer or keyboard. Collapsing the top-level row hides both levels. Turning off Subtasks hides the subtask rows.',
+                  },
+                  {
+                    'id': 'A3',
+                    'source': 'brief.md',
+                    'text': 'Selecting a second- or third-level title opens that issue. Activating the fold control only changes the branch and does not open an issue or initiate dragging.',
+                  },
+                ],
+              'children': null,
+              'specChanges': [],
+            },
+            {
+              'choice': 'approved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-nested-subtasks',
+                      'task': '看板里已经支持了展示三级任务, 表格也需要支持三级, 当前只看到两级',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'With nested subtasks enabled and Default collapsed off, the table shows all three levels without any clicks. In nested-only display, third-level rows appear once, below and further indented under their own parent, with the same configured cells as second-level rows.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': "With Default collapsed on, the table initially shows top-level rows in nested-only display. Expanding a top-level row reveals its second-level rows with their branches folded. For branches with a subtask progress count, that control on a second-level row expands or collapses its own third-level rows by pointer or keyboard. Collapsing the top-level row hides both levels. Changing Default collapsed reapplies the setting to the table's subtask branches. Turning off nested subtasks hides the nested rows.",
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'Selecting a second- or third-level title opens that issue. Activating the fold control only changes the branch and does not open an issue or initiate dragging.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges': [],
+                        },
+                    },
+                },
+            },
+            {
+              'acceptance':
+                [
+                  {
+                    'id': 'A1',
+                    'source': 'brief.md',
+                    'text': 'With nested subtasks enabled and Default collapsed off, the table shows all three levels without any clicks. In nested-only display, third-level rows appear once, below and further indented under their own parent, with the same configured cells as second-level rows.',
+                  },
+                  {
+                    'id': 'A2',
+                    'source': 'brief.md',
+                    'text': "With Default collapsed on, the table initially shows top-level rows in nested-only display. Expanding a top-level row reveals its second-level rows with their branches folded. For branches with a subtask progress count, that control on a second-level row expands or collapses its own third-level rows by pointer or keyboard. Collapsing the top-level row hides both levels. Changing Default collapsed reapplies the setting to the table's subtask branches. Turning off nested subtasks hides the nested rows.",
+                  },
+                  {
+                    'id': 'A3',
+                    'source': 'brief.md',
+                    'text': 'Selecting a second- or third-level title opens that issue. Activating the fold control only changes the branch and does not open an issue or initiate dragging.',
+                  },
+                ],
+              'children': null,
+              'specChanges': [],
+            },
+            {
+              'addressedAcceptanceIds': ['A1', 'A2', 'A3'],
+              'checks':
+                [
+                  {
+                    'name': 'bun run --filter=web test',
+                    'note': '/Users/poco/Projects/itsaplan; 757 passed across 154 files, 0 failed. Includes table subtask, Kanban subtask, and shared folding regressions. Log: /tmp/itsaplan-table-web-tests.GhEKzh.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun run --filter=web typecheck',
+                    'note': '/Users/poco/Projects/itsaplan; TypeScript exited 0.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun run --filter=web lint',
+                    'note': '/Users/poco/Projects/itsaplan; ESLint exited 0. Log: /tmp/itsaplan-table-web-lint.mGUOCB.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Prettier --check and git diff --check',
+                    'note': '/Users/poco/Projects/itsaplan; all three changed TypeScript files match formatting, and git diff --check passed.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Focused code and security review',
+                    'note': '/Users/poco/Projects/itsaplan; reviewed the three changed source/test files, existing table callers, and subtasks provider. No actionable findings. The rows use existing scoped board data and do not introduce requests or raw HTML.',
+                    'result': 'passed',
+                  },
+                ],
+              'knownLimits':
+                [
+                  'No real-browser visual check was run. The regressions assert the row order, shared grid cells, indent classes, native button state, and event isolation in JSDOM.',
+                  'The fold button follows the existing progress rule and is absent if every direct subtask is canceled.',
+                ],
+              'requireIndependentReview': false,
+              'summary': 'Render third-level table rows under their second-level task using the existing subtask provider and fold controls. Keep configured cells, detail navigation, and drag event isolation.',
+            },
+            {
+              'choice': 'approved',
+              'proposal':
+                {
+                  'activation':
+                    {
+                      'report':
+                        {
+                          'attempt': 1,
+                          'candidateId': 'table-nested-subtasks:7',
+                          'iteration': 1,
+                          'reportRef': 'docs/comet/changes/table-nested-subtasks/verification.md',
+                          'stateVersion': 10,
+                        },
+                    },
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-nested-subtasks',
+                      'task': '看板里已经支持了展示三级任务, 表格也需要支持三级, 当前只看到两级',
+                    },
+                  'outputs':
+                    {
+                      'verify.verifier':
+                        {
+                          'candidateId': 'table-nested-subtasks:7',
+                          'checks':
+                            [
+                              {
+                                'name': 'bun run --filter=web test',
+                                'note': '/Users/poco/Projects/itsaplan; 757 passed across 154 files, 0 failed. Includes table subtask, Kanban subtask, and shared folding regressions. Log: /tmp/itsaplan-table-web-tests.GhEKzh.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun run --filter=web typecheck',
+                                'note': '/Users/poco/Projects/itsaplan; TypeScript exited 0.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun run --filter=web lint',
+                                'note': '/Users/poco/Projects/itsaplan; ESLint exited 0. Log: /tmp/itsaplan-table-web-lint.mGUOCB.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Prettier --check and git diff --check',
+                                'note': '/Users/poco/Projects/itsaplan; all three changed TypeScript files match formatting, and git diff --check passed.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Focused code and security review',
+                                'note': '/Users/poco/Projects/itsaplan; reviewed the three changed source/test files, existing table callers, and subtasks provider. No actionable findings. The rows use existing scoped board data and do not introduce requests or raw HTML.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'response':
+                            {
+                              'kind': 'final-result',
+                              'result':
+                                {
+                                  'acceptance':
+                                    [
+                                      {
+                                        'id': 'A1',
+                                        'reason': 'TableRowSubtasks.test.tsx:18 verifies the default expanded order with the third-level issue once beneath its parent, deeper logical padding, and the same six configured builtin and custom column values. TableSubtaskRow.tsx:38 uses the existing subgrid layout.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A2',
+                                        'reason': 'WorkItemsPage.tsx:273 and BoardLayout.tsx:61 pass the existing collapseSubtasks setting. TableRow.tsx:169 renders task branches only while the top-level fold is open. The shared fold and table regressions verify folded initial state, independent expansion, setting reset, and hidden rows when nested subtasks are disabled.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A3',
+                                        'reason': 'TableRowSubtasks.test.tsx:150 confirms that second- and third-level titles open IDs 2 and 4. The toggle changes only its own branch, and click, pointer, and native button keyboard events do not reach the parent drag or open handlers.',
+                                        'result': 'passed',
+                                      },
+                                    ],
+                                  'attempt': 1,
+                                  'iteration': 1,
+                                  'requestReview':
+                                    {
+                                      'reason': 'The original request asks for the table to show the third task level already visible on Kanban. The user clarified that the existing Default collapsed setting should govern its initial visibility and explicitly confirmed the resulting brief. The candidate implements three levels, the existing setting, and table title navigation through the ordinary table renderer.',
+                                      'result': 'aligned',
+                                    },
+                                  'risks':
+                                    [
+                                      'Rendered layout and keyboard events were checked through React DOM tests with JSDOM. Browser layout was not inspected directly.',
+                                      'The subtask progress control is absent when all direct children are canceled, which follows the accepted existing progress rule.',
+                                    ],
+                                  'summary': 'All three acceptance items passed. The Web suite passed 757 tests, and TypeScript, ESLint, and changed-file formatting checks passed.',
+                                  'verdict': 'pass',
+                                },
+                            },
+                          'verifierExecutionRef': '01a1f7e7-8b27-7b41-8f30-adab806a1292',
+                        },
+                    },
+                },
+            },
+            {
+              'candidateId': 'table-nested-subtasks:7',
+              'checks':
+                [
+                  {
+                    'name': 'bun run --filter=web test',
+                    'note': '/Users/poco/Projects/itsaplan; 757 passed across 154 files, 0 failed. Includes table subtask, Kanban subtask, and shared folding regressions. Log: /tmp/itsaplan-table-web-tests.GhEKzh.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun run --filter=web typecheck',
+                    'note': '/Users/poco/Projects/itsaplan; TypeScript exited 0.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun run --filter=web lint',
+                    'note': '/Users/poco/Projects/itsaplan; ESLint exited 0. Log: /tmp/itsaplan-table-web-lint.mGUOCB.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Prettier --check and git diff --check',
+                    'note': '/Users/poco/Projects/itsaplan; all three changed TypeScript files match formatting, and git diff --check passed.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Focused code and security review',
+                    'note': '/Users/poco/Projects/itsaplan; reviewed the three changed source/test files, existing table callers, and subtasks provider. No actionable findings. The rows use existing scoped board data and do not introduce requests or raw HTML.',
+                    'result': 'passed',
+                  },
+                ],
+              'response':
+                {
+                  'kind': 'final-result',
+                  'result':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'reason': 'TableRowSubtasks.test.tsx:18 verifies the default expanded order with the third-level issue once beneath its parent, deeper logical padding, and the same six configured builtin and custom column values. TableSubtaskRow.tsx:38 uses the existing subgrid layout.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A2',
+                            'reason': 'WorkItemsPage.tsx:273 and BoardLayout.tsx:61 pass the existing collapseSubtasks setting. TableRow.tsx:169 renders task branches only while the top-level fold is open. The shared fold and table regressions verify folded initial state, independent expansion, setting reset, and hidden rows when nested subtasks are disabled.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A3',
+                            'reason': 'TableRowSubtasks.test.tsx:150 confirms that second- and third-level titles open IDs 2 and 4. The toggle changes only its own branch, and click, pointer, and native button keyboard events do not reach the parent drag or open handlers.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'attempt': 1,
+                      'iteration': 1,
+                      'requestReview':
+                        {
+                          'reason': 'The original request asks for the table to show the third task level already visible on Kanban. The user clarified that the existing Default collapsed setting should govern its initial visibility and explicitly confirmed the resulting brief. The candidate implements three levels, the existing setting, and table title navigation through the ordinary table renderer.',
+                          'result': 'aligned',
+                        },
+                      'risks':
+                        [
+                          'Rendered layout and keyboard events were checked through React DOM tests with JSDOM. Browser layout was not inspected directly.',
+                          'The subtask progress control is absent when all direct children are canceled, which follows the accepted existing progress rule.',
+                        ],
+                      'summary': 'All three acceptance items passed. The Web suite passed 757 tests, and TypeScript, ESLint, and changed-file formatting checks passed.',
+                      'verdict': 'pass',
+                    },
+                },
+              'verifierExecutionRef': '01a1f7e7-8b27-7b41-8f30-adab806a1292',
+            },
+            {
+              'archiveDirRef': 'docs/comet/archive/2026-11-20-table-nested-subtasks',
+              'blockers': [],
+              'candidateId': 'table-nested-subtasks:7',
+              'capabilityPeers': [],
+              'ready': true,
+              'reportRef': 'docs/comet/changes/table-nested-subtasks/verification.md',
+              'reportStateVersion': 10,
+              'requiresReverification': false,
+              'specPreview': [],
+              'stateVersion': 11,
+            },
+            {
+              'archiveRef': '2026-11-20-table-nested-subtasks',
+              'specCount': 0,
+              'stateVersion': 11,
+              'transactionId': '17b23d4d-b58d-450d-b557-618b526e8140',
+            },
+            {
+              'sequence': 7,
+              'value':
+                {
+                  'addressedAcceptanceIds': ['A1', 'A2', 'A3'],
+                  'checks':
+                    [
+                      {
+                        'name': 'bun run --filter=web test',
+                        'note': '/Users/poco/Projects/itsaplan; 757 passed across 154 files, 0 failed. Includes table subtask, Kanban subtask, and shared folding regressions. Log: /tmp/itsaplan-table-web-tests.GhEKzh.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun run --filter=web typecheck',
+                        'note': '/Users/poco/Projects/itsaplan; TypeScript exited 0.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun run --filter=web lint',
+                        'note': '/Users/poco/Projects/itsaplan; ESLint exited 0. Log: /tmp/itsaplan-table-web-lint.mGUOCB.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Prettier --check and git diff --check',
+                        'note': '/Users/poco/Projects/itsaplan; all three changed TypeScript files match formatting, and git diff --check passed.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Focused code and security review',
+                        'note': '/Users/poco/Projects/itsaplan; reviewed the three changed source/test files, existing table callers, and subtasks provider. No actionable findings. The rows use existing scoped board data and do not introduce requests or raw HTML.',
+                        'result': 'passed',
+                      },
+                    ],
+                  'knownLimits':
+                    [
+                      'No real-browser visual check was run. The regressions assert the row order, shared grid cells, indent classes, native button state, and event isolation in JSDOM.',
+                      'The fold button follows the existing progress rule and is absent if every direct subtask is canceled.',
+                    ],
+                  'requireIndependentReview': false,
+                  'summary': 'Render third-level table rows under their second-level task using the existing subtask provider and fold controls. Keep configured cells, detail navigation, and drag event isolation.',
+                },
+            },
+            {
+              'sequence': 6,
+              'value':
+                {
+                  'choice': 'approved',
+                  'proposal':
+                    {
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'table-nested-subtasks',
+                          'task': '看板里已经支持了展示三级任务, 表格也需要支持三级, 当前只看到两级',
+                        },
+                      'outputs':
+                        {
+                          'shape.prepare':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'source': 'brief.md',
+                                    'text': 'With nested subtasks enabled and Default collapsed off, the table shows all three levels without any clicks. In nested-only display, third-level rows appear once, below and further indented under their own parent, with the same configured cells as second-level rows.',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'source': 'brief.md',
+                                    'text': "With Default collapsed on, the table initially shows top-level rows in nested-only display. Expanding a top-level row reveals its second-level rows with their branches folded. For branches with a subtask progress count, that control on a second-level row expands or collapses its own third-level rows by pointer or keyboard. Collapsing the top-level row hides both levels. Changing Default collapsed reapplies the setting to the table's subtask branches. Turning off nested subtasks hides the nested rows.",
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'source': 'brief.md',
+                                    'text': 'Selecting a second- or third-level title opens that issue. Activating the fold control only changes the branch and does not open an issue or initiate dragging.',
+                                  },
+                                ],
+                              'children': null,
+                              'specChanges': [],
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 5,
+              'value':
+                {
+                  'acceptance':
+                    [
+                      {
+                        'id': 'A1',
+                        'source': 'brief.md',
+                        'text': 'With nested subtasks enabled and Default collapsed off, the table shows all three levels without any clicks. In nested-only display, third-level rows appear once, below and further indented under their own parent, with the same configured cells as second-level rows.',
+                      },
+                      {
+                        'id': 'A2',
+                        'source': 'brief.md',
+                        'text': "With Default collapsed on, the table initially shows top-level rows in nested-only display. Expanding a top-level row reveals its second-level rows with their branches folded. For branches with a subtask progress count, that control on a second-level row expands or collapses its own third-level rows by pointer or keyboard. Collapsing the top-level row hides both levels. Changing Default collapsed reapplies the setting to the table's subtask branches. Turning off nested subtasks hides the nested rows.",
+                      },
+                      {
+                        'id': 'A3',
+                        'source': 'brief.md',
+                        'text': 'Selecting a second- or third-level title opens that issue. Activating the fold control only changes the branch and does not open an issue or initiate dragging.',
+                      },
+                    ],
+                  'children': null,
+                  'specChanges': [],
+                },
+            },
+            {
+              'sequence': 9,
+              'value':
+                {
+                  'choice': 'approved',
+                  'proposal':
+                    {
+                      'activation':
+                        {
+                          'report':
+                            {
+                              'attempt': 1,
+                              'candidateId': 'table-nested-subtasks:7',
+                              'iteration': 1,
+                              'reportRef': 'docs/comet/changes/table-nested-subtasks/verification.md',
+                              'stateVersion': 10,
+                            },
+                        },
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'table-nested-subtasks',
+                          'task': '看板里已经支持了展示三级任务, 表格也需要支持三级, 当前只看到两级',
+                        },
+                      'outputs':
+                        {
+                          'verify.verifier':
+                            {
+                              'candidateId': 'table-nested-subtasks:7',
+                              'checks':
+                                [
+                                  {
+                                    'name': 'bun run --filter=web test',
+                                    'note': '/Users/poco/Projects/itsaplan; 757 passed across 154 files, 0 failed. Includes table subtask, Kanban subtask, and shared folding regressions. Log: /tmp/itsaplan-table-web-tests.GhEKzh.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'bun run --filter=web typecheck',
+                                    'note': '/Users/poco/Projects/itsaplan; TypeScript exited 0.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'bun run --filter=web lint',
+                                    'note': '/Users/poco/Projects/itsaplan; ESLint exited 0. Log: /tmp/itsaplan-table-web-lint.mGUOCB.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Prettier --check and git diff --check',
+                                    'note': '/Users/poco/Projects/itsaplan; all three changed TypeScript files match formatting, and git diff --check passed.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Focused code and security review',
+                                    'note': '/Users/poco/Projects/itsaplan; reviewed the three changed source/test files, existing table callers, and subtasks provider. No actionable findings. The rows use existing scoped board data and do not introduce requests or raw HTML.',
+                                    'result': 'passed',
+                                  },
+                                ],
+                              'response':
+                                {
+                                  'kind': 'final-result',
+                                  'result':
+                                    {
+                                      'acceptance':
+                                        [
+                                          {
+                                            'id': 'A1',
+                                            'reason': 'TableRowSubtasks.test.tsx:18 verifies the default expanded order with the third-level issue once beneath its parent, deeper logical padding, and the same six configured builtin and custom column values. TableSubtaskRow.tsx:38 uses the existing subgrid layout.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A2',
+                                            'reason': 'WorkItemsPage.tsx:273 and BoardLayout.tsx:61 pass the existing collapseSubtasks setting. TableRow.tsx:169 renders task branches only while the top-level fold is open. The shared fold and table regressions verify folded initial state, independent expansion, setting reset, and hidden rows when nested subtasks are disabled.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A3',
+                                            'reason': 'TableRowSubtasks.test.tsx:150 confirms that second- and third-level titles open IDs 2 and 4. The toggle changes only its own branch, and click, pointer, and native button keyboard events do not reach the parent drag or open handlers.',
+                                            'result': 'passed',
+                                          },
+                                        ],
+                                      'attempt': 1,
+                                      'iteration': 1,
+                                      'requestReview':
+                                        {
+                                          'reason': 'The original request asks for the table to show the third task level already visible on Kanban. The user clarified that the existing Default collapsed setting should govern its initial visibility and explicitly confirmed the resulting brief. The candidate implements three levels, the existing setting, and table title navigation through the ordinary table renderer.',
+                                          'result': 'aligned',
+                                        },
+                                      'risks':
+                                        [
+                                          'Rendered layout and keyboard events were checked through React DOM tests with JSDOM. Browser layout was not inspected directly.',
+                                          'The subtask progress control is absent when all direct children are canceled, which follows the accepted existing progress rule.',
+                                        ],
+                                      'summary': 'All three acceptance items passed. The Web suite passed 757 tests, and TypeScript, ESLint, and changed-file formatting checks passed.',
+                                      'verdict': 'pass',
+                                    },
+                                },
+                              'verifierExecutionRef': '01a1f7e7-8b27-7b41-8f30-adab806a1292',
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 8,
+              'value':
+                {
+                  'candidateId': 'table-nested-subtasks:7',
+                  'checks':
+                    [
+                      {
+                        'name': 'bun run --filter=web test',
+                        'note': '/Users/poco/Projects/itsaplan; 757 passed across 154 files, 0 failed. Includes table subtask, Kanban subtask, and shared folding regressions. Log: /tmp/itsaplan-table-web-tests.GhEKzh.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun run --filter=web typecheck',
+                        'note': '/Users/poco/Projects/itsaplan; TypeScript exited 0.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun run --filter=web lint',
+                        'note': '/Users/poco/Projects/itsaplan; ESLint exited 0. Log: /tmp/itsaplan-table-web-lint.mGUOCB.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Prettier --check and git diff --check',
+                        'note': '/Users/poco/Projects/itsaplan; all three changed TypeScript files match formatting, and git diff --check passed.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Focused code and security review',
+                        'note': '/Users/poco/Projects/itsaplan; reviewed the three changed source/test files, existing table callers, and subtasks provider. No actionable findings. The rows use existing scoped board data and do not introduce requests or raw HTML.',
+                        'result': 'passed',
+                      },
+                    ],
+                  'response':
+                    {
+                      'kind': 'final-result',
+                      'result':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'reason': 'TableRowSubtasks.test.tsx:18 verifies the default expanded order with the third-level issue once beneath its parent, deeper logical padding, and the same six configured builtin and custom column values. TableSubtaskRow.tsx:38 uses the existing subgrid layout.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A2',
+                                'reason': 'WorkItemsPage.tsx:273 and BoardLayout.tsx:61 pass the existing collapseSubtasks setting. TableRow.tsx:169 renders task branches only while the top-level fold is open. The shared fold and table regressions verify folded initial state, independent expansion, setting reset, and hidden rows when nested subtasks are disabled.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A3',
+                                'reason': 'TableRowSubtasks.test.tsx:150 confirms that second- and third-level titles open IDs 2 and 4. The toggle changes only its own branch, and click, pointer, and native button keyboard events do not reach the parent drag or open handlers.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'attempt': 1,
+                          'iteration': 1,
+                          'requestReview':
+                            {
+                              'reason': 'The original request asks for the table to show the third task level already visible on Kanban. The user clarified that the existing Default collapsed setting should govern its initial visibility and explicitly confirmed the resulting brief. The candidate implements three levels, the existing setting, and table title navigation through the ordinary table renderer.',
+                              'result': 'aligned',
+                            },
+                          'risks':
+                            [
+                              'Rendered layout and keyboard events were checked through React DOM tests with JSDOM. Browser layout was not inspected directly.',
+                              'The subtask progress control is absent when all direct children are canceled, which follows the accepted existing progress rule.',
+                            ],
+                          'summary': 'All three acceptance items passed. The Web suite passed 757 tests, and TypeScript, ESLint, and changed-file formatting checks passed.',
+                          'verdict': 'pass',
+                        },
+                    },
+                  'verifierExecutionRef': '01a1f7e7-8b27-7b41-8f30-adab806a1292',
+                },
+            },
+            {
+              'sequence': 10,
+              'value':
+                {
+                  'archiveDirRef': 'docs/comet/archive/2026-11-20-table-nested-subtasks',
+                  'blockers': [],
+                  'candidateId': 'table-nested-subtasks:7',
+                  'capabilityPeers': [],
+                  'ready': true,
+                  'reportRef': 'docs/comet/changes/table-nested-subtasks/verification.md',
+                  'reportStateVersion': 10,
+                  'requiresReverification': false,
+                  'specPreview': [],
+                  'stateVersion': 11,
+                },
+            },
+            {
+              'sequence': 11,
+              'value':
+                {
+                  'archiveRef': '2026-11-20-table-nested-subtasks',
+                  'specCount': 0,
+                  'stateVersion': 11,
+                  'transactionId': '17b23d4d-b58d-450d-b557-618b526e8140',
+                },
+            },
+            {
+              'sequence': 2,
+              'value':
+                {
+                  'choice': 'rejected',
+                  'proposal':
+                    {
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'table-nested-subtasks',
+                          'task': '看板里已经支持了展示三级任务, 表格也需要支持三级, 当前只看到两级',
+                        },
+                      'outputs':
+                        {
+                          'shape.prepare':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'source': 'brief.md',
+                                    'text': 'With Subtasks enabled and Default collapsed off, the table shows a top-level issue, its direct subtasks, and their direct children. Third-level rows appear below and further indented under their own parent, use the same configured cells as second-level rows, and appear once.',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'source': 'brief.md',
+                                    'text': 'With Default collapsed on, opening a top-level issue reveals its second-level rows with their branches folded. For branches with a subtask progress count, that control on a second-level row expands or collapses its own third-level rows by pointer or keyboard. Collapsing the top-level row hides both levels. Turning off Subtasks hides the subtask rows.',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'source': 'brief.md',
+                                    'text': 'Selecting a second- or third-level title opens that issue. Activating the fold control only changes the branch and does not open an issue or initiate dragging.',
+                                  },
+                                ],
+                              'children': null,
+                              'specChanges': [],
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 1,
+              'value':
+                {
+                  'acceptance':
+                    [
+                      {
+                        'id': 'A1',
+                        'source': 'brief.md',
+                        'text': 'With Subtasks enabled and Default collapsed off, the table shows a top-level issue, its direct subtasks, and their direct children. Third-level rows appear below and further indented under their own parent, use the same configured cells as second-level rows, and appear once.',
+                      },
+                      {
+                        'id': 'A2',
+                        'source': 'brief.md',
+                        'text': 'With Default collapsed on, opening a top-level issue reveals its second-level rows with their branches folded. For branches with a subtask progress count, that control on a second-level row expands or collapses its own third-level rows by pointer or keyboard. Collapsing the top-level row hides both levels. Turning off Subtasks hides the subtask rows.',
+                      },
+                      {
+                        'id': 'A3',
+                        'source': 'brief.md',
+                        'text': 'Selecting a second- or third-level title opens that issue. Activating the fold control only changes the branch and does not open an issue or initiate dragging.',
+                      },
+                    ],
+                  'children': null,
+                  'specChanges': [],
+                },
+            },
+            {
+              'sequence': 4,
+              'value':
+                {
+                  'choice': 'rejected',
+                  'proposal':
+                    {
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'table-nested-subtasks',
+                          'task': '看板里已经支持了展示三级任务, 表格也需要支持三级, 当前只看到两级',
+                        },
+                      'outputs':
+                        {
+                          'shape.prepare':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'source': 'brief.md',
+                                    'text': 'Opening a table with its default display settings in a project with subtasks enabled shows the first three levels without any clicks. In nested-only display, third-level rows appear once, below and further indented under their own parent, with the same configured cells as second-level rows.',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'source': 'brief.md',
+                                    'text': 'With Default collapsed on, opening a top-level issue reveals its second-level rows with their branches folded. For branches with a subtask progress count, that control on a second-level row expands or collapses its own third-level rows by pointer or keyboard. Collapsing the top-level row hides both levels. Turning off Subtasks hides the subtask rows.',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'source': 'brief.md',
+                                    'text': 'Selecting a second- or third-level title opens that issue. Activating the fold control only changes the branch and does not open an issue or initiate dragging.',
+                                  },
+                                ],
+                              'children': null,
+                              'specChanges': [],
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 3,
+              'value':
+                {
+                  'acceptance':
+                    [
+                      {
+                        'id': 'A1',
+                        'source': 'brief.md',
+                        'text': 'Opening a table with its default display settings in a project with subtasks enabled shows the first three levels without any clicks. In nested-only display, third-level rows appear once, below and further indented under their own parent, with the same configured cells as second-level rows.',
+                      },
+                      {
+                        'id': 'A2',
+                        'source': 'brief.md',
+                        'text': 'With Default collapsed on, opening a top-level issue reveals its second-level rows with their branches folded. For branches with a subtask progress count, that control on a second-level row expands or collapses its own third-level rows by pointer or keyboard. Collapsing the top-level row hides both levels. Turning off Subtasks hides the subtask rows.',
+                      },
+                      {
+                        'id': 'A3',
+                        'source': 'brief.md',
+                        'text': 'Selecting a second- or third-level title opens that issue. Activating the fold control only changes the branch and does not open an issue or initiate dragging.',
+                      },
+                    ],
+                  'children': null,
+                  'specChanges': [],
+                },
+            },
+            {
+              'sequence': 12,
+              'value':
+                {
+                  'archiveRef': '2026-11-20-table-nested-subtasks',
+                  'change': 'table-nested-subtasks',
+                  'runId': 'table-nested-subtasks',
+                  'specs': [],
+                  'stateVersion': 12,
+                  'transactionId': '17b23d4d-b58d-450d-b557-618b526e8140',
+                },
+            },
+          ],
+        'nodes':
+          [
+            { 'key': 'shape.prepare', 'value': 1, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': null, 'right': 0, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 3, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 2, 'left': null, 'right': 2, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 5, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 4, 'left': null, 'right': 4, 'height': 2 },
+            { 'key': 'build.builder', 'value': 6, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 4, 'left': 6, 'right': 4, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 5, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.confirm', 'value': 7, 'left': 8, 'right': 9, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 4, 'left': 6, 'right': 10, 'height': 3 },
+            { 'key': 'archive.prepare', 'value': 9, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 6, 'left': 12, 'right': null, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 4, 'left': 13, 'right': 10, 'height': 3 },
+            { 'key': 'archive.execute', 'value': 10, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 6, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.prepare', 'value': 9, 'left': 15, 'right': 16, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 4, 'left': 17, 'right': 10, 'height': 3 },
+            { 'key': 'build.builder', 'value': 11, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.prepare', 'value': 13, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 15, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.confirm', 'value': 14, 'left': 20, 'right': 21, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 12, 'left': 19, 'right': 22, 'height': 3 },
+            { 'key': 'archive.prepare', 'value': 16, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 11, 'left': 24, 'right': null, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 12, 'left': 25, 'right': 22, 'height': 3 },
+            { 'key': 'archive.execute', 'value': 17, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 11, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.prepare', 'value': 16, 'left': 27, 'right': 28, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 12, 'left': 29, 'right': 22, 'height': 3 },
+            { 'key': 'shape.prepare', 'value': 19, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 18, 'left': null, 'right': 31, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 21, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 20, 'left': null, 'right': 33, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 13, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 12, 'left': null, 'right': 35, 'height': 2 },
+            { 'key': 'build.builder', 'value': 11, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 12, 'left': 37, 'right': 35, 'height': 2 },
+            { 'key': 'archive.execute', 'value': 17, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.prepare', 'value': 16, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.finalize', 'value': 22, 'left': 39, 'right': 40, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 12, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 15, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.confirm', 'value': 14, 'left': null, 'right': 43, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 13, 'left': 42, 'right': 44, 'height': 3 },
+            { 'key': 'build.builder', 'value': 11, 'left': 41, 'right': 45, 'height': 4 },
+            { 'key': 'shape.prepare', 'value': 19, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.prepare', 'value': 21, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 18, 'left': null, 'right': 48, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 13, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 20, 'left': null, 'right': 50, 'height': 2 },
+            { 'key': 'build.builder', 'value': 11, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 15, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.prepare', 'value': 13, 'left': null, 'right': 53, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 12, 'left': 52, 'right': 54, 'height': 3 },
+          ],
+        'maps': [null, 1, 3, 5, 7, 11, 14, 18, 23, 26, 30, 32, 34, 36, 38, 46, 47, 49, 51, 55],
+        'bindings':
+          [
+            { 'path': ['actions', '0', 'input', 'outputs'], 'map': 0 },
+            { 'path': ['actions', '1', 'input', 'outputs'], 'map': 1 },
+            { 'path': ['actions', '2', 'input', 'outputs'], 'map': 2 },
+            { 'path': ['actions', '3', 'input', 'outputs'], 'map': 3 },
+            { 'path': ['actions', '4', 'input', 'outputs'], 'map': 4 },
+            { 'path': ['actions', '5', 'input', 'outputs'], 'map': 5 },
+            { 'path': ['actions', '6', 'input', 'outputs'], 'map': 6 },
+            { 'path': ['actions', '7', 'input', 'outputs'], 'map': 7 },
+            { 'path': ['actionContexts', 'table-nested-subtasks:1', 'results'], 'map': 0 },
+            { 'path': ['actionContexts', 'table-nested-subtasks:10', 'results'], 'map': 8 },
+            { 'path': ['actionContexts', 'table-nested-subtasks:11', 'results'], 'map': 9 },
+            { 'path': ['actionContexts', 'table-nested-subtasks:12', 'results'], 'map': 10 },
+            { 'path': ['actionContexts', 'table-nested-subtasks:3', 'results'], 'map': 11 },
+            { 'path': ['actionContexts', 'table-nested-subtasks:5', 'results'], 'map': 12 },
+            { 'path': ['actionContexts', 'table-nested-subtasks:7', 'results'], 'map': 13 },
+            { 'path': ['actionContexts', 'table-nested-subtasks:8', 'results'], 'map': 14 },
+            { 'path': ['outputs'], 'map': 15 },
+            { 'path': ['waits', '0', 'results'], 'map': 16 },
+            { 'path': ['waits', '1', 'results'], 'map': 17 },
+            { 'path': ['waits', '2', 'results'], 'map': 18 },
+            { 'path': ['waits', '3', 'results'], 'map': 19 },
+          ],
+      },
+    'storageHash': 'a5d52315b26e957606d24dd7df5057e107f09bf2aaa405b29caac99066b216c5',
+  }
