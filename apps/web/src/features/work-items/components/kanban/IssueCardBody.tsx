@@ -1,17 +1,9 @@
-import {
-  CalendarArrowUp,
-  CalendarClock,
-  Clock,
-  Hash,
-  RefreshCw,
-  Target,
-  Timer,
-} from 'lucide-react';
+import { CalendarArrowUp, Clock, Hash, RefreshCw, Target, Timer } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { BoardIssue } from '@/lib/api/endpoints/issues';
 import { type Maps } from '@/utils/project';
 import { cn } from '@/lib/utils';
-import { formatDurationShort, formatShortDate, isDueOverdue } from '@/utils/dates';
+import { formatDurationShort, formatShortDate } from '@/utils/dates';
 import { formatMinutes } from '@/utils/estimate';
 import type { DisplayProperty, PropertyKey } from '@/utils/viewSettings';
 import {
@@ -26,6 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { StateIcon } from '@/features/issue/components/shared/IssueIcons';
 import { IssueIdentifier } from '../shared/IssueIdentifier';
+import { IssueCardDeadline } from './IssueCardDeadline';
 import { IssueCardLinks } from './IssueCardLinks';
 import { IssueCardSubtasks } from './IssueCardSubtasks';
 
@@ -124,11 +117,10 @@ export function IssueCardBody({
             />
           )}
           {has('dueDate') && issue.dueDate && (
-            <DateBadge
-              icon={<CalendarClock className="size-2.5" />}
-              date={issue.dueDate}
-              label={t('columns.dueDate')}
-              overdue={isDueOverdue(issue.dueDate, column?.stateType)}
+            <IssueCardDeadline
+              issue={issue}
+              dueDate={issue.dueDate}
+              stateType={column?.stateType}
             />
           )}
           {has('type') && type && (

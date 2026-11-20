@@ -1,4 +1,9 @@
 {
+  "deadline": {
+    "dueWithinThreeDays": "Vence em até 3 dias",
+    "dueWithinFiveDays": "Vence em até 5 dias",
+    "completedLate": "Concluído com atraso · {date}"
+  },
   "newIssue": "Nova issue",
   "addWorkItem": "Adicionar item de trabalho",
   "pin": "Fixar",

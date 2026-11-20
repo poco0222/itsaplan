@@ -153,6 +153,7 @@ export interface ViewSettings {
   // or unfolds every card again.
   collapseSubtasks: boolean;
   properties: PropertyKey[];
+  actualCompletionDateField: CustomFieldKey | null;
   timelineScale: TimelineScale;
   // Initial Timeline group state. Individual group toggles are transient and do
   // not update this saved preference.
@@ -194,6 +195,7 @@ const COMMON: Omit<ViewSettings, 'group' | 'subgroup' | 'properties' | 'sort' | 
   showSubtasks: true,
   separateSubtasks: false,
   collapseSubtasks: false,
+  actualCompletionDateField: null,
   timelineScale: 'week',
   timelineCollapseAll: false,
   calendarDateField: 'dueDate',
@@ -331,6 +333,11 @@ export function normalizeViewSettings(
             typeof p === 'string' && (DISPLAY_VALUES.includes(p) || isCustomFieldKey(p)),
         )
       : d.properties,
+    actualCompletionDateField:
+      typeof s.actualCompletionDateField === 'string' &&
+      isCustomFieldKey(s.actualCompletionDateField)
+        ? s.actualCompletionDateField
+        : null,
     timelineScale: TIMELINE_SCALES.includes(s.timelineScale as TimelineScale)
       ? (s.timelineScale as TimelineScale)
       : d.timelineScale,

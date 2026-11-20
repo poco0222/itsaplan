@@ -70,10 +70,12 @@
     "1": "الإثنين"
   },
   "dateFields": {
+    "unset": "بلا",
     "dueDate": "تاريخ الاستحقاق",
     "startDate": "تاريخ البدء"
   },
   "rows": {
+    "actualCompletionDateField": "تاريخ الإكمال الفعلي",
     "columns": "الأعمدة",
     "grouping": "التجميع",
     "swimlanes": "المسارات",

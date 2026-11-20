@@ -70,10 +70,12 @@
     "1": "Monday"
   },
   "dateFields": {
+    "unset": "None",
     "dueDate": "Due date",
     "startDate": "Start date"
   },
   "rows": {
+    "actualCompletionDateField": "Actual completion date",
     "columns": "Columns",
     "grouping": "Grouping",
     "swimlanes": "Swimlanes",

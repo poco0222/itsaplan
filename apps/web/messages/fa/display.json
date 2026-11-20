@@ -70,10 +70,12 @@
     "1": "دوشنبه"
   },
   "dateFields": {
+    "unset": "هیچ‌کدام",
     "dueDate": "تاریخ سررسید",
     "startDate": "تاریخ شروع"
   },
   "rows": {
+    "actualCompletionDateField": "تاریخ واقعی تکمیل",
     "columns": "ستون‌ها",
     "grouping": "گروه‌بندی",
     "swimlanes": "Swimlane‌ها",

@@ -70,10 +70,12 @@
     "1": "Lunes"
   },
   "dateFields": {
+    "unset": "Ninguna",
     "dueDate": "Fecha de vencimiento",
     "startDate": "Fecha de inicio"
   },
   "rows": {
+    "actualCompletionDateField": "Fecha real de finalización",
     "columns": "Columnas",
     "grouping": "Agrupación",
     "swimlanes": "Carriles",

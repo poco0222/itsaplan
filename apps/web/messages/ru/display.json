@@ -70,10 +70,12 @@
     "1": "Понедельник"
   },
   "dateFields": {
+    "unset": "Нет",
     "dueDate": "Дедлайн",
     "startDate": "Дата начала"
   },
   "rows": {
+    "actualCompletionDateField": "Фактическая дата завершения",
     "columns": "Колонки",
     "grouping": "Группировка",
     "swimlanes": "Дорожки",

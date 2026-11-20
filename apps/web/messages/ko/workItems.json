@@ -1,4 +1,9 @@
 {
+  "deadline": {
+    "dueWithinThreeDays": "3일 이내 마감",
+    "dueWithinFiveDays": "5일 이내 마감",
+    "completedLate": "지연 완료 · 실제 {date}"
+  },
   "newIssue": "새 이슈",
   "addWorkItem": "작업 추가",
   "pin": "고정",

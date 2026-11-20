@@ -3,7 +3,9 @@ import { byKey } from '@/utils/messageKey';
 import type { CustomField } from '@/lib/api/endpoints/customFields';
 import type { IssueType } from '@/lib/api/endpoints/issueTypes';
 import {
+  customFieldKey,
   DISPLAY_PROPERTIES,
+  isCustomFieldKey,
   isTimelineField,
   offeredDisplayProperties,
   type PropertyKey,
@@ -14,6 +16,8 @@ import { useProjectFeatures } from '@/hooks/useProjectFeatures';
 import PropertyChip from '@/components/layout/PropertyChip';
 import ColumnProperties from '@/components/layout/ColumnProperties';
 import DisplaySection from '@/components/layout/DisplaySection';
+import DisplaySettingsRow from './DisplaySettingsRow';
+import DisplaySettingsSelect from './DisplaySettingsSelect';
 
 // The properties an issue shows. On the Kanban they are plain on/off chips for the
 // card; on the Table and the Timeline they are the columns, sortable and extendable
@@ -36,6 +40,12 @@ export default function DisplayPropertiesSection({
   const features = useProjectFeatures();
 
   if (view === 'kanban') {
+    const dateOptions = customFields
+      .filter((field) => field.fieldType === 'date')
+      .map((field) => ({ value: customFieldKey(field.id), label: field.name }));
+    const actualDate = dateOptions.find(
+      (option) => option.value === settings.actualCompletionDateField,
+    );
     const toggle = (p: PropertyKey) =>
       onChange({
         properties: settings.properties.includes(p)
@@ -54,6 +64,18 @@ export default function DisplayPropertiesSection({
             />
           ))}
         </div>
+        {settings.properties.includes('dueDate') && dateOptions.length > 0 && (
+          <DisplaySettingsRow label={t('rows.actualCompletionDateField')}>
+            <DisplaySettingsSelect
+              ariaLabel={t('rows.actualCompletionDateField')}
+              value={actualDate?.value ?? 'none'}
+              onChange={(value) =>
+                onChange({ actualCompletionDateField: isCustomFieldKey(value) ? value : null })
+              }
+              options={[{ value: 'none', label: t('dateFields.unset') }, ...dateOptions]}
+            />
+          </DisplaySettingsRow>
+        )}
       </DisplaySection>
     );
   }

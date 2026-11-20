@@ -1,4 +1,9 @@
 {
+  "deadline": {
+    "dueWithinThreeDays": "Jatuh tempo dalam 3 hari",
+    "dueWithinFiveDays": "Jatuh tempo dalam 5 hari",
+    "completedLate": "Selesai terlambat · {date}"
+  },
   "newIssue": "Issue baru",
   "addWorkItem": "Tambah item kerja",
   "pin": "Sematkan",

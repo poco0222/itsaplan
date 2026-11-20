@@ -70,10 +70,12 @@
     "1": "Lundi"
   },
   "dateFields": {
+    "unset": "Aucune",
     "dueDate": "Échéance",
     "startDate": "Date de début"
   },
   "rows": {
+    "actualCompletionDateField": "Date réelle de fin",
     "columns": "Colonnes",
     "grouping": "Regroupement",
     "swimlanes": "Couloirs",

@@ -1,4 +1,9 @@
 {
+  "deadline": {
+    "dueWithinThreeDays": "3 gün içinde son tarih",
+    "dueWithinFiveDays": "5 gün içinde son tarih",
+    "completedLate": "Geç tamamlandı · {date}"
+  },
   "newIssue": "Yeni iş",
   "addWorkItem": "İş maddesi ekle",
   "pin": "Sabitle",

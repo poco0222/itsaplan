@@ -70,10 +70,12 @@
     "1": "Senin"
   },
   "dateFields": {
+    "unset": "Tidak ada",
     "dueDate": "Tenggat waktu",
     "startDate": "Tanggal mulai"
   },
   "rows": {
+    "actualCompletionDateField": "Tanggal penyelesaian aktual",
     "columns": "Kolom",
     "grouping": "Pengelompokan",
     "swimlanes": "Swimlane",

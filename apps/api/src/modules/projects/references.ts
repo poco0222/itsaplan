@@ -125,6 +125,13 @@ export function mapDisplay(display: unknown, refs: References): unknown {
     if (mapped === undefined) delete out[key];
     else out[key] = mapped;
   }
+  const completionFieldId = fieldIdOf(out.actualCompletionDateField);
+  const completionField =
+    completionFieldId != null && refs.fieldType(completionFieldId) === 'date'
+      ? mapFieldKey(out.actualCompletionDateField, refs)
+      : undefined;
+  if (completionField === undefined) delete out.actualCompletionDateField;
+  else out.actualCompletionDateField = completionField;
   if (Array.isArray(out.properties)) {
     out.properties = kept(out.properties, (key) => mapFieldKey(key, refs));
   }

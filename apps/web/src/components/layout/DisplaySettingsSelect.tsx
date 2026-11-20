@@ -11,10 +11,12 @@ export default function DisplaySettingsSelect({
   value,
   onChange,
   options,
+  ariaLabel,
 }: {
   value: string;
   onChange: (value: string) => void;
   options: { value: string; label: string }[];
+  ariaLabel?: string;
 }) {
   // A closed Radix Select still renders all its items to find the selected label.
   // The Display popover renders several of these on every open, so the label is
@@ -25,6 +27,7 @@ export default function DisplaySettingsSelect({
   return (
     <Select value={value} onValueChange={onChange} onOpenChange={(open) => open && setUsed(true)}>
       <SelectTrigger
+        aria-label={ariaLabel}
         size="sm"
         className="gap-1 border-0 bg-transparent px-2 font-medium shadow-none hover:bg-accent data-[size=sm]:h-7 dark:bg-transparent dark:hover:bg-accent"
         onFocus={() => setUsed(true)}
