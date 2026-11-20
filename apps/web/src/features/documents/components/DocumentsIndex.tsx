@@ -34,7 +34,6 @@ import { cn } from '@/lib/utils';
 import { useMoveDocument, useSetDocumentFavorite } from '../services/documents.service';
 import { DOCUMENT_LIST_TABS, type DocumentListTab } from '../utils/documentList';
 import DocumentTree, { type DocumentSort } from './DocumentTree';
-import DocumentsWeeklyReport from './DocumentsWeeklyReport';
 
 const SORTS = [
   'position',
@@ -61,7 +60,6 @@ export default function DocumentsIndex({
   loading,
   failed,
   canCreate,
-  canPreviewWeeklyReport,
   canEdit,
   authorNames,
   reorderSafe,
@@ -80,7 +78,6 @@ export default function DocumentsIndex({
   loading: boolean;
   failed: boolean;
   canCreate: boolean;
-  canPreviewWeeklyReport?: boolean;
   canEdit: boolean;
   authorNames: Record<string, string>;
   reorderSafe: boolean;
@@ -182,9 +179,6 @@ export default function DocumentsIndex({
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-1.5">
-            {canPreviewWeeklyReport && (
-              <DocumentsWeeklyReport projectKey={projectKey} canSave={canCreate} />
-            )}
             {canCreate && (
               <>
                 <input
