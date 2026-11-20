@@ -1,0 +1,2152 @@
+# comet-execution: managed-run
+schema: comet.native.v4
+name: rolling-plan-dashboard
+language: en
+phase: archive
+status: done
+state_version: 10
+brief: brief.md
+document_constraints_version: 3
+spec_changes: []
+workspace:
+  isolation: current
+  change_branch: main
+  target_branch: main
+  finish: null
+loop:
+  stage: done
+  goal_cycle: 1
+  iteration: 1
+  attempt: 1
+  retry_epoch: 0
+  failed_iteration_count: 0
+  no_progress_count: 0
+  execution_failure_count: 0
+  previous_unresolved_ids: []
+  next_action: null
+acceptance:
+  - id: A1
+    source: brief.md
+    text: Rolling Plan has exactly one saved dashboard named 任务跟进 with its own tab.
+      The built-in Overview remains available.
+    result: passed
+    reason:
+      text: The live read shows exactly one saved dashboard named 任务跟进 with ID 1. The
+        existing dashboard routing and tab components use the saved ID to select
+        its tab and retain the built-in Overview tab.
+      truncated: false
+  - id: A2
+    source: brief.md
+    text: The first row has four live work-item counts with the stated status
+      filters. The two lists below use the matching filters, show up to ten work
+      items each in most-recently-updated order, and use the existing work-item
+      links.
+    result: passed
+    reason:
+      text: Readback confirmed the four counts in row one and both configured issue
+        lists in row two. The saved status filters give 5, 16, 6 and 1 matches
+        on current issue data. The overdue list matches ROLL-25 and the near-due
+        list matches six issues. Existing widget code applies the filters and
+        updated-time sort, limits the rows, and links each to its source issue.
+      truncated: false
+  - id: A3
+    source: brief.md
+    text: The status breakdown shows counts grouped by project status. No issue
+      record or project workflow configuration is edited.
+    result: passed
+    reason:
+      text: Readback shows status grouping. The status endpoint returns seven buckets
+        that reconcile exactly with all 66 live issues. The only connector write
+        was dashboard creation. The repository has no application-source edits.
+      truncated: false
+  - id: A4
+    source: brief.md
+    text: The full-width 活跃度 heatmap below the status breakdown shows project-wide
+      activity grouped by day.
+    result: passed
+    reason:
+      text: Readback shows a project-wide daily pulse widget spanning 12 columns below
+        the breakdown. The live daily pulse query returned 112 date buckets with
+        517 activity records on November 20.
+      truncated: false
+builder_handoff:
+  candidate_id: rolling-plan-dashboard:5
+  identity_provider: skill-coordinated
+  builder_execution_ref: 01a1f673-dfa7-7031-a7a9-bb5c159f7b3d
+  iteration: 1
+  summary:
+    text: Created dashboard 任务跟进 (ID 1) in pocoy.ROLL via the existing dashboard
+      connector. It holds four status counts, two filtered issue lists, the
+      status breakdown and the full-width project-wide daily activity heatmap.
+      The built-in Overview remains available. No application source code or
+      work items were edited.
+    truncated: false
+  addressed_acceptance_ids:
+    - A1
+    - A2
+    - A3
+    - A4
+  checks:
+    - name:
+        text: Itsaplan create_dashboard and list_dashboards on pocoy.ROLL
+        truncated: false
+      result: passed
+      note:
+        text: Create returned HTTP 201. A separate read returned one dashboard named
+          任务跟进 with ID 1, the expected project, and all eight widgets matching
+          the requested positions and settings. DashboardTabs always renders the
+          built-in Overview and lists saved dashboards separately.
+        truncated: false
+    - name:
+        text: Itsaplan list_issues and get_project_breakdown on pocoy.ROLL
+        truncated: false
+      result: passed
+      note:
+        text: The 66 issues match all seven status buckets. The four saved filters match
+          5, 16, 6 and 1 issues respectively. The overdue list matches ROLL-25,
+          and the near-due list matches ROLL-62, ROLL-56, ROLL-49, ROLL-40,
+          ROLL-19 and ROLL-1 in updated order. The saved list settings give a
+          maximum of ten issues and the existing RecentIssuesWidget makes each
+          row an issue link.
+        truncated: false
+    - name:
+        text: Itsaplan get_project_pulse on pocoy.ROLL
+        truncated: false
+      result: passed
+      note:
+        text: The project-wide day query (16 columns) returned 112 nonnegative daily
+          buckets. The November 20 bucket contains 517 activity records. The
+          saved project/day heatmap spans all 12 columns, below the status
+          breakdown.
+        truncated: false
+    - name:
+        text: git status --short --untracked-files=all and git diff --stat in
+          /Users/poco/Projects/itsaplan
+        truncated: false
+      result: passed
+      note:
+        text: Only the two untracked Comet records for this change were present. The
+          dashboard was the only resource written through the connector.
+        truncated: false
+  checks_truncated: false
+  known_limits:
+    - text: Verified via connector readback, live data and UI source. The application
+        was not opened in a browser.
+      truncated: false
+  known_limits_truncated: false
+  review: null
+  submitted_at: 2026-11-20T01:02:41.143Z
+blockers: []
+verification:
+  candidate_id: rolling-plan-dashboard:5
+  identity_provider: skill-coordinated
+  verifier_execution_ref: 01a1f673-dfa7-7031-a7a9-bb5c159f7b3d
+  iteration: 1
+  attempt: 1
+  assurance: self-reviewed
+  verdict: pass
+  checks: []
+  reported_checks:
+    - name:
+        text: Itsaplan create_dashboard and list_dashboards on pocoy.ROLL
+        truncated: false
+      result: passed
+      note:
+        text: Create returned HTTP 201. A separate read returned one dashboard named
+          任务跟进 with ID 1, the expected project, and all eight widgets matching
+          the requested positions and settings. DashboardTabs always renders the
+          built-in Overview and lists saved dashboards separately.
+        truncated: false
+    - name:
+        text: Itsaplan list_issues and get_project_breakdown on pocoy.ROLL
+        truncated: false
+      result: passed
+      note:
+        text: The 66 issues match all seven status buckets. The four saved filters match
+          5, 16, 6 and 1 issues respectively. The overdue list matches ROLL-25,
+          and the near-due list matches ROLL-62, ROLL-56, ROLL-49, ROLL-40,
+          ROLL-19 and ROLL-1 in updated order. The saved list settings give a
+          maximum of ten issues and the existing RecentIssuesWidget makes each
+          row an issue link.
+        truncated: false
+    - name:
+        text: Itsaplan get_project_pulse on pocoy.ROLL
+        truncated: false
+      result: passed
+      note:
+        text: The project-wide day query (16 columns) returned 112 nonnegative daily
+          buckets. The November 20 bucket contains 517 activity records. The
+          saved project/day heatmap spans all 12 columns, below the status
+          breakdown.
+        truncated: false
+    - name:
+        text: git status --short --untracked-files=all and git diff --stat in
+          /Users/poco/Projects/itsaplan
+        truncated: false
+      result: passed
+      note:
+        text: Only the two untracked Comet records for this change were present. The
+          dashboard was the only resource written through the connector.
+        truncated: false
+  summary:
+    text: The saved task-follow-up dashboard matches the approved configuration.
+      Verified its layout, filters, status counts, and daily activity data.
+    truncated: false
+  risks:
+    - text: Checks used live connector readback, live project data and the existing
+        widget source. Browser rendering and clicking through were not
+        exercised.
+      truncated: false
+  risks_truncated: false
+  completed_at: 2026-11-20T01:02:46.258Z
+history:
+  - goal_cycle: 1
+    iteration: 1
+    attempt: 1
+    outcome: pass
+    unresolved_ids: []
+    summary:
+      text: The saved task-follow-up dashboard matches the approved configuration.
+        Verified its layout, filters, status counts, and daily activity data.
+      truncated: false
+    completed_at: 2026-11-20T01:02:46.258Z
+history_overflow:
+  dropped_entries: 0
+  first_dropped_at: null
+  last_dropped_at: null
+  outcome_counts:
+    pass: 0
+    fail: 0
+    blocked: 0
+    execution-error: 0
+    recovery: 0
+verification_result: pass
+verification_report: verification.md
+archived: true
+created_at: 2026-11-20T00:56:26.934Z
+archive_receipt:
+  runId: rolling-plan-dashboard
+  change: rolling-plan-dashboard
+  archiveRef: 2026-11-20-rolling-plan-dashboard
+  transactionId: b525d98f-004a-4a7f-a95f-88211c65c754
+  stateVersion: 10
+  specs: []
+run_checkpoint:
+  {
+    'schema': 'comet.workflow-run-checkpoint.v2',
+    'hash': '35773e78bf0d176f977e33f8b2b2e19cef708f888c34bb21ebf2c51748e061fc',
+    'run':
+      {
+        'protocolVersion': 1,
+        'schemaVersion': 1,
+        'runId': 'rolling-plan-dashboard',
+        'revision': 1,
+        'workflow':
+          {
+            'id': 'comet-native',
+            'version': '4',
+            'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+          },
+        'definitionHashes':
+          {
+            '["comet-native","4"]': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+          },
+        'initialStateHash': '00e723578941f5f2bb101c1451ad7cba092e2cc8bab50340d5885e33f8e10250',
+        'input':
+          {
+            'artifactRootRef': 'docs',
+            'name': 'rolling-plan-dashboard',
+            'task': '能帮我把仪表盘好好弄一下吗?',
+          },
+        'state':
+          {
+            'acceptance':
+              [
+                {
+                  'id': 'A1',
+                  'reason':
+                    {
+                      'text': 'The live read shows exactly one saved dashboard named 任务跟进 with ID 1. The existing dashboard routing and tab components use the saved ID to select its tab and retain the built-in Overview tab.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'Rolling Plan has exactly one saved dashboard named 任务跟进 with its own tab. The built-in Overview remains available.',
+                },
+                {
+                  'id': 'A2',
+                  'reason':
+                    {
+                      'text': 'Readback confirmed the four counts in row one and both configured issue lists in row two. The saved status filters give 5, 16, 6 and 1 matches on current issue data. The overdue list matches ROLL-25 and the near-due list matches six issues. Existing widget code applies the filters and updated-time sort, limits the rows, and links each to its source issue.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'The first row has four live work-item counts with the stated status filters. The two lists below use the matching filters, show up to ten work items each in most-recently-updated order, and use the existing work-item links.',
+                },
+                {
+                  'id': 'A3',
+                  'reason':
+                    {
+                      'text': 'Readback shows status grouping. The status endpoint returns seven buckets that reconcile exactly with all 66 live issues. The only connector write was dashboard creation. The repository has no application-source edits.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'The status breakdown shows counts grouped by project status. No issue record or project workflow configuration is edited.',
+                },
+                {
+                  'id': 'A4',
+                  'reason':
+                    {
+                      'text': 'Readback shows a project-wide daily pulse widget spanning 12 columns below the breakdown. The live daily pulse query returned 112 date buckets with 517 activity records on November 20.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'The full-width 活跃度 heatmap below the status breakdown shows project-wide activity grouped by day.',
+                },
+              ],
+            'archived': true,
+            'blockers': [],
+            'brief': 'brief.md',
+            'builder_handoff':
+              {
+                'addressed_acceptance_ids': ['A1', 'A2', 'A3', 'A4'],
+                'builder_execution_ref': '01a1f673-dfa7-7031-a7a9-bb5c159f7b3d',
+                'candidate_id': 'rolling-plan-dashboard:5',
+                'checks':
+                  [
+                    {
+                      'name':
+                        {
+                          'text': 'Itsaplan create_dashboard and list_dashboards on pocoy.ROLL',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'Create returned HTTP 201. A separate read returned one dashboard named 任务跟进 with ID 1, the expected project, and all eight widgets matching the requested positions and settings. DashboardTabs always renders the built-in Overview and lists saved dashboards separately.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Itsaplan list_issues and get_project_breakdown on pocoy.ROLL',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'The 66 issues match all seven status buckets. The four saved filters match 5, 16, 6 and 1 issues respectively. The overdue list matches ROLL-25, and the near-due list matches ROLL-62, ROLL-56, ROLL-49, ROLL-40, ROLL-19 and ROLL-1 in updated order. The saved list settings give a maximum of ten issues and the existing RecentIssuesWidget makes each row an issue link.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        { 'text': 'Itsaplan get_project_pulse on pocoy.ROLL', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'The project-wide day query (16 columns) returned 112 nonnegative daily buckets. The November 20 bucket contains 517 activity records. The saved project/day heatmap spans all 12 columns, below the status breakdown.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'git status --short --untracked-files=all and git diff --stat in /Users/poco/Projects/itsaplan',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'Only the two untracked Comet records for this change were present. The dashboard was the only resource written through the connector.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                  ],
+                'checks_truncated': false,
+                'identity_provider': 'skill-coordinated',
+                'iteration': 1,
+                'known_limits':
+                  [
+                    {
+                      'text': 'Verified via connector readback, live data and UI source. The application was not opened in a browser.',
+                      'truncated': false,
+                    },
+                  ],
+                'known_limits_truncated': false,
+                'review': null,
+                'submitted_at': '2026-11-20T01:02:41.143Z',
+                'summary':
+                  {
+                    'text': 'Created dashboard 任务跟进 (ID 1) in pocoy.ROLL via the existing dashboard connector. It holds four status counts, two filtered issue lists, the status breakdown and the full-width project-wide daily activity heatmap. The built-in Overview remains available. No application source code or work items were edited.',
+                    'truncated': false,
+                  },
+              },
+            'created_at': '2026-11-20T00:56:26.934Z',
+            'document_constraints_version': 3,
+            'history':
+              [
+                {
+                  'attempt': 1,
+                  'completed_at': '2026-11-20T01:02:46.258Z',
+                  'goal_cycle': 1,
+                  'iteration': 1,
+                  'outcome': 'pass',
+                  'summary':
+                    {
+                      'text': 'The saved task-follow-up dashboard matches the approved configuration. Verified its layout, filters, status counts, and daily activity data.',
+                      'truncated': false,
+                    },
+                  'unresolved_ids': [],
+                },
+              ],
+            'history_overflow':
+              {
+                'dropped_entries': 0,
+                'first_dropped_at': null,
+                'last_dropped_at': null,
+                'outcome_counts':
+                  { 'blocked': 0, 'execution-error': 0, 'fail': 0, 'pass': 0, 'recovery': 0 },
+              },
+            'language': 'en',
+            'loop':
+              {
+                'attempt': 1,
+                'execution_failure_count': 0,
+                'failed_iteration_count': 0,
+                'goal_cycle': 1,
+                'iteration': 1,
+                'next_action': null,
+                'no_progress_count': 0,
+                'previous_unresolved_ids': [],
+                'retry_epoch': 0,
+                'stage': 'done',
+              },
+            'name': 'rolling-plan-dashboard',
+            'phase': 'archive',
+            'schema': 'comet.native.v4',
+            'spec_changes': [],
+            'state_version': 10,
+            'status': 'done',
+            'verification':
+              {
+                'assurance': 'self-reviewed',
+                'attempt': 1,
+                'candidate_id': 'rolling-plan-dashboard:5',
+                'checks': [],
+                'completed_at': '2026-11-20T01:02:46.258Z',
+                'identity_provider': 'skill-coordinated',
+                'iteration': 1,
+                'reported_checks':
+                  [
+                    {
+                      'name':
+                        {
+                          'text': 'Itsaplan create_dashboard and list_dashboards on pocoy.ROLL',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'Create returned HTTP 201. A separate read returned one dashboard named 任务跟进 with ID 1, the expected project, and all eight widgets matching the requested positions and settings. DashboardTabs always renders the built-in Overview and lists saved dashboards separately.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Itsaplan list_issues and get_project_breakdown on pocoy.ROLL',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'The 66 issues match all seven status buckets. The four saved filters match 5, 16, 6 and 1 issues respectively. The overdue list matches ROLL-25, and the near-due list matches ROLL-62, ROLL-56, ROLL-49, ROLL-40, ROLL-19 and ROLL-1 in updated order. The saved list settings give a maximum of ten issues and the existing RecentIssuesWidget makes each row an issue link.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        { 'text': 'Itsaplan get_project_pulse on pocoy.ROLL', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'The project-wide day query (16 columns) returned 112 nonnegative daily buckets. The November 20 bucket contains 517 activity records. The saved project/day heatmap spans all 12 columns, below the status breakdown.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'git status --short --untracked-files=all and git diff --stat in /Users/poco/Projects/itsaplan',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'Only the two untracked Comet records for this change were present. The dashboard was the only resource written through the connector.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                  ],
+                'risks':
+                  [
+                    {
+                      'text': 'Checks used live connector readback, live project data and the existing widget source. Browser rendering and clicking through were not exercised.',
+                      'truncated': false,
+                    },
+                  ],
+                'risks_truncated': false,
+                'summary':
+                  {
+                    'text': 'The saved task-follow-up dashboard matches the approved configuration. Verified its layout, filters, status counts, and daily activity data.',
+                    'truncated': false,
+                  },
+                'verdict': 'pass',
+                'verifier_execution_ref': '01a1f673-dfa7-7031-a7a9-bb5c159f7b3d',
+              },
+            'verification_report': 'verification.md',
+            'verification_result': 'pass',
+            'workspace':
+              {
+                'change_branch': 'main',
+                'finish': null,
+                'isolation': 'current',
+                'target_branch': 'main',
+              },
+          },
+        'status': 'completed',
+        'sequence': 10,
+        'actions':
+          [
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a1f673-dfa7-7031-a7a9-bb5c159f7b3d',
+                  'token': 'portable-59be838b91bff351531a7adbed5ded17e49fe724510bc83005456ef4bd5fcda9',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'rolling-plan-dashboard:1',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'rolling-plan-dashboard',
+                      'task': '能帮我把仪表盘好好弄一下吗?',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '7faf1aada2ecb15eca1f714b0c98c9f2c8206520c44473308525625a6f17523f',
+              'outcome':
+                {
+                  'actionId': 'rolling-plan-dashboard:1',
+                  'attempt': 1,
+                  'claimToken': 'portable-59be838b91bff351531a7adbed5ded17e49fe724510bc83005456ef4bd5fcda9',
+                  'inputHash': '7faf1aada2ecb15eca1f714b0c98c9f2c8206520c44473308525625a6f17523f',
+                  'outcomeId': 'native-result-ac60eb48223db720207857be66c59c8aa338c4e5d3c2a108041afd6a5e3a3a10',
+                  'output':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'source': 'brief.md',
+                            'text': 'Rolling Plan has a single saved dashboard named 任务跟进 with its own tab alongside the built-in Overview.',
+                          },
+                          {
+                            'id': 'A2',
+                            'source': 'brief.md',
+                            'text': 'Four live counts at the top show 待确认, 未开始, 临期处理中 (the two existing near-due in-progress status columns), and 已超期. Below the counts, the overdue and near-due lists use those same status filters, show up to ten items each ordered by most recently updated, and link to the work items.',
+                          },
+                          {
+                            'id': 'A3',
+                            'source': 'brief.md',
+                            'text': 'The final widget shows the issue breakdown by project status. The saved change consists only of dashboard configuration and its Comet records.',
+                          },
+                        ],
+                      'children': null,
+                      'specChanges': [],
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '1397849c98d6338b7253106c0704a727d925b24a5d602ea2cb1fa34b493ca34e',
+                    'outcomeId': 'native-result-ac60eb48223db720207857be66c59c8aa338c4e5d3c2a108041afd6a5e3a3a10',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-shape-prepare',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'rolling-plan-dashboard',
+              'status': 'succeeded',
+              'stepId': 'shape.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-cli',
+                  'token': 'portable-100f708e030e0e124876a3a7db2d686990c7df6d04509c9307e5668f9f0eadb6',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'rolling-plan-dashboard:3',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'rolling-plan-dashboard',
+                      'task': '能帮我把仪表盘好好弄一下吗?',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': 'ef9138f05dfbb68b855ffebd14122b283d6b234bb46baf3e957aec834ca671fc',
+              'outcome':
+                {
+                  'actionId': 'rolling-plan-dashboard:3',
+                  'attempt': 1,
+                  'claimToken': 'portable-100f708e030e0e124876a3a7db2d686990c7df6d04509c9307e5668f9f0eadb6',
+                  'inputHash': 'ef9138f05dfbb68b855ffebd14122b283d6b234bb46baf3e957aec834ca671fc',
+                  'outcomeId': '2ee7c9d5-5b87-4de2-a35a-c4f7e68c4387',
+                  'output':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'source': 'brief.md',
+                            'text': 'Rolling Plan has exactly one saved dashboard named 任务跟进 with its own tab. The built-in Overview remains available.',
+                          },
+                          {
+                            'id': 'A2',
+                            'source': 'brief.md',
+                            'text': 'The first row has four live work-item counts with the stated status filters. The two lists below use the matching filters, show up to ten work items each in most-recently-updated order, and use the existing work-item links.',
+                          },
+                          {
+                            'id': 'A3',
+                            'source': 'brief.md',
+                            'text': 'The status breakdown shows counts grouped by project status. No issue record or project workflow configuration is edited.',
+                          },
+                          {
+                            'id': 'A4',
+                            'source': 'brief.md',
+                            'text': 'The full-width 活跃度 heatmap below the status breakdown shows project-wide activity grouped by day.',
+                          },
+                        ],
+                      'children': null,
+                      'specChanges': [],
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '83f4c5b576bb6dab1c784ef657cdbea37c0b94ae0499f321a765171cde1ff74f',
+                    'outcomeId': '2ee7c9d5-5b87-4de2-a35a-c4f7e68c4387',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-shape-prepare',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'rolling-plan-dashboard',
+              'status': 'succeeded',
+              'stepId': 'shape.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a1f673-dfa7-7031-a7a9-bb5c159f7b3d',
+                  'token': 'portable-51a4e87b2d0d51157c70aa6d75184ee8fb5baacaedec395b11442b4d4b5e015e',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'rolling-plan-dashboard:5',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'rolling-plan-dashboard',
+                      'task': '能帮我把仪表盘好好弄一下吗?',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '9cd964beab936af62e470b5ffef34a79a461e0b8be7d8419eb806b24dfb94a21',
+              'outcome':
+                {
+                  'actionId': 'rolling-plan-dashboard:5',
+                  'attempt': 1,
+                  'claimToken': 'portable-51a4e87b2d0d51157c70aa6d75184ee8fb5baacaedec395b11442b4d4b5e015e',
+                  'inputHash': '9cd964beab936af62e470b5ffef34a79a461e0b8be7d8419eb806b24dfb94a21',
+                  'outcomeId': 'native-result-da201b8c0c3797fbda1bf53576c55e1da8e914cbe86eb74de4719aa336dce8cd',
+                  'output':
+                    {
+                      'addressedAcceptanceIds': ['A1', 'A2', 'A3', 'A4'],
+                      'checks':
+                        [
+                          {
+                            'name': 'Itsaplan create_dashboard and list_dashboards on pocoy.ROLL',
+                            'note': 'Create returned HTTP 201. A separate read returned one dashboard named 任务跟进 with ID 1, the expected project, and all eight widgets matching the requested positions and settings. DashboardTabs always renders the built-in Overview and lists saved dashboards separately.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Itsaplan list_issues and get_project_breakdown on pocoy.ROLL',
+                            'note': 'The 66 issues match all seven status buckets. The four saved filters match 5, 16, 6 and 1 issues respectively. The overdue list matches ROLL-25, and the near-due list matches ROLL-62, ROLL-56, ROLL-49, ROLL-40, ROLL-19 and ROLL-1 in updated order. The saved list settings give a maximum of ten issues and the existing RecentIssuesWidget makes each row an issue link.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Itsaplan get_project_pulse on pocoy.ROLL',
+                            'note': 'The project-wide day query (16 columns) returned 112 nonnegative daily buckets. The November 20 bucket contains 517 activity records. The saved project/day heatmap spans all 12 columns, below the status breakdown.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'git status --short --untracked-files=all and git diff --stat in /Users/poco/Projects/itsaplan',
+                            'note': 'Only the two untracked Comet records for this change were present. The dashboard was the only resource written through the connector.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'knownLimits':
+                        [
+                          'Verified via connector readback, live data and UI source. The application was not opened in a browser.',
+                        ],
+                      'requireIndependentReview': false,
+                      'summary': 'Created dashboard 任务跟进 (ID 1) in pocoy.ROLL via the existing dashboard connector. It holds four status counts, two filtered issue lists, the status breakdown and the full-width project-wide daily activity heatmap. The built-in Overview remains available. No application source code or work items were edited.',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '5915aa1b4b28f0da84e0edbae9b2d966926ef6ce582b5c78327c7ffcfb1c3f68',
+                    'outcomeId': 'native-result-da201b8c0c3797fbda1bf53576c55e1da8e914cbe86eb74de4719aa336dce8cd',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-builder',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'rolling-plan-dashboard',
+              'status': 'succeeded',
+              'stepId': 'build.builder',
+              'type': 'handoff',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a1f673-dfa7-7031-a7a9-bb5c159f7b3d',
+                  'token': 'portable-d9bf31eaa0c09e597726489dbda2ba8372d4d288100607c02a213d0022b4be25',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'rolling-plan-dashboard:6',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'rolling-plan-dashboard',
+                      'task': '能帮我把仪表盘好好弄一下吗?',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': 'de52cff8206abe80084c8b29f22ce86fd144f70542afd0b0baca6d76b93b0982',
+              'outcome':
+                {
+                  'actionId': 'rolling-plan-dashboard:6',
+                  'attempt': 1,
+                  'claimToken': 'portable-d9bf31eaa0c09e597726489dbda2ba8372d4d288100607c02a213d0022b4be25',
+                  'inputHash': 'de52cff8206abe80084c8b29f22ce86fd144f70542afd0b0baca6d76b93b0982',
+                  'outcomeId': 'native-result-d3a5f6bd2bc34ff26ffe004f379fee872e965fb7459e957470adf4b8a43b470d',
+                  'output':
+                    {
+                      'candidateId': 'rolling-plan-dashboard:5',
+                      'checks':
+                        [
+                          {
+                            'name': 'Itsaplan create_dashboard and list_dashboards on pocoy.ROLL',
+                            'note': 'Create returned HTTP 201. A separate read returned one dashboard named 任务跟进 with ID 1, the expected project, and all eight widgets matching the requested positions and settings. DashboardTabs always renders the built-in Overview and lists saved dashboards separately.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Itsaplan list_issues and get_project_breakdown on pocoy.ROLL',
+                            'note': 'The 66 issues match all seven status buckets. The four saved filters match 5, 16, 6 and 1 issues respectively. The overdue list matches ROLL-25, and the near-due list matches ROLL-62, ROLL-56, ROLL-49, ROLL-40, ROLL-19 and ROLL-1 in updated order. The saved list settings give a maximum of ten issues and the existing RecentIssuesWidget makes each row an issue link.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Itsaplan get_project_pulse on pocoy.ROLL',
+                            'note': 'The project-wide day query (16 columns) returned 112 nonnegative daily buckets. The November 20 bucket contains 517 activity records. The saved project/day heatmap spans all 12 columns, below the status breakdown.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'git status --short --untracked-files=all and git diff --stat in /Users/poco/Projects/itsaplan',
+                            'note': 'Only the two untracked Comet records for this change were present. The dashboard was the only resource written through the connector.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'response':
+                        {
+                          'kind': 'final-result',
+                          'result':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'reason': 'The live read shows exactly one saved dashboard named 任务跟进 with ID 1. The existing dashboard routing and tab components use the saved ID to select its tab and retain the built-in Overview tab.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'reason': 'Readback confirmed the four counts in row one and both configured issue lists in row two. The saved status filters give 5, 16, 6 and 1 matches on current issue data. The overdue list matches ROLL-25 and the near-due list matches six issues. Existing widget code applies the filters and updated-time sort, limits the rows, and links each to its source issue.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'reason': 'Readback shows status grouping. The status endpoint returns seven buckets that reconcile exactly with all 66 live issues. The only connector write was dashboard creation. The repository has no application-source edits.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A4',
+                                    'reason': 'Readback shows a project-wide daily pulse widget spanning 12 columns below the breakdown. The live daily pulse query returned 112 date buckets with 517 activity records on November 20.',
+                                    'result': 'passed',
+                                  },
+                                ],
+                              'attempt': 1,
+                              'iteration': 1,
+                              'requestReview':
+                                {
+                                  'reason': 'The user requested dashboard improvement, clarified that they wanted configuration rather than source edits, asked to retain 活跃度, and replied 确认 to the revised preview. The approved result is a saved dashboard using existing project features.',
+                                  'result': 'aligned',
+                                },
+                              'risks':
+                                [
+                                  'Checks used live connector readback, live project data and the existing widget source. Browser rendering and clicking through were not exercised.',
+                                ],
+                              'summary': 'The saved task-follow-up dashboard matches the approved configuration. Verified its layout, filters, status counts, and daily activity data.',
+                              'verdict': 'pass',
+                            },
+                        },
+                      'verifierExecutionRef': '01a1f673-dfa7-7031-a7a9-bb5c159f7b3d',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '5f07c410a774c36e124c70c38f428137c44c5b8b47c1abd16a97367749c3d16f',
+                    'outcomeId': 'native-result-d3a5f6bd2bc34ff26ffe004f379fee872e965fb7459e957470adf4b8a43b470d',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-verifier',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'rolling-plan-dashboard',
+              'status': 'succeeded',
+              'stepId': 'verify.verifier',
+              'type': 'handoff',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-preflight',
+                  'token': 'portable-3a1e84e1eb95be6678788a89b0e6936f2a64ea1b5edac34f60d005e64f70d9a5',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'rolling-plan-dashboard:8',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'rolling-plan-dashboard',
+                      'task': '能帮我把仪表盘好好弄一下吗?',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '04e1e8510ac82c36d1e8a2045c256b505d0a2a55935b971ed1187390c1377c00',
+              'outcome':
+                {
+                  'actionId': 'rolling-plan-dashboard:8',
+                  'attempt': 1,
+                  'claimToken': 'portable-3a1e84e1eb95be6678788a89b0e6936f2a64ea1b5edac34f60d005e64f70d9a5',
+                  'inputHash': '04e1e8510ac82c36d1e8a2045c256b505d0a2a55935b971ed1187390c1377c00',
+                  'outcomeId': 'rolling-plan-dashboard:8:1:executor-result',
+                  'output':
+                    {
+                      'archiveDirRef': 'docs/comet/archive/2026-11-20-rolling-plan-dashboard',
+                      'blockers': [],
+                      'candidateId': 'rolling-plan-dashboard:5',
+                      'capabilityPeers': [],
+                      'ready': true,
+                      'reportRef': 'docs/comet/changes/rolling-plan-dashboard/verification.md',
+                      'reportStateVersion': 8,
+                      'requiresReverification': false,
+                      'specPreview': [],
+                      'stateVersion': 9,
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '746ecdb24ede6c66ea9301dcddf44dc2d196a21ade0e3cca103085b69aa9f655',
+                    'outcomeId': 'rolling-plan-dashboard:8:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive-preflight',
+              'requiredCapabilities': [],
+              'retry': 'idempotent',
+              'runId': 'rolling-plan-dashboard',
+              'status': 'succeeded',
+              'stepId': 'archive.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-apply',
+                  'token': 'portable-0a27c8ef800357446e210a0082dfa4bbfdd214e437b1224ca0edfaab18785b4e',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'rolling-plan-dashboard:9',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'rolling-plan-dashboard',
+                      'task': '能帮我把仪表盘好好弄一下吗?',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': 'e577079eb20653afa7d6966fe549d72dfa5b0f4a0785f09961df7eb4eb83a668',
+              'outcome':
+                {
+                  'actionId': 'rolling-plan-dashboard:9',
+                  'attempt': 1,
+                  'claimToken': 'portable-0a27c8ef800357446e210a0082dfa4bbfdd214e437b1224ca0edfaab18785b4e',
+                  'inputHash': 'e577079eb20653afa7d6966fe549d72dfa5b0f4a0785f09961df7eb4eb83a668',
+                  'outcomeId': 'rolling-plan-dashboard:9:1:executor-result',
+                  'output':
+                    {
+                      'archiveRef': '2026-11-20-rolling-plan-dashboard',
+                      'specCount': 0,
+                      'stateVersion': 9,
+                      'transactionId': 'b525d98f-004a-4a7f-a95f-88211c65c754',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '48ff10a8bfb19e13413b71ce8042f960c7b75687f2726fd1b3c1de54c158fb98',
+                    'outcomeId': 'rolling-plan-dashboard:9:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'rolling-plan-dashboard',
+              'status': 'succeeded',
+              'stepId': 'archive.execute',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-finalize',
+                  'token': 'portable-c034582105424154248627446df3a524fdb98c3afd1cdfa3fd72fea065b9a18e',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'rolling-plan-dashboard:10',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'rolling-plan-dashboard',
+                      'task': '能帮我把仪表盘好好弄一下吗?',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '68332368441a54ae820c4664c1773cda13e1e6c1004c99f49dd963b92904eb1e',
+              'outcome':
+                {
+                  'actionId': 'rolling-plan-dashboard:10',
+                  'attempt': 1,
+                  'claimToken': 'portable-c034582105424154248627446df3a524fdb98c3afd1cdfa3fd72fea065b9a18e',
+                  'inputHash': '68332368441a54ae820c4664c1773cda13e1e6c1004c99f49dd963b92904eb1e',
+                  'outcomeId': 'rolling-plan-dashboard:10:1:executor-result',
+                  'output':
+                    {
+                      'archiveRef': '2026-11-20-rolling-plan-dashboard',
+                      'change': 'rolling-plan-dashboard',
+                      'runId': 'rolling-plan-dashboard',
+                      'specs': [],
+                      'stateVersion': 10,
+                      'transactionId': 'b525d98f-004a-4a7f-a95f-88211c65c754',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'f37352bf8168148803da07239de80eb22fc5213a50993e3407ba268241a07ec7',
+                    'outcomeId': 'rolling-plan-dashboard:10:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive-finalize',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'rolling-plan-dashboard',
+              'status': 'succeeded',
+              'stepId': 'archive.finalize',
+              'type': 'call_tool',
+            },
+          ],
+        'actionContexts':
+          {
+            'rolling-plan-dashboard:1': { 'results': {}, 'sequence': 1 },
+            'rolling-plan-dashboard:10': { 'results': {}, 'sequence': 10 },
+            'rolling-plan-dashboard:3': { 'results': {}, 'sequence': 3 },
+            'rolling-plan-dashboard:5': { 'results': {}, 'sequence': 5 },
+            'rolling-plan-dashboard:6': { 'results': {}, 'sequence': 6 },
+            'rolling-plan-dashboard:8': { 'results': {}, 'sequence': 8 },
+            'rolling-plan-dashboard:9': { 'results': {}, 'sequence': 9 },
+          },
+        'waits':
+          [
+            {
+              'id': 'rolling-plan-dashboard:2',
+              'stepId': 'shape.confirm',
+              'sequence': 2,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'rolling-plan-dashboard',
+                      'task': '能帮我把仪表盘好好弄一下吗?',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'Rolling Plan has a single saved dashboard named 任务跟进 with its own tab alongside the built-in Overview.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'Four live counts at the top show 待确认, 未开始, 临期处理中 (the two existing near-due in-progress status columns), and 已超期. Below the counts, the overdue and near-due lists use those same status filters, show up to ten items each ordered by most recently updated, and link to the work items.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'The final widget shows the issue breakdown by project status. The saved change consists only of dashboard configuration and its Comet records.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges': [],
+                        },
+                    },
+                },
+              'proposalHash': '9ea3d1eb21de4b1e939568539ae2cd9da60f46647db301758ffb8b4826423403',
+              'choices': ['approved', 'rejected'],
+              'results': {},
+              'decision':
+                {
+                  'id': 'abf80cc80fd031c70910b4279b009e0f5cab0391bbe3dfd813df6c46e9c4b978',
+                  'choice': 'rejected',
+                  'proposalHash': '9ea3d1eb21de4b1e939568539ae2cd9da60f46647db301758ffb8b4826423403',
+                },
+            },
+            {
+              'id': 'rolling-plan-dashboard:4',
+              'stepId': 'shape.confirm',
+              'sequence': 4,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'rolling-plan-dashboard',
+                      'task': '能帮我把仪表盘好好弄一下吗?',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'Rolling Plan has exactly one saved dashboard named 任务跟进 with its own tab. The built-in Overview remains available.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'The first row has four live work-item counts with the stated status filters. The two lists below use the matching filters, show up to ten work items each in most-recently-updated order, and use the existing work-item links.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'The status breakdown shows counts grouped by project status. No issue record or project workflow configuration is edited.',
+                              },
+                              {
+                                'id': 'A4',
+                                'source': 'brief.md',
+                                'text': 'The full-width 活跃度 heatmap below the status breakdown shows project-wide activity grouped by day.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges': [],
+                        },
+                    },
+                },
+              'proposalHash': '0a435c7819c70bf0c9a57b3fedb8fcb07798767fcf272d066bdc5fa7166717ee',
+              'choices': ['approved', 'rejected'],
+              'results': {},
+              'decision':
+                {
+                  'id': 'eba2bc97f13e6332c3625b955c7a4a6e2abd24a5b95369635fc58dff3b3543a0',
+                  'choice': 'approved',
+                  'proposalHash': '0a435c7819c70bf0c9a57b3fedb8fcb07798767fcf272d066bdc5fa7166717ee',
+                },
+            },
+            {
+              'id': 'rolling-plan-dashboard:7',
+              'stepId': 'verify.confirm',
+              'sequence': 7,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'activation':
+                    {
+                      'report':
+                        {
+                          'attempt': 1,
+                          'candidateId': 'rolling-plan-dashboard:5',
+                          'iteration': 1,
+                          'reportRef': 'docs/comet/changes/rolling-plan-dashboard/verification.md',
+                          'stateVersion': 8,
+                        },
+                    },
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'rolling-plan-dashboard',
+                      'task': '能帮我把仪表盘好好弄一下吗?',
+                    },
+                  'outputs':
+                    {
+                      'verify.verifier':
+                        {
+                          'candidateId': 'rolling-plan-dashboard:5',
+                          'checks':
+                            [
+                              {
+                                'name': 'Itsaplan create_dashboard and list_dashboards on pocoy.ROLL',
+                                'note': 'Create returned HTTP 201. A separate read returned one dashboard named 任务跟进 with ID 1, the expected project, and all eight widgets matching the requested positions and settings. DashboardTabs always renders the built-in Overview and lists saved dashboards separately.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Itsaplan list_issues and get_project_breakdown on pocoy.ROLL',
+                                'note': 'The 66 issues match all seven status buckets. The four saved filters match 5, 16, 6 and 1 issues respectively. The overdue list matches ROLL-25, and the near-due list matches ROLL-62, ROLL-56, ROLL-49, ROLL-40, ROLL-19 and ROLL-1 in updated order. The saved list settings give a maximum of ten issues and the existing RecentIssuesWidget makes each row an issue link.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Itsaplan get_project_pulse on pocoy.ROLL',
+                                'note': 'The project-wide day query (16 columns) returned 112 nonnegative daily buckets. The November 20 bucket contains 517 activity records. The saved project/day heatmap spans all 12 columns, below the status breakdown.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'git status --short --untracked-files=all and git diff --stat in /Users/poco/Projects/itsaplan',
+                                'note': 'Only the two untracked Comet records for this change were present. The dashboard was the only resource written through the connector.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'response':
+                            {
+                              'kind': 'final-result',
+                              'result':
+                                {
+                                  'acceptance':
+                                    [
+                                      {
+                                        'id': 'A1',
+                                        'reason': 'The live read shows exactly one saved dashboard named 任务跟进 with ID 1. The existing dashboard routing and tab components use the saved ID to select its tab and retain the built-in Overview tab.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A2',
+                                        'reason': 'Readback confirmed the four counts in row one and both configured issue lists in row two. The saved status filters give 5, 16, 6 and 1 matches on current issue data. The overdue list matches ROLL-25 and the near-due list matches six issues. Existing widget code applies the filters and updated-time sort, limits the rows, and links each to its source issue.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A3',
+                                        'reason': 'Readback shows status grouping. The status endpoint returns seven buckets that reconcile exactly with all 66 live issues. The only connector write was dashboard creation. The repository has no application-source edits.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A4',
+                                        'reason': 'Readback shows a project-wide daily pulse widget spanning 12 columns below the breakdown. The live daily pulse query returned 112 date buckets with 517 activity records on November 20.',
+                                        'result': 'passed',
+                                      },
+                                    ],
+                                  'attempt': 1,
+                                  'iteration': 1,
+                                  'requestReview':
+                                    {
+                                      'reason': 'The user requested dashboard improvement, clarified that they wanted configuration rather than source edits, asked to retain 活跃度, and replied 确认 to the revised preview. The approved result is a saved dashboard using existing project features.',
+                                      'result': 'aligned',
+                                    },
+                                  'risks':
+                                    [
+                                      'Checks used live connector readback, live project data and the existing widget source. Browser rendering and clicking through were not exercised.',
+                                    ],
+                                  'summary': 'The saved task-follow-up dashboard matches the approved configuration. Verified its layout, filters, status counts, and daily activity data.',
+                                  'verdict': 'pass',
+                                },
+                            },
+                          'verifierExecutionRef': '01a1f673-dfa7-7031-a7a9-bb5c159f7b3d',
+                        },
+                    },
+                },
+              'proposalHash': '20f5e001b0bb686df7c0787e074faedeb2075306f7d6a059b778665a6e860e73',
+              'choices': ['approved', 'rejected', 'reverify'],
+              'results': {},
+              'decision':
+                {
+                  'id': '94795d19b28f5e5588b33961973b81912aa5d38c2486cfc51315a37c301cf91e',
+                  'choice': 'approved',
+                  'proposalHash': '20f5e001b0bb686df7c0787e074faedeb2075306f7d6a059b778665a6e860e73',
+                  'reason': 'The user accepted the verified Rolling Plan 任务跟进 dashboard and explicitly requested archive.',
+                },
+            },
+          ],
+        'ready': [],
+        'joins': {},
+        'outputs': {},
+        'children': [],
+        'lineage': [],
+      },
+    'sourceRevision': 17,
+    'sourceHash': 'b463c4d9bd65aeaf326138cda5ffc6e38b3b4a76dfc4ecf4c01ecf6cd409f032',
+    'pool':
+      {
+        'version': 3,
+        'values':
+          [
+            {
+              'choice': 'rejected',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'rolling-plan-dashboard',
+                      'task': '能帮我把仪表盘好好弄一下吗?',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'Rolling Plan has a single saved dashboard named 任务跟进 with its own tab alongside the built-in Overview.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'Four live counts at the top show 待确认, 未开始, 临期处理中 (the two existing near-due in-progress status columns), and 已超期. Below the counts, the overdue and near-due lists use those same status filters, show up to ten items each ordered by most recently updated, and link to the work items.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'The final widget shows the issue breakdown by project status. The saved change consists only of dashboard configuration and its Comet records.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges': [],
+                        },
+                    },
+                },
+            },
+            {
+              'acceptance':
+                [
+                  {
+                    'id': 'A1',
+                    'source': 'brief.md',
+                    'text': 'Rolling Plan has a single saved dashboard named 任务跟进 with its own tab alongside the built-in Overview.',
+                  },
+                  {
+                    'id': 'A2',
+                    'source': 'brief.md',
+                    'text': 'Four live counts at the top show 待确认, 未开始, 临期处理中 (the two existing near-due in-progress status columns), and 已超期. Below the counts, the overdue and near-due lists use those same status filters, show up to ten items each ordered by most recently updated, and link to the work items.',
+                  },
+                  {
+                    'id': 'A3',
+                    'source': 'brief.md',
+                    'text': 'The final widget shows the issue breakdown by project status. The saved change consists only of dashboard configuration and its Comet records.',
+                  },
+                ],
+              'children': null,
+              'specChanges': [],
+            },
+            {
+              'choice': 'approved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'rolling-plan-dashboard',
+                      'task': '能帮我把仪表盘好好弄一下吗?',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'Rolling Plan has exactly one saved dashboard named 任务跟进 with its own tab. The built-in Overview remains available.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'The first row has four live work-item counts with the stated status filters. The two lists below use the matching filters, show up to ten work items each in most-recently-updated order, and use the existing work-item links.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'The status breakdown shows counts grouped by project status. No issue record or project workflow configuration is edited.',
+                              },
+                              {
+                                'id': 'A4',
+                                'source': 'brief.md',
+                                'text': 'The full-width 活跃度 heatmap below the status breakdown shows project-wide activity grouped by day.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges': [],
+                        },
+                    },
+                },
+            },
+            {
+              'acceptance':
+                [
+                  {
+                    'id': 'A1',
+                    'source': 'brief.md',
+                    'text': 'Rolling Plan has exactly one saved dashboard named 任务跟进 with its own tab. The built-in Overview remains available.',
+                  },
+                  {
+                    'id': 'A2',
+                    'source': 'brief.md',
+                    'text': 'The first row has four live work-item counts with the stated status filters. The two lists below use the matching filters, show up to ten work items each in most-recently-updated order, and use the existing work-item links.',
+                  },
+                  {
+                    'id': 'A3',
+                    'source': 'brief.md',
+                    'text': 'The status breakdown shows counts grouped by project status. No issue record or project workflow configuration is edited.',
+                  },
+                  {
+                    'id': 'A4',
+                    'source': 'brief.md',
+                    'text': 'The full-width 活跃度 heatmap below the status breakdown shows project-wide activity grouped by day.',
+                  },
+                ],
+              'children': null,
+              'specChanges': [],
+            },
+            {
+              'addressedAcceptanceIds': ['A1', 'A2', 'A3', 'A4'],
+              'checks':
+                [
+                  {
+                    'name': 'Itsaplan create_dashboard and list_dashboards on pocoy.ROLL',
+                    'note': 'Create returned HTTP 201. A separate read returned one dashboard named 任务跟进 with ID 1, the expected project, and all eight widgets matching the requested positions and settings. DashboardTabs always renders the built-in Overview and lists saved dashboards separately.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Itsaplan list_issues and get_project_breakdown on pocoy.ROLL',
+                    'note': 'The 66 issues match all seven status buckets. The four saved filters match 5, 16, 6 and 1 issues respectively. The overdue list matches ROLL-25, and the near-due list matches ROLL-62, ROLL-56, ROLL-49, ROLL-40, ROLL-19 and ROLL-1 in updated order. The saved list settings give a maximum of ten issues and the existing RecentIssuesWidget makes each row an issue link.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Itsaplan get_project_pulse on pocoy.ROLL',
+                    'note': 'The project-wide day query (16 columns) returned 112 nonnegative daily buckets. The November 20 bucket contains 517 activity records. The saved project/day heatmap spans all 12 columns, below the status breakdown.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'git status --short --untracked-files=all and git diff --stat in /Users/poco/Projects/itsaplan',
+                    'note': 'Only the two untracked Comet records for this change were present. The dashboard was the only resource written through the connector.',
+                    'result': 'passed',
+                  },
+                ],
+              'knownLimits':
+                [
+                  'Verified via connector readback, live data and UI source. The application was not opened in a browser.',
+                ],
+              'requireIndependentReview': false,
+              'summary': 'Created dashboard 任务跟进 (ID 1) in pocoy.ROLL via the existing dashboard connector. It holds four status counts, two filtered issue lists, the status breakdown and the full-width project-wide daily activity heatmap. The built-in Overview remains available. No application source code or work items were edited.',
+            },
+            {
+              'choice': 'approved',
+              'proposal':
+                {
+                  'activation':
+                    {
+                      'report':
+                        {
+                          'attempt': 1,
+                          'candidateId': 'rolling-plan-dashboard:5',
+                          'iteration': 1,
+                          'reportRef': 'docs/comet/changes/rolling-plan-dashboard/verification.md',
+                          'stateVersion': 8,
+                        },
+                    },
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'rolling-plan-dashboard',
+                      'task': '能帮我把仪表盘好好弄一下吗?',
+                    },
+                  'outputs':
+                    {
+                      'verify.verifier':
+                        {
+                          'candidateId': 'rolling-plan-dashboard:5',
+                          'checks':
+                            [
+                              {
+                                'name': 'Itsaplan create_dashboard and list_dashboards on pocoy.ROLL',
+                                'note': 'Create returned HTTP 201. A separate read returned one dashboard named 任务跟进 with ID 1, the expected project, and all eight widgets matching the requested positions and settings. DashboardTabs always renders the built-in Overview and lists saved dashboards separately.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Itsaplan list_issues and get_project_breakdown on pocoy.ROLL',
+                                'note': 'The 66 issues match all seven status buckets. The four saved filters match 5, 16, 6 and 1 issues respectively. The overdue list matches ROLL-25, and the near-due list matches ROLL-62, ROLL-56, ROLL-49, ROLL-40, ROLL-19 and ROLL-1 in updated order. The saved list settings give a maximum of ten issues and the existing RecentIssuesWidget makes each row an issue link.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Itsaplan get_project_pulse on pocoy.ROLL',
+                                'note': 'The project-wide day query (16 columns) returned 112 nonnegative daily buckets. The November 20 bucket contains 517 activity records. The saved project/day heatmap spans all 12 columns, below the status breakdown.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'git status --short --untracked-files=all and git diff --stat in /Users/poco/Projects/itsaplan',
+                                'note': 'Only the two untracked Comet records for this change were present. The dashboard was the only resource written through the connector.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'response':
+                            {
+                              'kind': 'final-result',
+                              'result':
+                                {
+                                  'acceptance':
+                                    [
+                                      {
+                                        'id': 'A1',
+                                        'reason': 'The live read shows exactly one saved dashboard named 任务跟进 with ID 1. The existing dashboard routing and tab components use the saved ID to select its tab and retain the built-in Overview tab.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A2',
+                                        'reason': 'Readback confirmed the four counts in row one and both configured issue lists in row two. The saved status filters give 5, 16, 6 and 1 matches on current issue data. The overdue list matches ROLL-25 and the near-due list matches six issues. Existing widget code applies the filters and updated-time sort, limits the rows, and links each to its source issue.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A3',
+                                        'reason': 'Readback shows status grouping. The status endpoint returns seven buckets that reconcile exactly with all 66 live issues. The only connector write was dashboard creation. The repository has no application-source edits.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A4',
+                                        'reason': 'Readback shows a project-wide daily pulse widget spanning 12 columns below the breakdown. The live daily pulse query returned 112 date buckets with 517 activity records on November 20.',
+                                        'result': 'passed',
+                                      },
+                                    ],
+                                  'attempt': 1,
+                                  'iteration': 1,
+                                  'requestReview':
+                                    {
+                                      'reason': 'The user requested dashboard improvement, clarified that they wanted configuration rather than source edits, asked to retain 活跃度, and replied 确认 to the revised preview. The approved result is a saved dashboard using existing project features.',
+                                      'result': 'aligned',
+                                    },
+                                  'risks':
+                                    [
+                                      'Checks used live connector readback, live project data and the existing widget source. Browser rendering and clicking through were not exercised.',
+                                    ],
+                                  'summary': 'The saved task-follow-up dashboard matches the approved configuration. Verified its layout, filters, status counts, and daily activity data.',
+                                  'verdict': 'pass',
+                                },
+                            },
+                          'verifierExecutionRef': '01a1f673-dfa7-7031-a7a9-bb5c159f7b3d',
+                        },
+                    },
+                },
+            },
+            {
+              'candidateId': 'rolling-plan-dashboard:5',
+              'checks':
+                [
+                  {
+                    'name': 'Itsaplan create_dashboard and list_dashboards on pocoy.ROLL',
+                    'note': 'Create returned HTTP 201. A separate read returned one dashboard named 任务跟进 with ID 1, the expected project, and all eight widgets matching the requested positions and settings. DashboardTabs always renders the built-in Overview and lists saved dashboards separately.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Itsaplan list_issues and get_project_breakdown on pocoy.ROLL',
+                    'note': 'The 66 issues match all seven status buckets. The four saved filters match 5, 16, 6 and 1 issues respectively. The overdue list matches ROLL-25, and the near-due list matches ROLL-62, ROLL-56, ROLL-49, ROLL-40, ROLL-19 and ROLL-1 in updated order. The saved list settings give a maximum of ten issues and the existing RecentIssuesWidget makes each row an issue link.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Itsaplan get_project_pulse on pocoy.ROLL',
+                    'note': 'The project-wide day query (16 columns) returned 112 nonnegative daily buckets. The November 20 bucket contains 517 activity records. The saved project/day heatmap spans all 12 columns, below the status breakdown.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'git status --short --untracked-files=all and git diff --stat in /Users/poco/Projects/itsaplan',
+                    'note': 'Only the two untracked Comet records for this change were present. The dashboard was the only resource written through the connector.',
+                    'result': 'passed',
+                  },
+                ],
+              'response':
+                {
+                  'kind': 'final-result',
+                  'result':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'reason': 'The live read shows exactly one saved dashboard named 任务跟进 with ID 1. The existing dashboard routing and tab components use the saved ID to select its tab and retain the built-in Overview tab.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A2',
+                            'reason': 'Readback confirmed the four counts in row one and both configured issue lists in row two. The saved status filters give 5, 16, 6 and 1 matches on current issue data. The overdue list matches ROLL-25 and the near-due list matches six issues. Existing widget code applies the filters and updated-time sort, limits the rows, and links each to its source issue.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A3',
+                            'reason': 'Readback shows status grouping. The status endpoint returns seven buckets that reconcile exactly with all 66 live issues. The only connector write was dashboard creation. The repository has no application-source edits.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A4',
+                            'reason': 'Readback shows a project-wide daily pulse widget spanning 12 columns below the breakdown. The live daily pulse query returned 112 date buckets with 517 activity records on November 20.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'attempt': 1,
+                      'iteration': 1,
+                      'requestReview':
+                        {
+                          'reason': 'The user requested dashboard improvement, clarified that they wanted configuration rather than source edits, asked to retain 活跃度, and replied 确认 to the revised preview. The approved result is a saved dashboard using existing project features.',
+                          'result': 'aligned',
+                        },
+                      'risks':
+                        [
+                          'Checks used live connector readback, live project data and the existing widget source. Browser rendering and clicking through were not exercised.',
+                        ],
+                      'summary': 'The saved task-follow-up dashboard matches the approved configuration. Verified its layout, filters, status counts, and daily activity data.',
+                      'verdict': 'pass',
+                    },
+                },
+              'verifierExecutionRef': '01a1f673-dfa7-7031-a7a9-bb5c159f7b3d',
+            },
+            {
+              'archiveDirRef': 'docs/comet/archive/2026-11-20-rolling-plan-dashboard',
+              'blockers': [],
+              'candidateId': 'rolling-plan-dashboard:5',
+              'capabilityPeers': [],
+              'ready': true,
+              'reportRef': 'docs/comet/changes/rolling-plan-dashboard/verification.md',
+              'reportStateVersion': 8,
+              'requiresReverification': false,
+              'specPreview': [],
+              'stateVersion': 9,
+            },
+            {
+              'archiveRef': '2026-11-20-rolling-plan-dashboard',
+              'specCount': 0,
+              'stateVersion': 9,
+              'transactionId': 'b525d98f-004a-4a7f-a95f-88211c65c754',
+            },
+            {
+              'sequence': 9,
+              'value':
+                {
+                  'archiveRef': '2026-11-20-rolling-plan-dashboard',
+                  'specCount': 0,
+                  'stateVersion': 9,
+                  'transactionId': 'b525d98f-004a-4a7f-a95f-88211c65c754',
+                },
+            },
+            {
+              'sequence': 8,
+              'value':
+                {
+                  'archiveDirRef': 'docs/comet/archive/2026-11-20-rolling-plan-dashboard',
+                  'blockers': [],
+                  'candidateId': 'rolling-plan-dashboard:5',
+                  'capabilityPeers': [],
+                  'ready': true,
+                  'reportRef': 'docs/comet/changes/rolling-plan-dashboard/verification.md',
+                  'reportStateVersion': 8,
+                  'requiresReverification': false,
+                  'specPreview': [],
+                  'stateVersion': 9,
+                },
+            },
+            {
+              'sequence': 5,
+              'value':
+                {
+                  'addressedAcceptanceIds': ['A1', 'A2', 'A3', 'A4'],
+                  'checks':
+                    [
+                      {
+                        'name': 'Itsaplan create_dashboard and list_dashboards on pocoy.ROLL',
+                        'note': 'Create returned HTTP 201. A separate read returned one dashboard named 任务跟进 with ID 1, the expected project, and all eight widgets matching the requested positions and settings. DashboardTabs always renders the built-in Overview and lists saved dashboards separately.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Itsaplan list_issues and get_project_breakdown on pocoy.ROLL',
+                        'note': 'The 66 issues match all seven status buckets. The four saved filters match 5, 16, 6 and 1 issues respectively. The overdue list matches ROLL-25, and the near-due list matches ROLL-62, ROLL-56, ROLL-49, ROLL-40, ROLL-19 and ROLL-1 in updated order. The saved list settings give a maximum of ten issues and the existing RecentIssuesWidget makes each row an issue link.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Itsaplan get_project_pulse on pocoy.ROLL',
+                        'note': 'The project-wide day query (16 columns) returned 112 nonnegative daily buckets. The November 20 bucket contains 517 activity records. The saved project/day heatmap spans all 12 columns, below the status breakdown.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'git status --short --untracked-files=all and git diff --stat in /Users/poco/Projects/itsaplan',
+                        'note': 'Only the two untracked Comet records for this change were present. The dashboard was the only resource written through the connector.',
+                        'result': 'passed',
+                      },
+                    ],
+                  'knownLimits':
+                    [
+                      'Verified via connector readback, live data and UI source. The application was not opened in a browser.',
+                    ],
+                  'requireIndependentReview': false,
+                  'summary': 'Created dashboard 任务跟进 (ID 1) in pocoy.ROLL via the existing dashboard connector. It holds four status counts, two filtered issue lists, the status breakdown and the full-width project-wide daily activity heatmap. The built-in Overview remains available. No application source code or work items were edited.',
+                },
+            },
+            {
+              'sequence': 4,
+              'value':
+                {
+                  'choice': 'approved',
+                  'proposal':
+                    {
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'rolling-plan-dashboard',
+                          'task': '能帮我把仪表盘好好弄一下吗?',
+                        },
+                      'outputs':
+                        {
+                          'shape.prepare':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'source': 'brief.md',
+                                    'text': 'Rolling Plan has exactly one saved dashboard named 任务跟进 with its own tab. The built-in Overview remains available.',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'source': 'brief.md',
+                                    'text': 'The first row has four live work-item counts with the stated status filters. The two lists below use the matching filters, show up to ten work items each in most-recently-updated order, and use the existing work-item links.',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'source': 'brief.md',
+                                    'text': 'The status breakdown shows counts grouped by project status. No issue record or project workflow configuration is edited.',
+                                  },
+                                  {
+                                    'id': 'A4',
+                                    'source': 'brief.md',
+                                    'text': 'The full-width 活跃度 heatmap below the status breakdown shows project-wide activity grouped by day.',
+                                  },
+                                ],
+                              'children': null,
+                              'specChanges': [],
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 3,
+              'value':
+                {
+                  'acceptance':
+                    [
+                      {
+                        'id': 'A1',
+                        'source': 'brief.md',
+                        'text': 'Rolling Plan has exactly one saved dashboard named 任务跟进 with its own tab. The built-in Overview remains available.',
+                      },
+                      {
+                        'id': 'A2',
+                        'source': 'brief.md',
+                        'text': 'The first row has four live work-item counts with the stated status filters. The two lists below use the matching filters, show up to ten work items each in most-recently-updated order, and use the existing work-item links.',
+                      },
+                      {
+                        'id': 'A3',
+                        'source': 'brief.md',
+                        'text': 'The status breakdown shows counts grouped by project status. No issue record or project workflow configuration is edited.',
+                      },
+                      {
+                        'id': 'A4',
+                        'source': 'brief.md',
+                        'text': 'The full-width 活跃度 heatmap below the status breakdown shows project-wide activity grouped by day.',
+                      },
+                    ],
+                  'children': null,
+                  'specChanges': [],
+                },
+            },
+            {
+              'sequence': 7,
+              'value':
+                {
+                  'choice': 'approved',
+                  'proposal':
+                    {
+                      'activation':
+                        {
+                          'report':
+                            {
+                              'attempt': 1,
+                              'candidateId': 'rolling-plan-dashboard:5',
+                              'iteration': 1,
+                              'reportRef': 'docs/comet/changes/rolling-plan-dashboard/verification.md',
+                              'stateVersion': 8,
+                            },
+                        },
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'rolling-plan-dashboard',
+                          'task': '能帮我把仪表盘好好弄一下吗?',
+                        },
+                      'outputs':
+                        {
+                          'verify.verifier':
+                            {
+                              'candidateId': 'rolling-plan-dashboard:5',
+                              'checks':
+                                [
+                                  {
+                                    'name': 'Itsaplan create_dashboard and list_dashboards on pocoy.ROLL',
+                                    'note': 'Create returned HTTP 201. A separate read returned one dashboard named 任务跟进 with ID 1, the expected project, and all eight widgets matching the requested positions and settings. DashboardTabs always renders the built-in Overview and lists saved dashboards separately.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Itsaplan list_issues and get_project_breakdown on pocoy.ROLL',
+                                    'note': 'The 66 issues match all seven status buckets. The four saved filters match 5, 16, 6 and 1 issues respectively. The overdue list matches ROLL-25, and the near-due list matches ROLL-62, ROLL-56, ROLL-49, ROLL-40, ROLL-19 and ROLL-1 in updated order. The saved list settings give a maximum of ten issues and the existing RecentIssuesWidget makes each row an issue link.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Itsaplan get_project_pulse on pocoy.ROLL',
+                                    'note': 'The project-wide day query (16 columns) returned 112 nonnegative daily buckets. The November 20 bucket contains 517 activity records. The saved project/day heatmap spans all 12 columns, below the status breakdown.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'git status --short --untracked-files=all and git diff --stat in /Users/poco/Projects/itsaplan',
+                                    'note': 'Only the two untracked Comet records for this change were present. The dashboard was the only resource written through the connector.',
+                                    'result': 'passed',
+                                  },
+                                ],
+                              'response':
+                                {
+                                  'kind': 'final-result',
+                                  'result':
+                                    {
+                                      'acceptance':
+                                        [
+                                          {
+                                            'id': 'A1',
+                                            'reason': 'The live read shows exactly one saved dashboard named 任务跟进 with ID 1. The existing dashboard routing and tab components use the saved ID to select its tab and retain the built-in Overview tab.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A2',
+                                            'reason': 'Readback confirmed the four counts in row one and both configured issue lists in row two. The saved status filters give 5, 16, 6 and 1 matches on current issue data. The overdue list matches ROLL-25 and the near-due list matches six issues. Existing widget code applies the filters and updated-time sort, limits the rows, and links each to its source issue.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A3',
+                                            'reason': 'Readback shows status grouping. The status endpoint returns seven buckets that reconcile exactly with all 66 live issues. The only connector write was dashboard creation. The repository has no application-source edits.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A4',
+                                            'reason': 'Readback shows a project-wide daily pulse widget spanning 12 columns below the breakdown. The live daily pulse query returned 112 date buckets with 517 activity records on November 20.',
+                                            'result': 'passed',
+                                          },
+                                        ],
+                                      'attempt': 1,
+                                      'iteration': 1,
+                                      'requestReview':
+                                        {
+                                          'reason': 'The user requested dashboard improvement, clarified that they wanted configuration rather than source edits, asked to retain 活跃度, and replied 确认 to the revised preview. The approved result is a saved dashboard using existing project features.',
+                                          'result': 'aligned',
+                                        },
+                                      'risks':
+                                        [
+                                          'Checks used live connector readback, live project data and the existing widget source. Browser rendering and clicking through were not exercised.',
+                                        ],
+                                      'summary': 'The saved task-follow-up dashboard matches the approved configuration. Verified its layout, filters, status counts, and daily activity data.',
+                                      'verdict': 'pass',
+                                    },
+                                },
+                              'verifierExecutionRef': '01a1f673-dfa7-7031-a7a9-bb5c159f7b3d',
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 6,
+              'value':
+                {
+                  'candidateId': 'rolling-plan-dashboard:5',
+                  'checks':
+                    [
+                      {
+                        'name': 'Itsaplan create_dashboard and list_dashboards on pocoy.ROLL',
+                        'note': 'Create returned HTTP 201. A separate read returned one dashboard named 任务跟进 with ID 1, the expected project, and all eight widgets matching the requested positions and settings. DashboardTabs always renders the built-in Overview and lists saved dashboards separately.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Itsaplan list_issues and get_project_breakdown on pocoy.ROLL',
+                        'note': 'The 66 issues match all seven status buckets. The four saved filters match 5, 16, 6 and 1 issues respectively. The overdue list matches ROLL-25, and the near-due list matches ROLL-62, ROLL-56, ROLL-49, ROLL-40, ROLL-19 and ROLL-1 in updated order. The saved list settings give a maximum of ten issues and the existing RecentIssuesWidget makes each row an issue link.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Itsaplan get_project_pulse on pocoy.ROLL',
+                        'note': 'The project-wide day query (16 columns) returned 112 nonnegative daily buckets. The November 20 bucket contains 517 activity records. The saved project/day heatmap spans all 12 columns, below the status breakdown.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'git status --short --untracked-files=all and git diff --stat in /Users/poco/Projects/itsaplan',
+                        'note': 'Only the two untracked Comet records for this change were present. The dashboard was the only resource written through the connector.',
+                        'result': 'passed',
+                      },
+                    ],
+                  'response':
+                    {
+                      'kind': 'final-result',
+                      'result':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'reason': 'The live read shows exactly one saved dashboard named 任务跟进 with ID 1. The existing dashboard routing and tab components use the saved ID to select its tab and retain the built-in Overview tab.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A2',
+                                'reason': 'Readback confirmed the four counts in row one and both configured issue lists in row two. The saved status filters give 5, 16, 6 and 1 matches on current issue data. The overdue list matches ROLL-25 and the near-due list matches six issues. Existing widget code applies the filters and updated-time sort, limits the rows, and links each to its source issue.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A3',
+                                'reason': 'Readback shows status grouping. The status endpoint returns seven buckets that reconcile exactly with all 66 live issues. The only connector write was dashboard creation. The repository has no application-source edits.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A4',
+                                'reason': 'Readback shows a project-wide daily pulse widget spanning 12 columns below the breakdown. The live daily pulse query returned 112 date buckets with 517 activity records on November 20.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'attempt': 1,
+                          'iteration': 1,
+                          'requestReview':
+                            {
+                              'reason': 'The user requested dashboard improvement, clarified that they wanted configuration rather than source edits, asked to retain 活跃度, and replied 确认 to the revised preview. The approved result is a saved dashboard using existing project features.',
+                              'result': 'aligned',
+                            },
+                          'risks':
+                            [
+                              'Checks used live connector readback, live project data and the existing widget source. Browser rendering and clicking through were not exercised.',
+                            ],
+                          'summary': 'The saved task-follow-up dashboard matches the approved configuration. Verified its layout, filters, status counts, and daily activity data.',
+                          'verdict': 'pass',
+                        },
+                    },
+                  'verifierExecutionRef': '01a1f673-dfa7-7031-a7a9-bb5c159f7b3d',
+                },
+            },
+            {
+              'sequence': 2,
+              'value':
+                {
+                  'choice': 'rejected',
+                  'proposal':
+                    {
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'rolling-plan-dashboard',
+                          'task': '能帮我把仪表盘好好弄一下吗?',
+                        },
+                      'outputs':
+                        {
+                          'shape.prepare':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'source': 'brief.md',
+                                    'text': 'Rolling Plan has a single saved dashboard named 任务跟进 with its own tab alongside the built-in Overview.',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'source': 'brief.md',
+                                    'text': 'Four live counts at the top show 待确认, 未开始, 临期处理中 (the two existing near-due in-progress status columns), and 已超期. Below the counts, the overdue and near-due lists use those same status filters, show up to ten items each ordered by most recently updated, and link to the work items.',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'source': 'brief.md',
+                                    'text': 'The final widget shows the issue breakdown by project status. The saved change consists only of dashboard configuration and its Comet records.',
+                                  },
+                                ],
+                              'children': null,
+                              'specChanges': [],
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 1,
+              'value':
+                {
+                  'acceptance':
+                    [
+                      {
+                        'id': 'A1',
+                        'source': 'brief.md',
+                        'text': 'Rolling Plan has a single saved dashboard named 任务跟进 with its own tab alongside the built-in Overview.',
+                      },
+                      {
+                        'id': 'A2',
+                        'source': 'brief.md',
+                        'text': 'Four live counts at the top show 待确认, 未开始, 临期处理中 (the two existing near-due in-progress status columns), and 已超期. Below the counts, the overdue and near-due lists use those same status filters, show up to ten items each ordered by most recently updated, and link to the work items.',
+                      },
+                      {
+                        'id': 'A3',
+                        'source': 'brief.md',
+                        'text': 'The final widget shows the issue breakdown by project status. The saved change consists only of dashboard configuration and its Comet records.',
+                      },
+                    ],
+                  'children': null,
+                  'specChanges': [],
+                },
+            },
+            {
+              'sequence': 10,
+              'value':
+                {
+                  'archiveRef': '2026-11-20-rolling-plan-dashboard',
+                  'change': 'rolling-plan-dashboard',
+                  'runId': 'rolling-plan-dashboard',
+                  'specs': [],
+                  'stateVersion': 10,
+                  'transactionId': 'b525d98f-004a-4a7f-a95f-88211c65c754',
+                },
+            },
+          ],
+        'nodes':
+          [
+            { 'key': 'shape.prepare', 'value': 1, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': null, 'right': 0, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 3, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 2, 'left': null, 'right': 2, 'height': 2 },
+            { 'key': 'build.builder', 'value': 4, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 2, 'left': 4, 'right': 2, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 3, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 6, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.confirm', 'value': 5, 'left': 6, 'right': 7, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 2, 'left': 4, 'right': 8, 'height': 3 },
+            { 'key': 'archive.prepare', 'value': 7, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 4, 'left': 10, 'right': null, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 2, 'left': 11, 'right': 8, 'height': 3 },
+            { 'key': 'archive.execute', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 4, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.prepare', 'value': 7, 'left': 13, 'right': 14, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 2, 'left': 15, 'right': 8, 'height': 3 },
+            { 'key': 'archive.execute', 'value': 9, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 11, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.prepare', 'value': 10, 'left': 17, 'right': 18, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 13, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 15, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.confirm', 'value': 14, 'left': 20, 'right': 21, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 12, 'left': 19, 'right': 22, 'height': 3 },
+            { 'key': 'shape.prepare', 'value': 17, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 16, 'left': null, 'right': 24, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 13, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 12, 'left': null, 'right': 26, 'height': 2 },
+            { 'key': 'build.builder', 'value': 11, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 12, 'left': 28, 'right': 26, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 13, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 15, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.confirm', 'value': 14, 'left': 30, 'right': 31, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 12, 'left': 28, 'right': 32, 'height': 3 },
+            { 'key': 'archive.prepare', 'value': 10, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 11, 'left': 34, 'right': null, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 12, 'left': 35, 'right': 32, 'height': 3 },
+            { 'key': 'archive.finalize', 'value': 18, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.execute', 'value': 9, 'left': null, 'right': 37, 'height': 2 },
+            { 'key': 'build.builder', 'value': 11, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.prepare', 'value': 10, 'left': 38, 'right': 39, 'height': 3 },
+            { 'key': 'shape.confirm', 'value': 12, 'left': 40, 'right': 32, 'height': 4 },
+            { 'key': 'shape.prepare', 'value': 17, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.prepare', 'value': 13, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 16, 'left': null, 'right': 43, 'height': 2 },
+            { 'key': 'build.builder', 'value': 11, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 15, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.prepare', 'value': 13, 'left': null, 'right': 46, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 12, 'left': 45, 'right': 47, 'height': 3 },
+          ],
+        'maps': [null, 1, 3, 5, 9, 12, 16, 23, 25, 27, 29, 33, 36, 41, 42, 44, 48],
+        'bindings':
+          [
+            { 'path': ['actions', '0', 'input', 'outputs'], 'map': 0 },
+            { 'path': ['actions', '1', 'input', 'outputs'], 'map': 1 },
+            { 'path': ['actions', '2', 'input', 'outputs'], 'map': 2 },
+            { 'path': ['actions', '3', 'input', 'outputs'], 'map': 3 },
+            { 'path': ['actions', '4', 'input', 'outputs'], 'map': 4 },
+            { 'path': ['actions', '5', 'input', 'outputs'], 'map': 5 },
+            { 'path': ['actions', '6', 'input', 'outputs'], 'map': 6 },
+            { 'path': ['actionContexts', 'rolling-plan-dashboard:1', 'results'], 'map': 0 },
+            { 'path': ['actionContexts', 'rolling-plan-dashboard:10', 'results'], 'map': 7 },
+            { 'path': ['actionContexts', 'rolling-plan-dashboard:3', 'results'], 'map': 8 },
+            { 'path': ['actionContexts', 'rolling-plan-dashboard:5', 'results'], 'map': 9 },
+            { 'path': ['actionContexts', 'rolling-plan-dashboard:6', 'results'], 'map': 10 },
+            { 'path': ['actionContexts', 'rolling-plan-dashboard:8', 'results'], 'map': 11 },
+            { 'path': ['actionContexts', 'rolling-plan-dashboard:9', 'results'], 'map': 12 },
+            { 'path': ['outputs'], 'map': 13 },
+            { 'path': ['waits', '0', 'results'], 'map': 14 },
+            { 'path': ['waits', '1', 'results'], 'map': 15 },
+            { 'path': ['waits', '2', 'results'], 'map': 16 },
+          ],
+      },
+    'storageHash': '115baf17cc1fd30e7e91960b8eadf7fab0cd6f2a8c17640ddb271eb2dd4aef42',
+  }
