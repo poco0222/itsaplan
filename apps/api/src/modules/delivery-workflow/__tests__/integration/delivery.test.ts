@@ -102,8 +102,28 @@ test('enrolls existing issues and applies the hierarchy with exact weighted prog
   await set(node, weight, 100);
   await set(completed, weight, 30);
   await set(open, weight, 50);
-  expect(await get(node)).toMatchObject({ progress: null, problem: 'weights' });
-  expect(await get(module)).toMatchObject({ progress: null, problem: 'child' });
+  expect(await get(node)).toMatchObject({
+    progress: null,
+    problem: 'weights',
+    progressFieldId: progress,
+    progressReadOnly: true,
+  });
+  expect(await get(module)).toMatchObject({
+    progress: null,
+    problem: 'child',
+    progressFieldId: progress,
+    progressReadOnly: true,
+  });
+  expect(await get(completed)).toMatchObject({
+    progress: 100,
+    progressFieldId: progress,
+    progressReadOnly: true,
+  });
+  expect(await get(open)).toMatchObject({
+    progress: 0,
+    progressFieldId: progress,
+    progressReadOnly: false,
+  });
   await set(open, weight, 70);
   expect((await get(node)).progress).toBe(30);
   await set(open, progress, 40);
@@ -116,7 +136,11 @@ test('enrolls existing issues and applies the hierarchy with exact weighted prog
   expect((await item(completed).get()).data?.dueDate).toBeDefined();
   const existing = await add('Work already tracked', s.moduleTypeId);
   await set(existing, progress, 21);
-  expect(await get(direct)).toMatchObject({ childTypeId: s.taskTypeId });
+  expect(await get(direct)).toMatchObject({
+    childTypeId: s.taskTypeId,
+    progress: 50,
+    progressReadOnly: false,
+  });
   expect((await item(existing).patch({ parentId: direct, typeId: s.taskTypeId })).status).toBe(200);
   expect(await get(existing)).toMatchObject({ role: 'task', moduleId: module, progress: 21 });
 });
@@ -153,6 +177,7 @@ test('recalculates completion and status after reopening and cancellation', asyn
   expect((await item(module).get()).data?.columnId).toBe(done);
   expect((await item(b).get()).data?.columnId).toBe(canceled);
   expect((await item(a).patch({ columnId: started })).status).toBe(200);
+  expect(await get(a)).toMatchObject({ progress: 50, progressReadOnly: false });
   expect((await item(node).get()).data?.columnId).toBe(started);
   expect((await item(module).get()).data?.columnId).toBe(started);
   expect(await get(module)).toMatchObject({ progress: 50, completedAt: null });

@@ -1,25 +1,22 @@
 import { useCallback } from 'react';
 import { useDraggable, useDroppable } from '@dnd-kit/core';
 import type { ProjectDetail } from '@/lib/api/endpoints/projects';
-import type { BoardIssue, IssuePatch } from '@/lib/api/endpoints/issues';
+import type { BoardIssue } from '@/lib/api/endpoints/issues';
 import type { DeliveryItem } from '@/lib/api/endpoints/deliveryWorkflow';
 import { type Maps } from '@/utils/project';
-import { useSetFieldValue, useUpdateIssue } from '@/services/issues.service';
 import { useIsPhone } from '@/hooks/useIsPhone';
 import { usePermissions } from '@/hooks/usePermissions';
 import { cn } from '@/lib/utils';
 import IssueContextMenu from '@/features/issue/components/actions/IssueContextMenu';
 import { DropLine } from '../shared/DropLine';
-import { EditableBuiltinCell } from '../shared/EditableBuiltinCell';
-import { EditableCustomCell } from '../shared/EditableCustomCell';
 import { IssueIdentifier } from '../shared/IssueIdentifier';
 import { SubtaskProgress } from '../shared/SubtaskProgress';
 import DeliveryProgressBadge from '../shared/DeliveryProgressBadge';
 import { useIsBlocked } from '../../context/useIssueLinks';
 import { useSubtaskFold } from '../../context/useSubtasks';
 import { DRAGGABLE_FOCUS } from '../../utils/dnd';
-import { columnKey, type OrderedColumn } from '../../utils/table';
-import { TableBuiltinCell } from './TableBuiltinCell';
+import type { OrderedColumn } from '../../utils/table';
+import { TableIssueCells } from './TableIssueCells';
 import { TableRowLinks } from './TableRowLinks';
 import { TableRowSubtasks } from './TableRowSubtasks';
 
@@ -70,9 +67,6 @@ export function TableRow({
   const delivery = deliveryById?.get(issue.id);
   const subtasks = useSubtaskFold();
   const blocked = useIsBlocked(issue);
-  const updateIssue = useUpdateIssue(project.project.ref);
-  const setFieldValue = useSetFieldValue(project.project.ref);
-  const patch = (fields: IssuePatch) => updateIssue.mutate({ id: issue.id, patch: fields });
   const {
     setNodeRef: dragRef,
     attributes,
@@ -139,39 +133,23 @@ export function TableRow({
           {delivery && <DeliveryProgressBadge item={delivery} />}
         </div>
 
-        {orderedColumns.map((c) =>
-          c.kind === 'builtin' ? (
-            <EditableBuiltinCell
-              key={columnKey(c)}
-              column={c.col}
-              issue={issue}
-              project={project}
-              readOnly={readOnly}
-              onPatch={patch}
-            >
-              <TableBuiltinCell column={c.col} issue={issue} maps={maps} />
-            </EditableBuiltinCell>
-          ) : (
-            <EditableCustomCell
-              key={columnKey(c)}
-              field={c.field}
-              issue={issue}
-              project={project}
-              maps={maps}
-              readOnly={readOnly}
-              onChange={(value) =>
-                setFieldValue.mutate({ issueId: issue.id, fieldId: c.field.id, value })
-              }
-            />
-          ),
-        )}
+        <TableIssueCells
+          project={project}
+          issue={issue}
+          orderedColumns={orderedColumns}
+          maps={maps}
+          readOnly={readOnly}
+          delivery={delivery}
+        />
 
         {subtasks.open && (
           <TableRowSubtasks
             deliveryById={deliveryById}
+            project={project}
             issueId={issue.id}
             maps={maps}
             orderedColumns={orderedColumns}
+            readOnly={readOnly}
             showId={showId}
             alignTop={alignTop}
             onOpenIssue={onOpenIssue}

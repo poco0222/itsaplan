@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { Clock, Hash } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { formatMinutes, parseMinutes, parsePoints } from '@/utils/estimate';
@@ -23,11 +23,13 @@ export default function EstimatePill({
   value,
   onChange,
   readOnly,
+  renderTrigger,
 }: {
   kind: EstimateKind;
   value: number | null;
   onChange: (value: number | null) => void;
   readOnly?: boolean;
+  renderTrigger?: (onClick: () => void) => ReactNode;
 }) {
   const t = useTranslations('issue.fields');
   const { icon, format, parse } = KINDS[kind];
@@ -61,7 +63,7 @@ export default function EstimatePill({
   );
 
   if (readOnly) return <ReadOnlyPill>{pill}</ReadOnlyPill>;
-  if (!editing) return pill;
+  if (!editing) return renderTrigger ? renderTrigger(startEditing) : pill;
   return (
     <Input
       autoFocus
