@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { type WorkItemsViewProps } from '@/utils/project';
 import { customFieldKey } from '@/utils/viewSettings';
+import { useDeliveryItems } from '@/services/deliveryWorkflow.service';
 import { KanbanDeadlineProvider } from '../../context/kanbanDeadlineContext';
 import { SelectionProvider } from '../../context/useSelection';
 import { WorkItemsEmpty } from '../shared/WorkItemsEmpty';
@@ -14,6 +15,15 @@ import { BulkActionBar } from './BulkActionBar';
 // bar acts on it. `validIds` are the issues currently on the board, so a selected
 // issue that leaves (deleted, archived, filtered out) drops from the selection.
 export default function KanbanBoard(props: WorkItemsViewProps) {
+  const delivery = useDeliveryItems(
+    props.project.project.ref,
+    props.project.project.id,
+    !props.readOnly,
+  );
+  const deliveryById = useMemo(
+    () => new Map(props.readOnly ? [] : delivery.data?.map((item) => [item.id, item])),
+    [delivery.data, props.readOnly],
+  );
   const validIds = useMemo(
     () => new Set(props.project.issues.map((i) => i.id)),
     [props.project.issues],
@@ -30,7 +40,7 @@ export default function KanbanBoard(props: WorkItemsViewProps) {
 
   return (
     <SelectionProvider validIds={validIds}>
-      <KanbanDeadlineProvider actualDateFieldId={actualDateFieldId}>
+      <KanbanDeadlineProvider actualDateFieldId={actualDateFieldId} deliveryById={deliveryById}>
         {props.settings.subgroup === 'none' ? (
           <FlatBoard {...props} />
         ) : (

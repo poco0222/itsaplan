@@ -1,4 +1,31 @@
 {
+  "deliveryWorkflow": {
+    "title": "Delivery workflow",
+    "delivery": "In delivery",
+    "maintenance": "In maintenance",
+    "progressValue": "Delivery {value}",
+    "completionDate": "Completed · {date}",
+    "unknown": "Unknown",
+    "handoff": "Confirm maintenance handoff",
+    "handoffHelp": "Transfer this module to maintenance and preserve its delivery result.",
+    "reversal": "Reverse handoff",
+    "reversalHelp": "Return the module to delivery. The handoff history and maintenance items stay available.",
+    "reason": "Reversal reason",
+    "legacy": "Mark imported date unknown",
+    "legacyHelp": "Use this for a historical completion whose date was assigned during import. The work stays completed.",
+    "history": "Handoff history",
+    "confirmedEvent": "{who} confirmed the handoff · {when}",
+    "reversedEvent": "{who} reversed the handoff · {when}",
+    "saved": "Delivery workflow updated.",
+    "attachType": "Search for an existing item to attach as {type}",
+    "problems": {
+      "hierarchy": "Check delivery parent",
+      "children": "Add delivery nodes",
+      "weights": "Weights must total 100%",
+      "child": "Child progress unavailable",
+      "progress": "Progress unavailable"
+    }
+  },
   "system": "시스템",
   "viewValue": "보기",
   "notFound": "이슈를 찾을 수 없습니다.",

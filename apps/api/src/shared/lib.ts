@@ -104,7 +104,53 @@ export function errorAnswer(
     return { status: 400, body: { error: first ?? 'Invalid request body' } };
   }
   if (code === 'NOT_FOUND') return { status: 404, body: { error: 'Not found' } };
-  if (pgErrorCode(error) === '23505') {
+  const pgCode = pgErrorCode(error);
+  if (pgCode === 'DP001') {
+    return {
+      status: 409,
+      body: {
+        error: 'Reverse the maintenance handoff before changing delivery',
+        code: 'delivery_locked',
+      },
+    };
+  }
+  if (pgCode === 'DP002') {
+    return {
+      status: 409,
+      body: {
+        error: 'Choose the parent required by this delivery work item type',
+        code: 'delivery_parent',
+      },
+    };
+  }
+  if (pgCode === 'DP003') {
+    return {
+      status: 409,
+      body: {
+        error: 'Complete the child work and allocate 100 percent first',
+        code: 'delivery_incomplete',
+      },
+    };
+  }
+  if (pgCode === 'DP004') {
+    return {
+      status: 400,
+      body: {
+        error: 'Delivery weights and progress must be between 0 and 100',
+        code: 'delivery_percentage',
+      },
+    };
+  }
+  if (pgCode === 'DP005') {
+    return {
+      status: 409,
+      body: {
+        error: 'This type, field or status is in use by the delivery workflow',
+        code: 'delivery_binding',
+      },
+    };
+  }
+  if (pgCode === '23505') {
     return { status: 409, body: { error: 'A record with this name already exists.' } };
   }
   // drizzle puts the failed statement and its parameters in the message, and the public

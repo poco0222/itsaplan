@@ -21,12 +21,12 @@ export function IssueCardDeadline({
   dueDate,
   stateType,
 }: {
-  issue: Pick<BoardIssue, 'fieldValues'>;
+  issue: Pick<BoardIssue, 'fieldValues'> & { id?: number };
   dueDate: string;
   stateType?: StateType;
 }) {
   const t = useTranslations('workItems');
-  const { today, actualDateFieldId } = useContext(KanbanDeadlineContext);
+  const { today, actualDateFieldId, deliveryById } = useContext(KanbanDeadlineContext);
   const due = validDate(dueDate);
   const currentDay = parseDate(today);
   const remaining = due && currentDay ? daysBetween(currentDay, due) : null;
@@ -34,10 +34,11 @@ export function IssueCardDeadline({
   const upcoming =
     stateType === 'started' && remaining !== null && remaining >= 0 && remaining <= 5;
   const urgent = upcoming && remaining <= 3;
-  const actual =
-    stateType === 'completed' && actualDateFieldId !== undefined
-      ? validDate(issue.fieldValues.find((field) => field.fieldId === actualDateFieldId)?.value)
-      : null;
+  const delivery = issue.id === undefined ? undefined : deliveryById?.get(issue.id);
+  const actualDate = delivery
+    ? delivery.completedAt && toDateStr(new Date(delivery.completedAt))
+    : issue.fieldValues.find((field) => field.fieldId === actualDateFieldId)?.value;
+  const actual = stateType === 'completed' ? validDate(actualDate) : null;
 
   return (
     <>

@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { DndContext } from '@dnd-kit/core';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import {
@@ -10,6 +10,7 @@ import {
   type WorkItemsViewProps,
 } from '@/utils/project';
 import { usePermissions } from '@/hooks/usePermissions';
+import { useDeliveryItems } from '@/services/deliveryWorkflow.service';
 import { usePersistedSet } from '@/hooks/usePersistedSet';
 import { useTableColumnWidths } from '../../hooks/useTableColumnWidths';
 import { useIssueReorder } from '../../hooks/useIssueReorder';
@@ -49,6 +50,11 @@ export default function TableView({
   readOnly,
   widthScope,
 }: TableViewProps) {
+  const delivery = useDeliveryItems(project.project.ref, project.project.id, !readOnly);
+  const deliveryById = useMemo(
+    () => new Map(readOnly ? [] : delivery.data?.map((item) => [item.id, item])),
+    [delivery.data, readOnly],
+  );
   const groupLabels = useGroupLabels();
   const { can } = usePermissions();
   const cellsReadOnly = !!readOnly || !can('work_items', 'edit');
@@ -138,6 +144,7 @@ export default function TableView({
       case 'row':
         return (
           <TableRow
+            deliveryById={deliveryById}
             project={project}
             issue={item.issue}
             orderedColumns={columns}

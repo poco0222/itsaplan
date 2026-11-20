@@ -1,4 +1,31 @@
 {
+  "deliveryWorkflow": {
+    "title": "交付工作流",
+    "delivery": "交付阶段",
+    "maintenance": "运维阶段",
+    "progressValue": "交付 {value}",
+    "completionDate": "完成时间 · {date}",
+    "unknown": "未知",
+    "handoff": "确认转运维",
+    "handoffHelp": "将整个模块转入运维阶段，保留当前交付结果。",
+    "reversal": "撤销转运维",
+    "reversalHelp": "将模块退回交付阶段。原交接记录和运维事项均可继续查看。",
+    "reason": "撤销原因",
+    "legacy": "标记历史完成日期未知",
+    "legacyHelp": "适用于在导入时生成完成日期的旧记录。该工作项仍计为已完成。",
+    "history": "交接记录",
+    "confirmedEvent": "{who} 确认转运维 · {when}",
+    "reversedEvent": "{who} 撤销转运维 · {when}",
+    "saved": "交付工作流已更新。",
+    "attachType": "搜索并挂接现有工作项，类型将设为「{type}」",
+    "problems": {
+      "hierarchy": "请检查交付父项",
+      "children": "请添加交付节点",
+      "weights": "占比须合计 100%",
+      "child": "下级进度不可用",
+      "progress": "进度不可用"
+    }
+  },
   "system": "系统",
   "viewValue": "视图",
   "notFound": "未找到工作项。",

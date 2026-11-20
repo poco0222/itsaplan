@@ -1,4 +1,20 @@
 {
+  "deliveryWorkflow": {
+    "title": "交付工作流程",
+    "description": "為交付和維運指定工作項目類型及數字欄位。",
+    "loadError": "無法載入交付設定。",
+    "moduleTypeId": "一級模組類型",
+    "nodeTypeId": "二級節點類型",
+    "taskTypeId": "三級執行類型",
+    "maintenanceTypeId": "維運事項類型",
+    "nodeWeightId": "節點占比欄位",
+    "taskWeightId": "執行任務占比欄位",
+    "nodeProgressId": "節點手動進度欄位",
+    "taskProgressId": "執行任務進度欄位",
+    "choose": "請選擇",
+    "enable": "啟用交付工作流程",
+    "saved": "已儲存交付工作流程。"
+  },
   "schedules": {
     "newTitle": "新建排程",
     "editTitle": "編輯排程",

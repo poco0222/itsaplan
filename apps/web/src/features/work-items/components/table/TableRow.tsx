@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useDraggable, useDroppable } from '@dnd-kit/core';
 import type { ProjectDetail } from '@/lib/api/endpoints/projects';
 import type { BoardIssue, IssuePatch } from '@/lib/api/endpoints/issues';
+import type { DeliveryItem } from '@/lib/api/endpoints/deliveryWorkflow';
 import { type Maps } from '@/utils/project';
 import { useSetFieldValue, useUpdateIssue } from '@/services/issues.service';
 import { useIsPhone } from '@/hooks/useIsPhone';
@@ -13,6 +14,7 @@ import { EditableBuiltinCell } from '../shared/EditableBuiltinCell';
 import { EditableCustomCell } from '../shared/EditableCustomCell';
 import { IssueIdentifier } from '../shared/IssueIdentifier';
 import { SubtaskProgress } from '../shared/SubtaskProgress';
+import DeliveryProgressBadge from '../shared/DeliveryProgressBadge';
 import { useIsBlocked } from '../../context/useIssueLinks';
 import { useSubtaskFold } from '../../context/useSubtasks';
 import { DRAGGABLE_FOCUS } from '../../utils/dnd';
@@ -38,6 +40,7 @@ export function TableRow({
   onDrop,
   onClick,
   onOpenIssue,
+  deliveryById,
 }: {
   project: ProjectDetail;
   issue: BoardIssue;
@@ -59,10 +62,12 @@ export function TableRow({
   onClick: () => void;
   // Opens a linked issue from a sub-row.
   onOpenIssue: (id: number) => void;
+  deliveryById?: Map<number, DeliveryItem>;
 }) {
   // Drag is disabled on phones, and without work_items edit (reordering is an
   // issue edit).
   const { can } = usePermissions();
+  const delivery = deliveryById?.get(issue.id);
   const subtasks = useSubtaskFold();
   const blocked = useIsBlocked(issue);
   const updateIssue = useUpdateIssue(project.project.ref);
@@ -131,6 +136,7 @@ export function TableRow({
             open={subtasks.open}
             onToggle={subtasks.toggle}
           />
+          {delivery && <DeliveryProgressBadge item={delivery} />}
         </div>
 
         {orderedColumns.map((c) =>
@@ -162,6 +168,7 @@ export function TableRow({
 
         {subtasks.open && (
           <TableRowSubtasks
+            deliveryById={deliveryById}
             issueId={issue.id}
             maps={maps}
             orderedColumns={orderedColumns}

@@ -18,6 +18,7 @@ function card({
   stateType = 'started',
   actual,
   actualDateFieldId = 2,
+  deliveryCompletion,
   locale = 'en',
 }: {
   dueDate?: string;
@@ -25,13 +26,35 @@ function card({
   stateType?: StateType;
   actual?: IssueFieldValueEntry['value'];
   actualDateFieldId?: number | null;
+  deliveryCompletion?: string | null;
   locale?: 'en' | 'zh-CN';
 } = {}) {
   const issue = {
+    id: 1,
     statusSince: '2026-12-01T00:00:00.000Z',
     fieldValues:
       actual === undefined ? [] : [{ fieldId: 2, value: actual, valueEnd: null, optionIds: [] }],
   };
+  const deliveryById =
+    deliveryCompletion === undefined
+      ? undefined
+      : new Map([
+          [
+            issue.id,
+            {
+              id: issue.id,
+              moduleId: issue.id,
+              childTypeId: null,
+              role: 'module' as const,
+              phase: 'delivery' as const,
+              progress: 100,
+              problem: null,
+              canConfirm: true,
+              completed: true,
+              completedAt: deliveryCompletion,
+            },
+          ],
+        ]);
   return renderToStaticMarkup(
     <NextIntlClientProvider
       locale={locale}
@@ -40,7 +63,7 @@ function card({
     >
       <TooltipProvider>
         <KanbanDeadlineContext.Provider
-          value={{ today, actualDateFieldId: actualDateFieldId ?? undefined }}
+          value={{ today, actualDateFieldId: actualDateFieldId ?? undefined, deliveryById }}
         >
           <IssueCardDeadline issue={issue} dueDate={dueDate} stateType={stateType} />
         </KanbanDeadlineContext.Provider>
@@ -114,5 +137,12 @@ describe('Kanban deadline badges', () => {
     } finally {
       setDisplayLocale(previousLocale);
     }
+  });
+
+  it('uses the effective completion date for delivery and respects an unknown imported date', () => {
+    const issue = { dueDate: '2026-10-08', actual: '2026-10-16', stateType: 'completed' as const };
+    const completion = new Date(2026, 9, 15, 12).toISOString();
+    assert.match(card({ ...issue, deliveryCompletion: completion }), /Completed late · Oct 15/);
+    assert.doesNotMatch(card({ ...issue, deliveryCompletion: null }), /Completed late/);
   });
 });

@@ -1,3 +1,4 @@
+import { useContext } from 'react';
 import { CalendarArrowUp, Clock, Hash, RefreshCw, Target, Timer } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { BoardIssue } from '@/lib/api/endpoints/issues';
@@ -18,6 +19,8 @@ import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { StateIcon } from '@/features/issue/components/shared/IssueIcons';
 import { IssueIdentifier } from '../shared/IssueIdentifier';
+import DeliveryProgressBadge from '../shared/DeliveryProgressBadge';
+import { KanbanDeadlineContext } from '../../context/kanbanDeadlineContext';
 import { IssueCardDeadline } from './IssueCardDeadline';
 import { IssueCardLinks } from './IssueCardLinks';
 import { IssueCardSubtasks } from './IssueCardSubtasks';
@@ -36,6 +39,7 @@ export function IssueCardBody({
   onOpen?: (id: number) => void;
 }) {
   const t = useTranslations('workItems');
+  const delivery = useContext(KanbanDeadlineContext).deliveryById?.get(issue.id);
   const has = (p: DisplayProperty) => properties.includes(p);
   const type = issue.typeId != null ? maps.typeById.get(issue.typeId) : undefined;
   const assignee =
@@ -93,6 +97,7 @@ export function IssueCardBody({
           {issue.title}
         </span>
       </div>
+      {delivery && <DeliveryProgressBadge item={delivery} />}
 
       {metaShown && (
         <div className="flex min-h-[22px] flex-wrap items-center gap-1">

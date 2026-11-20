@@ -1,4 +1,31 @@
 {
+  "deliveryWorkflow": {
+    "title": "交付工作流程",
+    "delivery": "交付階段",
+    "maintenance": "維運階段",
+    "progressValue": "交付 {value}",
+    "completionDate": "完成時間 · {date}",
+    "unknown": "未知",
+    "handoff": "確認轉維運",
+    "handoffHelp": "將整個模組轉入維運階段，保留目前交付結果。",
+    "reversal": "撤銷轉維運",
+    "reversalHelp": "將模組退回交付階段。原交接記錄和維運事項仍可查閱。",
+    "reason": "撤銷原因",
+    "legacy": "標記歷史完成日期未知",
+    "legacyHelp": "適用於匯入時產生完成日期的舊記錄。該工作項目仍計為已完成。",
+    "history": "交接記錄",
+    "confirmedEvent": "{who} 確認轉維運 · {when}",
+    "reversedEvent": "{who} 撤銷轉維運 · {when}",
+    "saved": "交付工作流程已更新。",
+    "attachType": "搜尋並掛接現有工作項目，類型將設為「{type}」",
+    "problems": {
+      "hierarchy": "請檢查交付父項",
+      "children": "請新增交付節點",
+      "weights": "占比須合計 100%",
+      "child": "下級進度無法取得",
+      "progress": "進度無法取得"
+    }
+  },
   "system": "系統",
   "viewValue": "檢視",
   "notFound": "未找到工作項目。",

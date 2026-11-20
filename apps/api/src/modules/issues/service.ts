@@ -1149,8 +1149,8 @@ export async function createIssue(
   // column's auto-assignee applies. An assignee sent with the create wins over it.
   const assigneeUserId = input.assigneeUserId ?? (await columnAutoAssignee(input.columnId));
   const { id: issueId, createdAt } = await db.transaction(async (tx) => {
+    await lockIssueTree(tx, project.id);
     if (input.parentId != null) {
-      await lockIssueTree(tx, project.id);
       await assertTreeLink(null, input.parentId, tx);
     }
     const [seqRow] = await tx
@@ -1367,8 +1367,15 @@ export async function updateIssue(
         ? eq(issue.id, id)
         : and(eq(issue.id, id), eq(issue.columnId, opts.onlyIfColumnId));
     const updated = await db.transaction(async (tx) => {
-      if (patch.parentId != null) {
+      if (
+        patch.parentId !== undefined ||
+        patch.columnId !== undefined ||
+        patch.typeId !== undefined ||
+        patch.dueDate !== undefined
+      ) {
         await lockIssueTree(tx, before.projectId);
+      }
+      if (patch.parentId != null) {
         await assertTreeLink(id, patch.parentId, tx);
       }
       return tx.update(issue).set(set).where(guard).returning({ id: issue.id });
@@ -1433,6 +1440,7 @@ export async function deleteIssue(
   const deleted = await getIssue(issueId);
   if (!deleted) return null;
   const attachments = await db.transaction(async (tx) => {
+    await lockIssueTree(tx, deleted.projectId);
     const attachmentRows = await tx
       .select()
       .from(issueAttachment)

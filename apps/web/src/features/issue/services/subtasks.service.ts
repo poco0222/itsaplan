@@ -10,6 +10,7 @@ interface SetParentVars {
   projectKey: string;
   issueId: number;
   parentId: number | null;
+  typeId?: number;
   // The parent the issue is leaving, so its own panel and feed refresh too.
   previousParentId?: number | null;
 }
@@ -17,7 +18,8 @@ interface SetParentVars {
 export function useSetIssueParent() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (vars: SetParentVars) => updateIssue(vars.issueId, { parentId: vars.parentId }),
+    mutationFn: ({ issueId, parentId, typeId }: SetParentVars) =>
+      updateIssue(issueId, { parentId, typeId }),
     onSuccess: (_data, { projectKey, issueId, parentId, previousParentId }) => {
       for (const id of [issueId, parentId, previousParentId]) {
         if (id == null) continue;

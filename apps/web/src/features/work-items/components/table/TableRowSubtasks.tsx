@@ -1,5 +1,6 @@
 import { CornerDownRight } from 'lucide-react';
 import type { SyntheticEvent } from 'react';
+import type { DeliveryItem } from '@/lib/api/endpoints/deliveryWorkflow';
 import { type Maps } from '@/utils/project';
 import { cn } from '@/lib/utils';
 import { noDragProps } from '@/lib/dnd';
@@ -7,6 +8,7 @@ import { StateIcon } from '@/features/issue/components/shared/IssueIcons';
 import { useSubtasks } from '../../context/useSubtasks';
 import { columnKey, type OrderedColumn } from '../../utils/table';
 import { SubtaskProgress } from '../shared/SubtaskProgress';
+import DeliveryProgressBadge from '../shared/DeliveryProgressBadge';
 import { TableBuiltinCell } from './TableBuiltinCell';
 import { TableCustomCell } from './TableCustomCell';
 
@@ -19,6 +21,7 @@ export function TableRowSubtasks({
   showId,
   alignTop,
   onOpenIssue,
+  deliveryById,
 }: {
   issueId: number;
   maps: Maps;
@@ -26,6 +29,7 @@ export function TableRowSubtasks({
   showId: boolean;
   alignTop: boolean;
   onOpenIssue: (id: number) => void;
+  deliveryById?: Map<number, DeliveryItem>;
 }) {
   const subtasks = useSubtasks(issueId);
   if (subtasks.length === 0) return null;
@@ -41,6 +45,7 @@ export function TableRowSubtasks({
       onKeyDown={stopPropagation}
     >
       {subtasks.map((subtask) => {
+        const delivery = deliveryById?.get(subtask.id);
         const column = maps.columnById.get(subtask.columnId);
         const done = column?.stateType === 'completed';
         return (
@@ -72,6 +77,7 @@ export function TableRowSubtasks({
                 {subtask.title}
               </span>
               <SubtaskProgress issueId={subtask.id} maps={maps} />
+              {delivery && <DeliveryProgressBadge item={delivery} />}
             </button>
             {orderedColumns.map((column) =>
               column.kind === 'builtin' ? (

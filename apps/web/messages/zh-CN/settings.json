@@ -1,4 +1,20 @@
 {
+  "deliveryWorkflow": {
+    "title": "交付工作流",
+    "description": "为交付和运维指定工作项类型及数字字段。",
+    "loadError": "无法加载交付配置。",
+    "moduleTypeId": "一级模块类型",
+    "nodeTypeId": "二级节点类型",
+    "taskTypeId": "三级执行类型",
+    "maintenanceTypeId": "运维事项类型",
+    "nodeWeightId": "节点占比字段",
+    "taskWeightId": "执行任务占比字段",
+    "nodeProgressId": "节点手填进度字段",
+    "taskProgressId": "执行任务进度字段",
+    "choose": "请选择",
+    "enable": "启用交付工作流",
+    "saved": "已保存交付工作流。"
+  },
   "schedules": {
     "newTitle": "新建定时任务",
     "editTitle": "编辑定时任务",
