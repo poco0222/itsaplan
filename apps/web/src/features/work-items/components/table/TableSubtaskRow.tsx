@@ -1,15 +1,15 @@
 import { CornerDownRight } from 'lucide-react';
 import type { DeliveryItem } from '@/lib/api/endpoints/deliveryWorkflow';
 import type { Issue } from '@/lib/api/endpoints/issues';
+import type { ProjectDetail } from '@/lib/api/endpoints/projects';
 import { cn } from '@/lib/utils';
 import type { Maps } from '@/utils/project';
 import { StateIcon } from '@/features/issue/components/shared/IssueIcons';
 import { useSubtaskFold, useSubtasks } from '../../context/useSubtasks';
-import { columnKey, type OrderedColumn } from '../../utils/table';
+import type { OrderedColumn } from '../../utils/table';
 import DeliveryProgressBadge from '../shared/DeliveryProgressBadge';
 import { SubtaskProgress } from '../shared/SubtaskProgress';
-import { TableBuiltinCell } from './TableBuiltinCell';
-import { TableCustomCell } from './TableCustomCell';
+import { TableIssueCells } from './TableIssueCells';
 
 export function TableSubtaskRow({
   subtask,
@@ -18,6 +18,8 @@ export function TableSubtaskRow({
 }: {
   subtask: Issue;
   nested?: boolean;
+  project: ProjectDetail;
+  readOnly: boolean;
   maps: Maps;
   orderedColumns: OrderedColumn[];
   showId: boolean;
@@ -25,7 +27,8 @@ export function TableSubtaskRow({
   onOpenIssue: (id: number) => void;
   deliveryById?: Map<number, DeliveryItem>;
 }) {
-  const { maps, orderedColumns, showId, alignTop, onOpenIssue, deliveryById } = rowProps;
+  const { project, readOnly, maps, orderedColumns, showId, alignTop, onOpenIssue, deliveryById } =
+    rowProps;
   const children = useSubtasks(subtask.id);
   const { open, toggle } = useSubtaskFold();
   const delivery = deliveryById?.get(subtask.id);
@@ -71,23 +74,14 @@ export function TableSubtaskRow({
             onToggle={nested ? undefined : toggle}
           />
         </div>
-        {orderedColumns.map((column) =>
-          column.kind === 'builtin' ? (
-            <TableBuiltinCell
-              key={columnKey(column)}
-              column={column.col}
-              issue={subtask}
-              maps={maps}
-            />
-          ) : (
-            <TableCustomCell
-              key={columnKey(column)}
-              field={column.field}
-              issue={subtask}
-              maps={maps}
-            />
-          ),
-        )}
+        <TableIssueCells
+          project={project}
+          issue={subtask}
+          orderedColumns={orderedColumns}
+          maps={maps}
+          readOnly={readOnly}
+          delivery={delivery}
+        />
       </div>
       {!nested &&
         open &&

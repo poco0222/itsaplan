@@ -1,12 +1,16 @@
 import assert from 'node:assert/strict';
 import { it } from 'node:test';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { JSDOM } from 'jsdom';
 import { NextIntlClientProvider } from 'next-intl';
 import { act } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
+import type { DeliveryItem } from '@/lib/api/endpoints/deliveryWorkflow';
 import type { Issue } from '@/lib/api/endpoints/issues';
+import type { ProjectDetail } from '@/lib/api/endpoints/projects';
 import type { Maps } from '@/utils/project';
 import common from '../../../../../messages/en/common.json';
+import issueMessages from '../../../../../messages/en/issue.json';
 import workItems from '../../../../../messages/en/workItems.json';
 import { SubtasksProvider } from '../../context/useSubtasks';
 import { orderedColumns } from '../../utils/table';
@@ -14,6 +18,12 @@ import { TableRowSubtasks } from './TableRowSubtasks';
 
 const issue = (id: number, parentId: number, title: string) =>
   ({ id, parentId, title, columnId: 1, sequenceNumber: id, identifier: `ROLL-${id}` }) as Issue;
+const project = {
+  project: { ref: 'test.ROLL', timeEstimateEnabled: true },
+  columns: [],
+  issueTypes: [],
+} as unknown as ProjectDetail;
+const messages = { common, issue: issueMessages, workItems };
 
 it('renders subtask values in the selected column order', () => {
   const subtask: Issue = {
@@ -109,21 +119,28 @@ it('renders subtask values in the selected column order', () => {
       },
     ],
   );
-  const html = renderToStaticMarkup(
-    <NextIntlClientProvider locale="en" messages={{ common, workItems }} timeZone="UTC">
-      <SubtasksProvider issues={[subtask, unscheduled, nested]} enabled>
-        <TableRowSubtasks
-          issueId={1}
-          maps={maps}
-          orderedColumns={columns}
-          showId
-          alignTop={false}
-          onOpenIssue={() => {}}
-        />
-      </SubtasksProvider>
-    </NextIntlClientProvider>,
-  );
-  const dom = new JSDOM(html);
+  const client = new QueryClient();
+  const render = (readOnly: boolean, deliveryById?: Map<number, DeliveryItem>) =>
+    renderToStaticMarkup(
+      <QueryClientProvider client={client}>
+        <NextIntlClientProvider locale="en" messages={messages} timeZone="UTC">
+          <SubtasksProvider issues={[subtask, unscheduled, nested]} enabled>
+            <TableRowSubtasks
+              project={project}
+              readOnly={readOnly}
+              issueId={1}
+              deliveryById={deliveryById}
+              maps={maps}
+              orderedColumns={columns}
+              showId
+              alignTop={false}
+              onOpenIssue={() => {}}
+            />
+          </SubtasksProvider>
+        </NextIntlClientProvider>
+      </QueryClientProvider>,
+    );
+  const dom = new JSDOM(render(true));
   try {
     const titles = [...dom.window.document.querySelectorAll('button:not([aria-expanded])')];
     assert.deepEqual(
@@ -142,7 +159,59 @@ it('renders subtask values in the selected column order', () => {
       ['Week 48', 'Task', '1h 30m', 'In progress', 'Nov 26', '75'],
       ['—', '—', '—', 'In progress', '—', '—'],
     ]);
+
+    dom.window.document.body.innerHTML = render(false);
+    const editButtons = [...dom.window.document.querySelectorAll('.ps-12')]
+      .find((title) => title.textContent?.includes('Record findings'))
+      ?.parentElement?.querySelectorAll(':scope > div.contents button');
+    assert.deepEqual(
+      [...(editButtons ?? [])].map((button) => button.textContent),
+      ['Week 48', 'Task', '1h 30m', 'In progress', 'Nov 26', '75'],
+    );
+
+    const completed: DeliveryItem = {
+      id: 4,
+      moduleId: 1,
+      childTypeId: null,
+      role: 'task',
+      phase: 'delivery',
+      progress: 100,
+      progressFieldId: 5,
+      progressReadOnly: true,
+      problem: null,
+      canConfirm: false,
+      completed: true,
+      completedAt: null,
+    };
+    const managed: DeliveryItem = {
+      ...completed,
+      id: 2,
+      role: 'node',
+      progress: null,
+      problem: 'weights',
+      completed: false,
+    };
+    const direct: DeliveryItem = {
+      ...managed,
+      id: 3,
+      progressReadOnly: false,
+      problem: 'progress',
+    };
+    dom.window.document.body.innerHTML = render(
+      false,
+      new Map([managed, direct, completed].map((item) => [item.id, item])),
+    );
+    const cell = (title: string) =>
+      [...dom.window.document.querySelectorAll('button')]
+        .find((button) => button.textContent?.includes(title))
+        ?.closest('.grid-cols-subgrid')?.lastElementChild;
+    assert.equal(cell('Record findings')?.textContent, '100%');
+    assert.equal(cell('Record findings')?.querySelector('button'), null);
+    assert.match(cell('Verify interface')?.textContent ?? '', /100%/);
+    assert.equal(cell('Verify interface')?.querySelector('button'), null);
+    assert.equal(cell('Review handoff')?.querySelector('button')?.textContent, '—');
   } finally {
+    client.clear();
     dom.window.close();
   }
 });
@@ -157,16 +226,31 @@ it('folds each nested branch and keeps its controls separate from the parent row
     'Element',
     'HTMLElement',
     'IS_REACT_ACT_ENVIRONMENT',
+    'fetch',
   ] as const;
   const originals = globals.map((name) => Object.getOwnPropertyDescriptor(globalThis, name));
+  const requests: { path: string; method?: string; body: unknown }[] = [];
+  const fetchIssue = async (input: string | URL, init?: RequestInit) => {
+    requests.push({
+      path: new URL(String(input)).pathname,
+      method: init?.method,
+      body: JSON.parse(String(init?.body)),
+    });
+    return Response.json({});
+  };
   for (const name of globals) {
+    let value: unknown;
+    if (name === 'IS_REACT_ACT_ENVIRONMENT') value = true;
+    else if (name === 'fetch') value = fetchIssue;
+    else value = dom.window[name];
     Object.defineProperty(globalThis, name, {
       configurable: true,
-      value: name === 'IS_REACT_ACT_ENVIRONMENT' ? true : dom.window[name],
+      value,
     });
   }
   const { createRoot } = await import('react-dom/client');
   const root = createRoot(document.querySelector('#root')!);
+  const client = new QueryClient();
   const issues = [
     issue(2, 1, 'Verify interface'),
     issue(3, 1, 'Review handoff'),
@@ -184,27 +268,31 @@ it('folds each nested branch and keeps its controls separate from the parent row
   const render = (collapsed: boolean, enabled = true) =>
     act(() =>
       root.render(
-        <NextIntlClientProvider locale="en" messages={{ workItems }} timeZone="UTC">
-          <div
-            onClick={() => parentEvents.push('click')}
-            onPointerDown={() => parentEvents.push('pointerdown')}
-            onKeyDown={(event) => {
-              event.preventDefault();
-              parentEvents.push('keydown');
-            }}
-          >
-            <SubtasksProvider issues={issues} enabled={enabled} collapsed={collapsed}>
-              <TableRowSubtasks
-                issueId={1}
-                maps={maps}
-                orderedColumns={[]}
-                showId={false}
-                alignTop={false}
-                onOpenIssue={(id) => opened.push(id)}
-              />
-            </SubtasksProvider>
-          </div>
-        </NextIntlClientProvider>,
+        <QueryClientProvider client={client}>
+          <NextIntlClientProvider locale="en" messages={messages} timeZone="UTC">
+            <div
+              onClick={() => parentEvents.push('click')}
+              onPointerDown={() => parentEvents.push('pointerdown')}
+              onKeyDown={(event) => {
+                event.preventDefault();
+                parentEvents.push('keydown');
+              }}
+            >
+              <SubtasksProvider issues={issues} enabled={enabled} collapsed={collapsed}>
+                <TableRowSubtasks
+                  project={project}
+                  readOnly={false}
+                  issueId={1}
+                  maps={maps}
+                  orderedColumns={orderedColumns(['estimateTime'], [])}
+                  showId={false}
+                  alignTop={false}
+                  onOpenIssue={(id) => opened.push(id)}
+                />
+              </SubtasksProvider>
+            </div>
+          </NextIntlClientProvider>
+        </QueryClientProvider>,
       ),
     );
   const button = (title: string) =>
@@ -240,6 +328,26 @@ it('folds each nested branch and keeps its controls separate from the parent row
     assert.deepEqual(opened, [2, 4]);
     assert.deepEqual(parentEvents, []);
 
+    const estimate = button('Record findings')
+      ?.closest('.grid-cols-subgrid')
+      ?.querySelector<HTMLButtonElement>('div.contents button');
+    assert.ok(estimate);
+    act(() => estimate.click());
+    const input = document.querySelector('input');
+    assert.ok(input);
+    act(() => {
+      Object.getOwnPropertyDescriptor(dom.window.HTMLInputElement.prototype, 'value')!.set!.call(
+        input,
+        '90m',
+      );
+      input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    });
+    await act(async () => input.blur());
+    assert.deepEqual(requests, [
+      { path: '/issues/4', method: 'PATCH', body: { estimateMinutes: 90 } },
+    ]);
+    assert.deepEqual(parentEvents, []);
+
     render(false);
     assert.ok(button('Send summary'));
     act(() => toggle.click());
@@ -253,6 +361,7 @@ it('folds each nested branch and keeps its controls separate from the parent row
     assert.equal(button('Verify interface'), undefined);
   } finally {
     act(() => root.unmount());
+    client.clear();
     dom.window.close();
     globals.forEach((name, index) => {
       const descriptor = originals[index];

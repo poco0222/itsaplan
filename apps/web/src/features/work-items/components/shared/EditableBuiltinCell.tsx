@@ -10,6 +10,7 @@ import StatusSelect from '@/components/common/fields/StatusSelect';
 import TypeSelect from '@/components/common/fields/TypeSelect';
 import CycleSelect from '@/features/issue/components/fields/CycleSelect';
 import DelegateSelect from '@/features/issue/components/fields/DelegateSelect';
+import EstimatePill from '@/features/issue/components/fields/EstimatePill';
 import InitiativeSelect from '@/features/issue/components/fields/InitiativeSelect';
 import { type TableColumn } from '../../utils/table';
 import { CellButton } from './CellButton';
@@ -17,7 +18,7 @@ import { CellEditor } from './CellEditor';
 
 // One built-in property cell showing `children` as its value. When the issue can be
 // edited, a click opens the picker the issue panel uses for that field. The
-// estimates and the times are shown only.
+// logged time is a total from the issue's worklogs.
 export function EditableBuiltinCell({
   column,
   issue,
@@ -33,9 +34,7 @@ export function EditableBuiltinCell({
   onPatch: (patch: IssuePatch) => void;
   children: ReactNode;
 }) {
-  const editor = readOnly
-    ? null
-    : builtinEditor(column, issue, project, onPatch, <CellButton>{children}</CellButton>);
+  const editor = readOnly ? null : builtinEditor(column, issue, project, onPatch, children);
   return editor ? <CellEditor>{editor}</CellEditor> : children;
 }
 
@@ -44,8 +43,9 @@ function builtinEditor(
   issue: Issue,
   project: ProjectDetail,
   onPatch: (patch: IssuePatch) => void,
-  trigger: ReactNode,
+  value: ReactNode,
 ): ReactNode {
+  const trigger = <CellButton>{value}</CellButton>;
   switch (column) {
     case 'status':
       return (
@@ -125,6 +125,15 @@ function builtinEditor(
           trigger={trigger}
         />
       );
+    case 'estimateTime':
+      return project.project.timeEstimateEnabled ? (
+        <EstimatePill
+          kind="time"
+          value={issue.estimateMinutes}
+          onChange={(estimateMinutes) => onPatch({ estimateMinutes })}
+          renderTrigger={(onClick) => <CellButton onClick={onClick}>{value}</CellButton>}
+        />
+      ) : null;
     case 'startDate': {
       const latestStart = parseDate(issue.dueDate);
       return (

@@ -48,6 +48,8 @@ function card({
               role: 'module' as const,
               phase: 'delivery' as const,
               progress: 100,
+              progressFieldId: null,
+              progressReadOnly: true,
               problem: null,
               canConfirm: true,
               completed: true,

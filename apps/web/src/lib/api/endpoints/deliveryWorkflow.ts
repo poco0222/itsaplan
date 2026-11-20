@@ -18,6 +18,8 @@ export interface DeliveryItem {
   role: 'module' | 'node' | 'task' | 'maintenance';
   phase: 'delivery' | 'maintenance';
   progress: number | null;
+  progressFieldId: number | null;
+  progressReadOnly: boolean;
   problem: 'hierarchy' | 'children' | 'weights' | 'child' | 'progress' | null;
   canConfirm: boolean;
   completed: boolean;

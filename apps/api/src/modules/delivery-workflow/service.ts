@@ -140,6 +140,11 @@ export async function readDeliveryItems(
   if (!settings) return [];
   return await executor.execute<DeliveryItem>(sql`
     SELECT d.id, d.module_id AS "moduleId", d.role, d.progress::float8, d.problem,
+      CASE
+        WHEN d.role IN ('module', 'node') THEN ${settings.nodeProgressId}::integer
+        WHEN d.role = 'task' THEN ${settings.taskProgressId}::integer
+      END AS "progressFieldId",
+      (d.managed OR d.state = 'completed' OR h.id IS NOT NULL) AS "progressReadOnly",
       CASE WHEN d.valid THEN CASE
         WHEN d.role = 'module' AND h.id IS NOT NULL THEN ${settings.maintenanceTypeId}::integer
         WHEN d.role = 'module' THEN ${settings.nodeTypeId}::integer

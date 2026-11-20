@@ -26,6 +26,8 @@ export const DeliveryItem = t.Object({
     t.Literal('maintenance'),
   ]),
   progress: t.Nullable(t.Number()),
+  progressFieldId: t.Nullable(id),
+  progressReadOnly: t.Boolean(),
   problem: t.Nullable(
     t.Union([
       t.Literal('hierarchy'),
