@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import DatePill from '@/components/common/fields/DatePill';
 import DateTimePill from '@/components/common/fields/DateTimePill';
+import InlineTextField from '@/components/common/fields/InlineTextField';
 import {
   Select,
   SelectContent,
@@ -16,7 +17,6 @@ import {
 import Avatar from '@/components/common/Avatar';
 import MemberSelect from './MemberSelect';
 import InlineUrlField from './InlineUrlField';
-import InlineTextField from './InlineTextField';
 import { useTranslations } from 'next-intl';
 
 // Radix Select forbids an empty-string item value, so "(none)" options use this
@@ -139,6 +139,7 @@ export default function IssueCustomFieldControl({
         value={(current?.value as string | number | null) ?? null}
         fieldType={def.fieldType}
         saveKey={saveKey}
+        label={def.name}
         onSave={(v) => onChange({ value: v })}
       />
     );

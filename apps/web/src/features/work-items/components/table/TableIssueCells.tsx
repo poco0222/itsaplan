@@ -1,13 +1,17 @@
 import type { ProjectDetail } from '@/lib/api/endpoints/projects';
-import type { Issue } from '@/lib/api/endpoints/issues';
+import type { Issue, IssueFieldValueInput } from '@/lib/api/endpoints/issues';
 import type { DeliveryItem } from '@/lib/api/endpoints/deliveryWorkflow';
 import { useSetFieldValue, useUpdateIssue } from '@/services/issues.service';
 import type { Maps } from '@/utils/project';
+import InlineTextField from '@/components/common/fields/InlineTextField';
 import { columnKey, type OrderedColumn } from '../../utils/table';
+import { CellButton } from '../shared/CellButton';
+import { CellEditor } from '../shared/CellEditor';
 import DeliveryProgressBadge from '../shared/DeliveryProgressBadge';
 import { EditableBuiltinCell } from '../shared/EditableBuiltinCell';
 import { EditableCustomCell } from '../shared/EditableCustomCell';
 import { TableBuiltinCell } from './TableBuiltinCell';
+import { TableCustomCell } from './TableCustomCell';
 
 export function TableIssueCells({
   project,
@@ -43,24 +47,41 @@ export function TableIssueCells({
         </EditableBuiltinCell>
       );
     }
-    if (
-      delivery?.progressReadOnly &&
-      column.field.id === delivery.progressFieldId &&
-      (column.field.issueTypeId == null || column.field.issueTypeId === issue.typeId)
-    ) {
+    const { field } = column;
+    const applies = field.issueTypeId == null || field.issueTypeId === issue.typeId;
+    if (delivery?.progressReadOnly && field.id === delivery.progressFieldId && applies) {
       return <DeliveryProgressBadge key={key} item={delivery} valueOnly />;
+    }
+    const onChange = (value: IssueFieldValueInput) =>
+      setFieldValue.mutate({ issueId: issue.id, fieldId: field.id, value });
+    if (!readOnly && applies && field.fieldType === 'number') {
+      const value = issue.fieldValues.find((entry) => entry.fieldId === field.id)?.value;
+      return (
+        <CellEditor key={key}>
+          <InlineTextField
+            fieldType="number"
+            value={typeof value === 'number' ? value : null}
+            saveKey={`${field.id}-${issue.updatedAt}`}
+            label={field.name}
+            renderTrigger={(onClick) => (
+              <CellButton onClick={onClick} title={field.name}>
+                <TableCustomCell field={field} issue={issue} maps={maps} />
+              </CellButton>
+            )}
+            onSave={(value) => onChange({ value })}
+          />
+        </CellEditor>
+      );
     }
     return (
       <EditableCustomCell
         key={key}
-        field={column.field}
+        field={field}
         issue={issue}
         project={project}
         maps={maps}
         readOnly={readOnly}
-        onChange={(value) =>
-          setFieldValue.mutate({ issueId: issue.id, fieldId: column.field.id, value })
-        }
+        onChange={onChange}
       />
     );
   });

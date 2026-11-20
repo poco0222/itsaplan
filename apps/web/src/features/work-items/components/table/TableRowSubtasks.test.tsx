@@ -5,6 +5,7 @@ import { JSDOM } from 'jsdom';
 import { NextIntlClientProvider } from 'next-intl';
 import { act } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
+import type { CustomField } from '@/lib/api/endpoints/customFields';
 import type { DeliveryItem } from '@/lib/api/endpoints/deliveryWorkflow';
 import type { Issue } from '@/lib/api/endpoints/issues';
 import type { ProjectDetail } from '@/lib/api/endpoints/projects';
@@ -14,16 +15,40 @@ import issueMessages from '../../../../../messages/en/issue.json';
 import workItems from '../../../../../messages/en/workItems.json';
 import { SubtasksProvider } from '../../context/useSubtasks';
 import { orderedColumns } from '../../utils/table';
+import { TableIssueCells } from './TableIssueCells';
 import { TableRowSubtasks } from './TableRowSubtasks';
 
-const issue = (id: number, parentId: number, title: string) =>
-  ({ id, parentId, title, columnId: 1, sequenceNumber: id, identifier: `ROLL-${id}` }) as Issue;
+const issue = (
+  id: number,
+  parentId: number | null,
+  title: string,
+  fieldValues: Issue['fieldValues'] = [],
+) =>
+  ({
+    id,
+    parentId,
+    title,
+    columnId: 1,
+    sequenceNumber: id,
+    identifier: `ROLL-${id}`,
+    fieldValues,
+  }) as Issue;
 const project = {
   project: { ref: 'test.ROLL', timeEstimateEnabled: true },
   columns: [],
   issueTypes: [],
 } as unknown as ProjectDetail;
 const messages = { common, issue: issueMessages, workItems };
+const progressField: CustomField = {
+  id: 5,
+  name: 'Progress',
+  fieldType: 'number',
+  issueTypeId: null,
+  memberScope: null,
+  showInBody: false,
+  position: 0,
+  options: [],
+};
 
 it('renders subtask values in the selected column order', () => {
   const subtask: Issue = {
@@ -69,7 +94,10 @@ it('renders subtask values in the selected column order', () => {
     dueDate: null,
     fieldValues: [],
   };
-  const nested: Issue = { ...subtask, ...issue(4, 2, 'Record findings') };
+  const nested: Issue = {
+    ...subtask,
+    ...issue(4, 2, 'Record findings', subtask.fieldValues),
+  };
   const maps: Maps = {
     typeById: new Map([
       [
@@ -106,18 +134,7 @@ it('renders subtask values in the selected column order', () => {
   };
   const columns = orderedColumns(
     ['cycle', 'type', 'estimateTime', 'status', 'dueDate', 'cf:5'],
-    [
-      {
-        id: 5,
-        name: 'Progress',
-        fieldType: 'number',
-        issueTypeId: null,
-        memberScope: null,
-        showInBody: false,
-        position: 0,
-        options: [],
-      },
-    ],
+    [progressField],
   );
   const client = new QueryClient();
   const render = (readOnly: boolean, deliveryById?: Map<number, DeliveryItem>) =>
@@ -216,7 +233,7 @@ it('renders subtask values in the selected column order', () => {
   }
 });
 
-it('folds each nested branch and keeps its controls separate from the parent row', async () => {
+it('folds branches and edits time and numbers without activating the parent row', async () => {
   const dom = new JSDOM('<!doctype html><div id="root"></div>');
   const globals = [
     'window',
@@ -251,8 +268,9 @@ it('folds each nested branch and keeps its controls separate from the parent row
   const { createRoot } = await import('react-dom/client');
   const root = createRoot(document.querySelector('#root')!);
   const client = new QueryClient();
+  const topLevel = issue(1, null, 'Parent');
   const issues = [
-    issue(2, 1, 'Verify interface'),
+    issue(2, 1, 'Verify interface', [{ fieldId: 5, value: 75, valueEnd: null, optionIds: [] }]),
     issue(3, 1, 'Review handoff'),
     issue(4, 2, 'Record findings'),
     issue(5, 3, 'Send summary'),
@@ -265,6 +283,10 @@ it('folds each nested branch and keeps its controls separate from the parent row
   };
   const opened: number[] = [];
   const parentEvents: string[] = [];
+  const numericColumns = orderedColumns(
+    ['cf:5', 'cf:6'],
+    [progressField, { ...progressField, id: 6, name: 'Weight' }],
+  );
   const render = (collapsed: boolean, enabled = true) =>
     act(() =>
       root.render(
@@ -278,13 +300,22 @@ it('folds each nested branch and keeps its controls separate from the parent row
                 parentEvents.push('keydown');
               }}
             >
+              <div id="parent-cells">
+                <TableIssueCells
+                  project={project}
+                  readOnly={false}
+                  issue={topLevel}
+                  maps={maps}
+                  orderedColumns={numericColumns}
+                />
+              </div>
               <SubtasksProvider issues={issues} enabled={enabled} collapsed={collapsed}>
                 <TableRowSubtasks
                   project={project}
                   readOnly={false}
                   issueId={1}
                   maps={maps}
-                  orderedColumns={orderedColumns(['estimateTime'], [])}
+                  orderedColumns={[...orderedColumns(['estimateTime'], []), ...numericColumns]}
                   showId={false}
                   alignTop={false}
                   onOpenIssue={(id) => opened.push(id)}
@@ -297,6 +328,34 @@ it('folds each nested branch and keeps its controls separate from the parent row
     );
   const button = (title: string) =>
     [...document.querySelectorAll('button')].find((element) => element.textContent === title);
+  const editCells = (title: string) =>
+    button(title)
+      ?.closest('.grid-cols-subgrid')
+      ?.querySelectorAll<HTMLButtonElement>('div.contents button');
+  const typeValue = (input: HTMLInputElement, value: string) => {
+    act(() => {
+      Object.getOwnPropertyDescriptor(dom.window.HTMLInputElement.prototype, 'value')!.set!.call(
+        input,
+        value,
+      );
+      input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
+    });
+  };
+  const press = (input: HTMLInputElement, key: string) => {
+    input.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key, bubbles: true }));
+  };
+  const editNumber = (trigger: HTMLButtonElement, value: string) => {
+    const cell = trigger.parentElement;
+    act(() => {
+      trigger.dispatchEvent(new dom.window.Event('pointerdown', { bubbles: true }));
+      trigger.click();
+    });
+    const input = cell?.querySelector('input[type="number"]');
+    assert.ok(input instanceof dom.window.HTMLInputElement);
+    assert.equal(document.activeElement, input);
+    assert.equal(input.value, value);
+    return input;
+  };
 
   try {
     render(true);
@@ -328,23 +387,37 @@ it('folds each nested branch and keeps its controls separate from the parent row
     assert.deepEqual(opened, [2, 4]);
     assert.deepEqual(parentEvents, []);
 
-    const estimate = button('Record findings')
-      ?.closest('.grid-cols-subgrid')
-      ?.querySelector<HTMLButtonElement>('div.contents button');
+    const estimate = editCells('Record findings')?.[0];
     assert.ok(estimate);
     act(() => estimate.click());
     const input = document.querySelector('input');
     assert.ok(input);
-    act(() => {
-      Object.getOwnPropertyDescriptor(dom.window.HTMLInputElement.prototype, 'value')!.set!.call(
-        input,
-        '90m',
-      );
-      input.dispatchEvent(new dom.window.Event('input', { bubbles: true }));
-    });
+    typeValue(input, '90m');
     await act(async () => input.blur());
     assert.deepEqual(requests, [
       { path: '/issues/4', method: 'PATCH', body: { estimateMinutes: 90 } },
+    ]);
+
+    const parentNumber = editNumber(document.querySelector('#parent-cells button')!, '');
+    typeValue(parentNumber, '12');
+    act(() => parentNumber.blur());
+    let progress = editNumber(editCells('Verify interface')![1], '75');
+    typeValue(progress, '20');
+    act(() => press(progress, 'Escape'));
+    assert.equal(editCells('Verify interface')![1].textContent, '75');
+    assert.equal(requests.length, 1);
+
+    const weight = editNumber(editCells('Record findings')![2], '');
+    typeValue(weight, '32.5');
+    await act(async () => press(weight, 'Enter'));
+    progress = editNumber(editCells('Verify interface')![1], '75');
+    typeValue(progress, '');
+    const save = progress.parentElement?.querySelector('button');
+    assert.ok(save);
+    await act(async () => save.click());
+    assert.deepEqual(requests.slice(1), [
+      { path: '/issues/4/fields/6', method: 'PUT', body: { value: 32.5 } },
+      { path: '/issues/2/fields/5', method: 'PUT', body: { value: null } },
     ]);
     assert.deepEqual(parentEvents, []);
 
