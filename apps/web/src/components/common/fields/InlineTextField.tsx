@@ -1,22 +1,24 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Check } from 'lucide-react';
-import { Pill } from '@/components/common/fields/Pill';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useTranslations } from 'next-intl';
+import { Pill } from './Pill';
 
-// Text/number custom field: shows the value as a ghost pill and switches to
-// an input on click, so an unset field reads as a compact "Empty" rather than a
-// full-width empty box.
+// The default trigger keeps unset fields compact in issue details.
 export default function InlineTextField({
   value,
   fieldType,
   saveKey,
+  label,
+  renderTrigger,
   onSave,
 }: {
   value: string | number | null;
   fieldType: 'text' | 'number';
   saveKey: string;
+  label: string;
+  renderTrigger?: (onClick: () => void) => ReactNode;
   onSave: (v: string | number | null) => void;
 }) {
   const t = useTranslations('issue.fields');
@@ -55,6 +57,7 @@ export default function InlineTextField({
   }
 
   if (!editing) {
+    if (renderTrigger) return renderTrigger(start);
     return (
       <Pill active={display != null} onClick={start}>
         <span className="max-w-[240px] truncate">{display ?? t('empty')}</span>
@@ -69,6 +72,7 @@ export default function InlineTextField({
         autoFocus
         value={draft}
         key={saveKey}
+        aria-label={label}
         aria-invalid={invalid || undefined}
         className="h-8 max-w-[220px]"
         onChange={(e) => {
@@ -85,6 +89,7 @@ export default function InlineTextField({
         onBlur={() => setEditing(false)}
       />
       <Button
+        type="button"
         variant="ghost"
         size="icon"
         className="size-8 shrink-0 text-muted-foreground hover:text-foreground"
