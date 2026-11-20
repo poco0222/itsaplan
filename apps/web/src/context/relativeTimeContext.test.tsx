@@ -4,7 +4,8 @@ import { act } from 'react';
 import type { Root } from 'react-dom/client';
 import { NextIntlClientProvider } from 'next-intl';
 import { JSDOM } from 'jsdom';
-import { RelativeTimeProvider, useRelativeTime } from './relativeTimeContext';
+import { toDateStr } from '@/utils/dates';
+import { RelativeTimeProvider, useCurrentTime, useRelativeTime } from './relativeTimeContext';
 
 const replacedGlobals = [
   'window',
@@ -13,17 +14,23 @@ const replacedGlobals = [
   'HTMLElement',
   'setInterval',
   'clearInterval',
+  'Date',
   'IS_REACT_ACT_ENVIRONMENT',
 ] as const;
 
 let dom: JSDOM;
 let root: Root;
 let intervalRegistrations: number;
+let refreshClock: () => void;
 let originalGlobalDescriptors: Map<string, PropertyDescriptor | undefined>;
 
 function RelativeTimeProbe({ value }: { value: string }) {
   const relativeTime = useRelativeTime();
   return <span>{relativeTime(value)}</span>;
+}
+
+function CurrentDayProbe() {
+  return <span>{toDateStr(useCurrentTime())}</span>;
 }
 
 beforeEach(async () => {
@@ -40,8 +47,9 @@ beforeEach(async () => {
     HTMLElement: { configurable: true, value: dom.window.HTMLElement },
     setInterval: {
       configurable: true,
-      value: () => {
+      value: (callback: () => void) => {
         intervalRegistrations += 1;
+        refreshClock = callback;
         return 1;
       },
     },
@@ -85,5 +93,27 @@ describe('RelativeTimeProvider', () => {
       [...document.querySelectorAll('span')].map((element) => element.textContent),
       ['now', 'now'],
     );
+  });
+
+  it('updates the local calendar day at the next clock tick after midnight', () => {
+    let wallTime = new Date(2026, 10, 20, 23, 59).getTime();
+    const ClockDate = new Proxy(Date, {
+      construct: (DateConstructor, args) =>
+        Reflect.construct(DateConstructor, args.length ? args : [wallTime]),
+    });
+    globalThis.Date = ClockDate;
+    act(() =>
+      root.render(
+        <NextIntlClientProvider locale="en" now={new Date(wallTime)} timeZone="UTC">
+          <RelativeTimeProvider>
+            <CurrentDayProbe />
+          </RelativeTimeProvider>
+        </NextIntlClientProvider>,
+      ),
+    );
+    assert.equal(document.querySelector('span')?.textContent, '2026-11-20');
+    wallTime += 60_000;
+    act(() => refreshClock());
+    assert.equal(document.querySelector('span')?.textContent, '2026-11-21');
   });
 });

@@ -30,10 +30,20 @@ export function RelativeTimeProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useRelativeTime(): (value: Date | string) => string {
+function useRelativeTimeClock(): RelativeTimeClock {
   const clock = useContext(RelativeTimeNowCtx);
-  const format = useFormatter();
   if (!clock) throw new Error('useRelativeTime must be used inside RelativeTimeProvider');
+  return clock;
+}
+
+export function useCurrentTime(): Date {
+  const clock = useRelativeTimeClock();
+  return clock.live ? new Date() : clock.scheduledNow;
+}
+
+export function useRelativeTime(): (value: Date | string) => string {
+  const clock = useRelativeTimeClock();
+  const format = useFormatter();
 
   return (value: Date | string) => {
     // A feed update can render between minute ticks. Read the wall clock during

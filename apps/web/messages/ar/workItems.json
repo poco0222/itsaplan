@@ -1,4 +1,9 @@
 {
+  "deadline": {
+    "dueWithinThreeDays": "يستحق خلال 3 أيام",
+    "dueWithinFiveDays": "يستحق خلال 5 أيام",
+    "completedLate": "اكتمل متأخرًا · {date}"
+  },
   "newIssue": "مهمة جديدة",
   "addWorkItem": "إضافة عنصر عمل",
   "pin": "تثبيت",

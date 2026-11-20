@@ -1,4 +1,9 @@
 {
+  "deadline": {
+    "dueWithinThreeDays": "سررسید تا ۳ روز دیگر",
+    "dueWithinFiveDays": "سررسید تا ۵ روز دیگر",
+    "completedLate": "تکمیل با تأخیر · {date}"
+  },
   "newIssue": "تسک جدید",
   "addWorkItem": "افزودن تسک",
   "pin": "سنجاق کردن",

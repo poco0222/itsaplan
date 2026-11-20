@@ -30,6 +30,20 @@ describe('normalizeSavedDisplay', () => {
       defaultViewSettings('kanban').showEmptyGroups,
     );
   });
+
+  it('round-trips the actual completion date field and clears invalid or unset values', () => {
+    const display = normalizeSavedDisplay({ layout: 'kanban', actualCompletionDateField: 'cf:12' });
+    assert.equal(
+      normalizeSavedDisplay(JSON.parse(JSON.stringify(display))).actualCompletionDateField,
+      'cf:12',
+    );
+    for (const value of [null, undefined, 12, 'dueDate', 'cf:invalid']) {
+      assert.equal(
+        normalizeSavedDisplay({ actualCompletionDateField: value }).actualCompletionDateField,
+        null,
+      );
+    }
+  });
 });
 
 describe('defaultViewSettings', () => {

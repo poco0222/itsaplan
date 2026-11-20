@@ -70,10 +70,12 @@
     "1": "월요일"
   },
   "dateFields": {
+    "unset": "없음",
     "dueDate": "마감일",
     "startDate": "시작일"
   },
   "rows": {
+    "actualCompletionDateField": "실제 완료일",
     "columns": "열",
     "grouping": "그룹화",
     "swimlanes": "스윔레인",

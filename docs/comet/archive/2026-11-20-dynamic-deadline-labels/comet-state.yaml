@@ -1,0 +1,2166 @@
+# comet-execution: managed-run
+schema: comet.native.v4
+name: dynamic-deadline-labels
+language: en
+phase: archive
+status: done
+state_version: 8
+brief: brief.md
+document_constraints_version: 3
+spec_changes:
+  - capability: kanban-deadline-badges
+    operation: create
+    source: specs/kanban-deadline-badges/spec.md
+workspace:
+  isolation: current
+  change_branch: main
+  target_branch: main
+  finish: null
+loop:
+  stage: done
+  goal_cycle: 1
+  iteration: 1
+  attempt: 1
+  retry_epoch: 0
+  failed_iteration_count: 0
+  no_progress_count: 0
+  execution_failure_count: 0
+  previous_unresolved_ids: []
+  next_action: null
+acceptance:
+  - id: A1
+    source: brief.md
+    text: A started card with a visible due date shows the 3-day indicator at zero
+      through three days remaining, and the 5-day indicator at four and five
+      days remaining. The date is visible and the two indicators never appear
+      together.
+    result: passed
+    reason:
+      text: Deadline component tests cover days 0–6. In both isolated Chrome layouts,
+        DQA-1 (today) and DQA-2 (day 3) showed only the 3-day badge; DQA-3 (day
+        4) and DQA-4 (day 5) showed only the 5-day badge beside the existing
+        date.
+      truncated: false
+  - id: A2
+    source: brief.md
+    text: A past due date on an open card retains its overdue styling. A missing or
+      invalid due date, a date more than five days away, and cards outside the
+      started state show no upcoming indicator. An open board updates as the
+      browser-local calendar day changes.
+    result: passed
+    reason:
+      text: Chrome showed the original Nov 19 date in red with no upcoming badge and
+        no upcoming badge on day 6 or unstarted DQA-10. Component tests cover
+        invalid dates and state boundaries; a simulated midnight tick advances
+        the browser-local day and the tested rendering transitions.
+        IssueCardBody gates all badges on presence of a visible due date.
+      truncated: false
+  - id: A3
+    source: brief.md
+    text: A completed card with an actual completion date later than its deadline
+      shows the late-completion indicator and the actual date next to its
+      deadline. A deadline on October 8 and completion on October 15 should show
+      October 15 in the indicator.
+    result: passed
+    reason:
+      text: DQA-7 showed its original Oct 8 date and the badge with actual Oct 15 in
+        both Chrome layouts using the configured date field. The focused test
+        asserts the pair directly.
+      truncated: false
+  - id: A4
+    source: brief.md
+    text: On-time completion, early completion, cancellation and missing or invalid
+      dates do not show a late-completion indicator. The system completion time
+      is never substituted for the chosen actual date field.
+    result: passed
+    reason:
+      text: Chrome showed no late badge on DQA-9 with a missing date. Component cases
+        suppressed same-day, early, invalid, missing, canceled and unconfigured
+        values. Only the selected custom-field value is used; system state-entry
+        time is excluded.
+      truncated: false
+  - id: A5
+    source: brief.md
+    text: The actual date field can be selected from existing date custom fields,
+      saved, reloaded and cleared. Missing or invalid selections do not break
+      older views. When existing copy flows remap a saved view, the date field
+      selection follows the mapped field or is cleared.
+    result: passed
+    reason:
+      text: Chrome selected the existing date field, saved and reloaded with the
+        badge, then cleared, saved and reloaded without it. Normalization tests
+        cover legacy and malformed values. The isolated API copy and template
+        tests check valid remapping and drop missing or non-date fields.
+      truncated: false
+  - id: A6
+    source: brief.md
+    text: Verify the indicators in regular and swimlane Kanban cards using test
+      records. Card, status, label and date data remain unchanged, and existing
+      layout behavior continues to work.
+    result: passed
+    reason:
+      text: The Chrome extension tab verified the indicator, original date and
+        retained subtask on both test layouts. The display mutation was confined
+        to the test view. Read-back of the disposable task rows matched the
+        seed, and the running instance remained on its original image.
+      truncated: false
+builder_handoff:
+  candidate_id: dynamic-deadline-labels:3
+  identity_provider: skill-coordinated
+  builder_execution_ref: 01a1f688-d788-7362-9c0c-5eb98d6b3dcc
+  iteration: 1
+  summary:
+    text: Both Kanban layouts now render mutually exclusive upcoming badges using
+      the shared clock and show the late-completion date from a saved, validated
+      project date-field selection. Existing overdue display, card structure and
+      records are preserved. View copies remap the selected field. Changes
+      tested in a disposable instance; live deployment excluded.
+    truncated: false
+  addressed_acceptance_ids:
+    - A1
+    - A2
+    - A3
+    - A4
+    - A5
+    - A6
+  checks:
+    - name:
+        text: Web regression suite
+        truncated: false
+      result: passed
+      note:
+        text: 'apps/web: bun run test — 753 passed, 0 failed. The final fixture-only
+          adjustment was rechecked in the focused suite.'
+        truncated: false
+    - name:
+        text: Deadline, rollover, and view settings regression
+        truncated: false
+      result: passed
+      note:
+        text: 'apps/web: bun test --preload ./test/setup.ts
+          src/features/work-items/components/kanban/IssueCardDeadline.test.tsx
+          src/context/relativeTimeContext.test.tsx
+          src/utils/viewSettings.test.ts — 11 passed, 0 failed. Separate focused
+          subtask regression — 3 passed.'
+        truncated: false
+    - name:
+        text: Saved-view and template integration
+        truncated: false
+      result: passed
+      note:
+        text: "apps/api: bun --no-env-file test
+          src/modules/project-templates/__tests__/integration/project-templates\
+          .test.ts src/modules/views/__tests__/integration/views.test.ts,
+          against the disposable deadline_test Postgres database — 93 passed, 0
+          failed."
+        truncated: false
+    - name:
+        text: Types and changed-file quality
+        truncated: false
+      result: passed
+      note:
+        text: 'Repository root: bun run --cwd apps/web typecheck; bun run --cwd apps/api
+          typecheck; targeted ESLint in apps/web and apps/api, Prettier, git
+          diff --check — exit 0.'
+        truncated: false
+  checks_truncated: false
+  known_limits: []
+  known_limits_truncated: false
+  review: null
+  submitted_at: 2026-11-20T03:46:19.533Z
+blockers: []
+verification:
+  candidate_id: dynamic-deadline-labels:3
+  identity_provider: skill-coordinated
+  verifier_execution_ref: 01a1f688-d788-7362-9c0c-5eb98d6b3dcc
+  iteration: 1
+  attempt: 1
+  assurance: self-reviewed
+  verdict: pass
+  checks: []
+  reported_checks:
+    - name:
+        text: Web regression suite
+        truncated: false
+      result: passed
+      note:
+        text: 'apps/web: bun run test — 753 passed, 0 failed. The final fixture-only
+          adjustment was rechecked in the focused suite.'
+        truncated: false
+    - name:
+        text: Deadline, rollover, and view settings regression
+        truncated: false
+      result: passed
+      note:
+        text: 'apps/web: bun test --preload ./test/setup.ts
+          src/features/work-items/components/kanban/IssueCardDeadline.test.tsx
+          src/context/relativeTimeContext.test.tsx
+          src/utils/viewSettings.test.ts — 11 passed, 0 failed. Separate focused
+          subtask regression — 3 passed.'
+        truncated: false
+    - name:
+        text: Saved-view and template integration
+        truncated: false
+      result: passed
+      note:
+        text: "apps/api: bun --no-env-file test
+          src/modules/project-templates/__tests__/integration/project-templates\
+          .test.ts src/modules/views/__tests__/integration/views.test.ts,
+          against the disposable deadline_test Postgres database — 93 passed, 0
+          failed."
+        truncated: false
+    - name:
+        text: Types and changed-file quality
+        truncated: false
+      result: passed
+      note:
+        text: 'Repository root: bun run --cwd apps/web typecheck; bun run --cwd apps/api
+          typecheck; targeted ESLint in apps/web and apps/api, Prettier, git
+          diff --check — exit 0.'
+        truncated: false
+    - name:
+        text: Isolated Chrome Kanban acceptance
+        truncated: false
+      result: passed
+      note:
+        text: Dedicated Chrome extension tab 267696375, disposable
+          http://deadline-test.localhost:3411, saved views 1 and 2. Checked both
+          layouts on seeded tasks, original due dates, red overdue styling,
+          missing and on-time completion, retained subtask row, and
+          actual-completion field save, reload, clear and reload. The test
+          instance's issue dates and parent record matched the seed after
+          verification.
+        truncated: false
+    - name:
+        text: Direct project copy
+        truncated: false
+      result: passed
+      note:
+        text: "Disposable API fixture: POST /projects/deadline-qa.DQA/copy then GET the
+          copied project's fields and saved views. Actual date reference changed
+          from source cf:1 to the copied date field cf:3."
+        truncated: false
+  summary:
+    text: All six requirements passed in automated checks and the isolated Chrome
+      acceptance. The running instance was not deployed to.
+    truncated: false
+  risks: []
+  risks_truncated: false
+  completed_at: 2026-11-20T03:48:02.055Z
+history:
+  - goal_cycle: 1
+    iteration: 1
+    attempt: 1
+    outcome: pass
+    unresolved_ids: []
+    summary:
+      text: All six requirements passed in automated checks and the isolated Chrome
+        acceptance. The running instance was not deployed to.
+      truncated: false
+    completed_at: 2026-11-20T03:48:02.055Z
+history_overflow:
+  dropped_entries: 0
+  first_dropped_at: null
+  last_dropped_at: null
+  outcome_counts:
+    pass: 0
+    fail: 0
+    blocked: 0
+    execution-error: 0
+    recovery: 0
+verification_result: pass
+verification_report: verification.md
+archived: true
+created_at: 2026-11-20T03:36:36.184Z
+archive_receipt:
+  runId: dynamic-deadline-labels
+  change: dynamic-deadline-labels
+  archiveRef: 2026-11-20-dynamic-deadline-labels
+  transactionId: 3e36fcdc-d3b9-4c10-906e-8ad05a9e0dfa
+  stateVersion: 8
+  specs:
+    - capability: kanban-deadline-badges
+      operation: create
+run_checkpoint:
+  {
+    'schema': 'comet.workflow-run-checkpoint.v2',
+    'hash': 'c048fd57f27d92e2f8838522439c06cd4cda224d8bc7632c2a25172f53d579c6',
+    'run':
+      {
+        'protocolVersion': 1,
+        'schemaVersion': 1,
+        'runId': 'dynamic-deadline-labels',
+        'revision': 1,
+        'workflow':
+          {
+            'id': 'comet-native',
+            'version': '4',
+            'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+          },
+        'definitionHashes':
+          {
+            '["comet-native","4"]': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+          },
+        'initialStateHash': '608afca6f04414e761a970413b76e14b553e8e344c9d698b659b60fd01eef8e8',
+        'input':
+          {
+            'artifactRootRef': 'docs',
+            'name': 'dynamic-deadline-labels',
+            'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 接受改代码方案, 我需要这个动态标签',
+          },
+        'state':
+          {
+            'acceptance':
+              [
+                {
+                  'id': 'A1',
+                  'reason':
+                    {
+                      'text': 'Deadline component tests cover days 0–6. In both isolated Chrome layouts, DQA-1 (today) and DQA-2 (day 3) showed only the 3-day badge; DQA-3 (day 4) and DQA-4 (day 5) showed only the 5-day badge beside the existing date.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'A started card with a visible due date shows the 3-day indicator at zero through three days remaining, and the 5-day indicator at four and five days remaining. The date is visible and the two indicators never appear together.',
+                },
+                {
+                  'id': 'A2',
+                  'reason':
+                    {
+                      'text': 'Chrome showed the original Nov 19 date in red with no upcoming badge and no upcoming badge on day 6 or unstarted DQA-10. Component tests cover invalid dates and state boundaries; a simulated midnight tick advances the browser-local day and the tested rendering transitions. IssueCardBody gates all badges on presence of a visible due date.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'A past due date on an open card retains its overdue styling. A missing or invalid due date, a date more than five days away, and cards outside the started state show no upcoming indicator. An open board updates as the browser-local calendar day changes.',
+                },
+                {
+                  'id': 'A3',
+                  'reason':
+                    {
+                      'text': 'DQA-7 showed its original Oct 8 date and the badge with actual Oct 15 in both Chrome layouts using the configured date field. The focused test asserts the pair directly.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'A completed card with an actual completion date later than its deadline shows the late-completion indicator and the actual date next to its deadline. A deadline on October 8 and completion on October 15 should show October 15 in the indicator.',
+                },
+                {
+                  'id': 'A4',
+                  'reason':
+                    {
+                      'text': 'Chrome showed no late badge on DQA-9 with a missing date. Component cases suppressed same-day, early, invalid, missing, canceled and unconfigured values. Only the selected custom-field value is used; system state-entry time is excluded.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'On-time completion, early completion, cancellation and missing or invalid dates do not show a late-completion indicator. The system completion time is never substituted for the chosen actual date field.',
+                },
+                {
+                  'id': 'A5',
+                  'reason':
+                    {
+                      'text': 'Chrome selected the existing date field, saved and reloaded with the badge, then cleared, saved and reloaded without it. Normalization tests cover legacy and malformed values. The isolated API copy and template tests check valid remapping and drop missing or non-date fields.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'The actual date field can be selected from existing date custom fields, saved, reloaded and cleared. Missing or invalid selections do not break older views. When existing copy flows remap a saved view, the date field selection follows the mapped field or is cleared.',
+                },
+                {
+                  'id': 'A6',
+                  'reason':
+                    {
+                      'text': 'The Chrome extension tab verified the indicator, original date and retained subtask on both test layouts. The display mutation was confined to the test view. Read-back of the disposable task rows matched the seed, and the running instance remained on its original image.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'Verify the indicators in regular and swimlane Kanban cards using test records. Card, status, label and date data remain unchanged, and existing layout behavior continues to work.',
+                },
+              ],
+            'archived': true,
+            'blockers': [],
+            'brief': 'brief.md',
+            'builder_handoff':
+              {
+                'addressed_acceptance_ids': ['A1', 'A2', 'A3', 'A4', 'A5', 'A6'],
+                'builder_execution_ref': '01a1f688-d788-7362-9c0c-5eb98d6b3dcc',
+                'candidate_id': 'dynamic-deadline-labels:3',
+                'checks':
+                  [
+                    {
+                      'name': { 'text': 'Web regression suite', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'apps/web: bun run test — 753 passed, 0 failed. The final fixture-only adjustment was rechecked in the focused suite.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Deadline, rollover, and view settings regression',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'apps/web: bun test --preload ./test/setup.ts src/features/work-items/components/kanban/IssueCardDeadline.test.tsx src/context/relativeTimeContext.test.tsx src/utils/viewSettings.test.ts — 11 passed, 0 failed. Separate focused subtask regression — 3 passed.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name': { 'text': 'Saved-view and template integration', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'apps/api: bun --no-env-file test src/modules/project-templates/__tests__/integration/project-templates.test.ts src/modules/views/__tests__/integration/views.test.ts, against the disposable deadline_test Postgres database — 93 passed, 0 failed.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name': { 'text': 'Types and changed-file quality', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'Repository root: bun run --cwd apps/web typecheck; bun run --cwd apps/api typecheck; targeted ESLint in apps/web and apps/api, Prettier, git diff --check — exit 0.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                  ],
+                'checks_truncated': false,
+                'identity_provider': 'skill-coordinated',
+                'iteration': 1,
+                'known_limits': [],
+                'known_limits_truncated': false,
+                'review': null,
+                'submitted_at': '2026-11-20T03:46:19.533Z',
+                'summary':
+                  {
+                    'text': 'Both Kanban layouts now render mutually exclusive upcoming badges using the shared clock and show the late-completion date from a saved, validated project date-field selection. Existing overdue display, card structure and records are preserved. View copies remap the selected field. Changes tested in a disposable instance; live deployment excluded.',
+                    'truncated': false,
+                  },
+              },
+            'created_at': '2026-11-20T03:36:36.184Z',
+            'document_constraints_version': 3,
+            'history':
+              [
+                {
+                  'attempt': 1,
+                  'completed_at': '2026-11-20T03:48:02.055Z',
+                  'goal_cycle': 1,
+                  'iteration': 1,
+                  'outcome': 'pass',
+                  'summary':
+                    {
+                      'text': 'All six requirements passed in automated checks and the isolated Chrome acceptance. The running instance was not deployed to.',
+                      'truncated': false,
+                    },
+                  'unresolved_ids': [],
+                },
+              ],
+            'history_overflow':
+              {
+                'dropped_entries': 0,
+                'first_dropped_at': null,
+                'last_dropped_at': null,
+                'outcome_counts':
+                  { 'blocked': 0, 'execution-error': 0, 'fail': 0, 'pass': 0, 'recovery': 0 },
+              },
+            'language': 'en',
+            'loop':
+              {
+                'attempt': 1,
+                'execution_failure_count': 0,
+                'failed_iteration_count': 0,
+                'goal_cycle': 1,
+                'iteration': 1,
+                'next_action': null,
+                'no_progress_count': 0,
+                'previous_unresolved_ids': [],
+                'retry_epoch': 0,
+                'stage': 'done',
+              },
+            'name': 'dynamic-deadline-labels',
+            'phase': 'archive',
+            'schema': 'comet.native.v4',
+            'spec_changes':
+              [
+                {
+                  'capability': 'kanban-deadline-badges',
+                  'operation': 'create',
+                  'source': 'specs/kanban-deadline-badges/spec.md',
+                },
+              ],
+            'state_version': 8,
+            'status': 'done',
+            'verification':
+              {
+                'assurance': 'self-reviewed',
+                'attempt': 1,
+                'candidate_id': 'dynamic-deadline-labels:3',
+                'checks': [],
+                'completed_at': '2026-11-20T03:48:02.055Z',
+                'identity_provider': 'skill-coordinated',
+                'iteration': 1,
+                'reported_checks':
+                  [
+                    {
+                      'name': { 'text': 'Web regression suite', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'apps/web: bun run test — 753 passed, 0 failed. The final fixture-only adjustment was rechecked in the focused suite.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Deadline, rollover, and view settings regression',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'apps/web: bun test --preload ./test/setup.ts src/features/work-items/components/kanban/IssueCardDeadline.test.tsx src/context/relativeTimeContext.test.tsx src/utils/viewSettings.test.ts — 11 passed, 0 failed. Separate focused subtask regression — 3 passed.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name': { 'text': 'Saved-view and template integration', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'apps/api: bun --no-env-file test src/modules/project-templates/__tests__/integration/project-templates.test.ts src/modules/views/__tests__/integration/views.test.ts, against the disposable deadline_test Postgres database — 93 passed, 0 failed.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name': { 'text': 'Types and changed-file quality', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'Repository root: bun run --cwd apps/web typecheck; bun run --cwd apps/api typecheck; targeted ESLint in apps/web and apps/api, Prettier, git diff --check — exit 0.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name': { 'text': 'Isolated Chrome Kanban acceptance', 'truncated': false },
+                      'note':
+                        {
+                          'text': "Dedicated Chrome extension tab 267696375, disposable http://deadline-test.localhost:3411, saved views 1 and 2. Checked both layouts on seeded tasks, original due dates, red overdue styling, missing and on-time completion, retained subtask row, and actual-completion field save, reload, clear and reload. The test instance's issue dates and parent record matched the seed after verification.",
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name': { 'text': 'Direct project copy', 'truncated': false },
+                      'note':
+                        {
+                          'text': "Disposable API fixture: POST /projects/deadline-qa.DQA/copy then GET the copied project's fields and saved views. Actual date reference changed from source cf:1 to the copied date field cf:3.",
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                  ],
+                'risks': [],
+                'risks_truncated': false,
+                'summary':
+                  {
+                    'text': 'All six requirements passed in automated checks and the isolated Chrome acceptance. The running instance was not deployed to.',
+                    'truncated': false,
+                  },
+                'verdict': 'pass',
+                'verifier_execution_ref': '01a1f688-d788-7362-9c0c-5eb98d6b3dcc',
+              },
+            'verification_report': 'verification.md',
+            'verification_result': 'pass',
+            'workspace':
+              {
+                'change_branch': 'main',
+                'finish': null,
+                'isolation': 'current',
+                'target_branch': 'main',
+              },
+          },
+        'status': 'completed',
+        'sequence': 8,
+        'actions':
+          [
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a1f688-d788-7362-9c0c-5eb98d6b3dcc',
+                  'token': 'portable-94245b997939787b37a67eea1f4fab68a57c61d1ce4b773f56baa5227c9aadf5',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'dynamic-deadline-labels:1',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'dynamic-deadline-labels',
+                      'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 接受改代码方案, 我需要这个动态标签',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '1f674bdfd0d45baab46ab42ff19e53347d388db59f138b3c6cb631eb7a4028d7',
+              'outcome':
+                {
+                  'actionId': 'dynamic-deadline-labels:1',
+                  'attempt': 1,
+                  'claimToken': 'portable-94245b997939787b37a67eea1f4fab68a57c61d1ce4b773f56baa5227c9aadf5',
+                  'inputHash': '1f674bdfd0d45baab46ab42ff19e53347d388db59f138b3c6cb631eb7a4028d7',
+                  'outcomeId': 'native-result-f2513877a104748db492c300823065c6e8fa67a1c5c0a629dcc3df265a76b924',
+                  'output':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'source': 'brief.md',
+                            'text': 'A started card with a visible due date shows the 3-day indicator at zero through three days remaining, and the 5-day indicator at four and five days remaining. The date is visible and the two indicators never appear together.',
+                          },
+                          {
+                            'id': 'A2',
+                            'source': 'brief.md',
+                            'text': 'A past due date on an open card retains its overdue styling. A missing or invalid due date, a date more than five days away, and cards outside the started state show no upcoming indicator. An open board updates as the browser-local calendar day changes.',
+                          },
+                          {
+                            'id': 'A3',
+                            'source': 'brief.md',
+                            'text': 'A completed card with an actual completion date later than its deadline shows the late-completion indicator and the actual date next to its deadline. A deadline on October 8 and completion on October 15 should show October 15 in the indicator.',
+                          },
+                          {
+                            'id': 'A4',
+                            'source': 'brief.md',
+                            'text': 'On-time completion, early completion, cancellation and missing or invalid dates do not show a late-completion indicator. The system completion time is never substituted for the chosen actual date field.',
+                          },
+                          {
+                            'id': 'A5',
+                            'source': 'brief.md',
+                            'text': 'The actual date field can be selected from existing date custom fields, saved, reloaded and cleared. Missing or invalid selections do not break older views. When existing copy flows remap a saved view, the date field selection follows the mapped field or is cleared.',
+                          },
+                          {
+                            'id': 'A6',
+                            'source': 'brief.md',
+                            'text': 'Verify the indicators in regular and swimlane Kanban cards using test records. Card, status, label and date data remain unchanged, and existing layout behavior continues to work.',
+                          },
+                        ],
+                      'children': null,
+                      'specChanges':
+                        [
+                          {
+                            'capability': 'kanban-deadline-badges',
+                            'operation': 'create',
+                            'source': 'specs/kanban-deadline-badges/spec.md',
+                          },
+                        ],
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '343488ccaa475de0957ebdb0b13a997eb75854b2f5b0f0602f2ea093c79424f6',
+                    'outcomeId': 'native-result-f2513877a104748db492c300823065c6e8fa67a1c5c0a629dcc3df265a76b924',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-shape-prepare',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'dynamic-deadline-labels',
+              'status': 'succeeded',
+              'stepId': 'shape.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a1f688-d788-7362-9c0c-5eb98d6b3dcc',
+                  'token': 'portable-1074f3a0e5b9ed0ef04886f03931be818acfe77dead9a15ea0286cf59bc52de9',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'dynamic-deadline-labels:3',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'dynamic-deadline-labels',
+                      'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 接受改代码方案, 我需要这个动态标签',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': 'c25d85d6e77f945b88b8c6b94c9abdb3a3543721cd05736c82c44be9ed6318d8',
+              'outcome':
+                {
+                  'actionId': 'dynamic-deadline-labels:3',
+                  'attempt': 1,
+                  'claimToken': 'portable-1074f3a0e5b9ed0ef04886f03931be818acfe77dead9a15ea0286cf59bc52de9',
+                  'inputHash': 'c25d85d6e77f945b88b8c6b94c9abdb3a3543721cd05736c82c44be9ed6318d8',
+                  'outcomeId': 'native-result-f7b0a52bf366f7d40776df534ef78078edc690e91d349dc1128f2454efd7f9f4',
+                  'output':
+                    {
+                      'addressedAcceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5', 'A6'],
+                      'checks':
+                        [
+                          {
+                            'name': 'Web regression suite',
+                            'note': 'apps/web: bun run test — 753 passed, 0 failed. The final fixture-only adjustment was rechecked in the focused suite.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Deadline, rollover, and view settings regression',
+                            'note': 'apps/web: bun test --preload ./test/setup.ts src/features/work-items/components/kanban/IssueCardDeadline.test.tsx src/context/relativeTimeContext.test.tsx src/utils/viewSettings.test.ts — 11 passed, 0 failed. Separate focused subtask regression — 3 passed.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Saved-view and template integration',
+                            'note': 'apps/api: bun --no-env-file test src/modules/project-templates/__tests__/integration/project-templates.test.ts src/modules/views/__tests__/integration/views.test.ts, against the disposable deadline_test Postgres database — 93 passed, 0 failed.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Types and changed-file quality',
+                            'note': 'Repository root: bun run --cwd apps/web typecheck; bun run --cwd apps/api typecheck; targeted ESLint in apps/web and apps/api, Prettier, git diff --check — exit 0.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'knownLimits': [],
+                      'requireIndependentReview': false,
+                      'summary': 'Both Kanban layouts now render mutually exclusive upcoming badges using the shared clock and show the late-completion date from a saved, validated project date-field selection. Existing overdue display, card structure and records are preserved. View copies remap the selected field. Changes tested in a disposable instance; live deployment excluded.',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '17d859234d127b8a289cf7e628ff2141bd4b766e2e6807c973c75a36cd7cb7de',
+                    'outcomeId': 'native-result-f7b0a52bf366f7d40776df534ef78078edc690e91d349dc1128f2454efd7f9f4',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-builder',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'dynamic-deadline-labels',
+              'status': 'succeeded',
+              'stepId': 'build.builder',
+              'type': 'handoff',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a1f688-d788-7362-9c0c-5eb98d6b3dcc',
+                  'token': 'portable-9cc7e2f19aa7308ee648c4f76b2761dc778a384822a08afda0870b8b8217a05b',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'dynamic-deadline-labels:4',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'dynamic-deadline-labels',
+                      'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 接受改代码方案, 我需要这个动态标签',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': 'd5821f0d6640b3e8dbd63c539e75d1e870c4b10a17f18c207beba1e553104296',
+              'outcome':
+                {
+                  'actionId': 'dynamic-deadline-labels:4',
+                  'attempt': 1,
+                  'claimToken': 'portable-9cc7e2f19aa7308ee648c4f76b2761dc778a384822a08afda0870b8b8217a05b',
+                  'inputHash': 'd5821f0d6640b3e8dbd63c539e75d1e870c4b10a17f18c207beba1e553104296',
+                  'outcomeId': 'native-result-07953eeaeabe0db53260eed4a9fe7748627f5ca561bb7f3371e86196ab3275af',
+                  'output':
+                    {
+                      'candidateId': 'dynamic-deadline-labels:3',
+                      'checks':
+                        [
+                          {
+                            'name': 'Web regression suite',
+                            'note': 'apps/web: bun run test — 753 passed, 0 failed. The final fixture-only adjustment was rechecked in the focused suite.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Deadline, rollover, and view settings regression',
+                            'note': 'apps/web: bun test --preload ./test/setup.ts src/features/work-items/components/kanban/IssueCardDeadline.test.tsx src/context/relativeTimeContext.test.tsx src/utils/viewSettings.test.ts — 11 passed, 0 failed. Separate focused subtask regression — 3 passed.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Saved-view and template integration',
+                            'note': 'apps/api: bun --no-env-file test src/modules/project-templates/__tests__/integration/project-templates.test.ts src/modules/views/__tests__/integration/views.test.ts, against the disposable deadline_test Postgres database — 93 passed, 0 failed.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Types and changed-file quality',
+                            'note': 'Repository root: bun run --cwd apps/web typecheck; bun run --cwd apps/api typecheck; targeted ESLint in apps/web and apps/api, Prettier, git diff --check — exit 0.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Isolated Chrome Kanban acceptance',
+                            'note': "Dedicated Chrome extension tab 267696375, disposable http://deadline-test.localhost:3411, saved views 1 and 2. Checked both layouts on seeded tasks, original due dates, red overdue styling, missing and on-time completion, retained subtask row, and actual-completion field save, reload, clear and reload. The test instance's issue dates and parent record matched the seed after verification.",
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Direct project copy',
+                            'note': "Disposable API fixture: POST /projects/deadline-qa.DQA/copy then GET the copied project's fields and saved views. Actual date reference changed from source cf:1 to the copied date field cf:3.",
+                            'result': 'passed',
+                          },
+                        ],
+                      'response':
+                        {
+                          'kind': 'final-result',
+                          'result':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'reason': 'Deadline component tests cover days 0–6. In both isolated Chrome layouts, DQA-1 (today) and DQA-2 (day 3) showed only the 3-day badge; DQA-3 (day 4) and DQA-4 (day 5) showed only the 5-day badge beside the existing date.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'reason': 'Chrome showed the original Nov 19 date in red with no upcoming badge and no upcoming badge on day 6 or unstarted DQA-10. Component tests cover invalid dates and state boundaries; a simulated midnight tick advances the browser-local day and the tested rendering transitions. IssueCardBody gates all badges on presence of a visible due date.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'reason': 'DQA-7 showed its original Oct 8 date and the badge with actual Oct 15 in both Chrome layouts using the configured date field. The focused test asserts the pair directly.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A4',
+                                    'reason': 'Chrome showed no late badge on DQA-9 with a missing date. Component cases suppressed same-day, early, invalid, missing, canceled and unconfigured values. Only the selected custom-field value is used; system state-entry time is excluded.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A5',
+                                    'reason': 'Chrome selected the existing date field, saved and reloaded with the badge, then cleared, saved and reloaded without it. Normalization tests cover legacy and malformed values. The isolated API copy and template tests check valid remapping and drop missing or non-date fields.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A6',
+                                    'reason': 'The Chrome extension tab verified the indicator, original date and retained subtask on both test layouts. The display mutation was confined to the test view. Read-back of the disposable task rows matched the seed, and the running instance remained on its original image.',
+                                    'result': 'passed',
+                                  },
+                                ],
+                              'attempt': 1,
+                              'iteration': 1,
+                              'requestReview':
+                                {
+                                  'reason': 'The screenshot requests two dynamic card indicators; the approved Shape specifies the calendar cutoffs, selected actual date, the existing red overdue treatment and both card layouts. The user explicitly confirmed that scope and requested implementation and verification with the running instance excluded. The implementation and observed results match.',
+                                  'result': 'aligned',
+                                },
+                              'risks': [],
+                              'summary': 'All six requirements passed in automated checks and the isolated Chrome acceptance. The running instance was not deployed to.',
+                              'verdict': 'pass',
+                            },
+                        },
+                      'verifierExecutionRef': '01a1f688-d788-7362-9c0c-5eb98d6b3dcc',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '689911f5fa89b9ad4224f7e8d8183d82f6d9b6afbcf1b145340d18475c225404',
+                    'outcomeId': 'native-result-07953eeaeabe0db53260eed4a9fe7748627f5ca561bb7f3371e86196ab3275af',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-verifier',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'dynamic-deadline-labels',
+              'status': 'succeeded',
+              'stepId': 'verify.verifier',
+              'type': 'handoff',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-preflight',
+                  'token': 'portable-12f43ebb0c82f408a45c28af98ec4879f5626e487206a10f8cea3c739b52d8aa',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'dynamic-deadline-labels:6',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'dynamic-deadline-labels',
+                      'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 接受改代码方案, 我需要这个动态标签',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '54bfbd089bd8d4de47cbebf81bb38c148a3494e32b3694ea23b02c711b97f164',
+              'outcome':
+                {
+                  'actionId': 'dynamic-deadline-labels:6',
+                  'attempt': 1,
+                  'claimToken': 'portable-12f43ebb0c82f408a45c28af98ec4879f5626e487206a10f8cea3c739b52d8aa',
+                  'inputHash': '54bfbd089bd8d4de47cbebf81bb38c148a3494e32b3694ea23b02c711b97f164',
+                  'outcomeId': 'dynamic-deadline-labels:6:1:executor-result',
+                  'output':
+                    {
+                      'archiveDirRef': 'docs/comet/archive/2026-11-20-dynamic-deadline-labels',
+                      'blockers': [],
+                      'candidateId': 'dynamic-deadline-labels:3',
+                      'capabilityPeers': [],
+                      'ready': true,
+                      'reportRef': 'docs/comet/changes/dynamic-deadline-labels/verification.md',
+                      'reportStateVersion': 6,
+                      'requiresReverification': false,
+                      'specPreview':
+                        [
+                          {
+                            'capability': 'kanban-deadline-badges',
+                            'operation': 'create',
+                            'source': 'specs/kanban-deadline-badges/spec.md',
+                          },
+                        ],
+                      'stateVersion': 7,
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '09b442b42c2bd0b0ca23f681849928975470608a3911eb10770c96035c7fdf17',
+                    'outcomeId': 'dynamic-deadline-labels:6:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive-preflight',
+              'requiredCapabilities': [],
+              'retry': 'idempotent',
+              'runId': 'dynamic-deadline-labels',
+              'status': 'succeeded',
+              'stepId': 'archive.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-apply',
+                  'token': 'portable-154f1198e17a00de9fe17856e70fc7c38bf5d00820613ce0130671442b66dd9d',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'dynamic-deadline-labels:7',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'dynamic-deadline-labels',
+                      'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 接受改代码方案, 我需要这个动态标签',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '9d651d475a6047f9de34d626a77a3ac4472b1f2d0b69cfbf713c78d64dd6ceb7',
+              'outcome':
+                {
+                  'actionId': 'dynamic-deadline-labels:7',
+                  'attempt': 1,
+                  'claimToken': 'portable-154f1198e17a00de9fe17856e70fc7c38bf5d00820613ce0130671442b66dd9d',
+                  'inputHash': '9d651d475a6047f9de34d626a77a3ac4472b1f2d0b69cfbf713c78d64dd6ceb7',
+                  'outcomeId': 'dynamic-deadline-labels:7:1:executor-result',
+                  'output':
+                    {
+                      'archiveRef': '2026-11-20-dynamic-deadline-labels',
+                      'specCount': 1,
+                      'stateVersion': 7,
+                      'transactionId': '3e36fcdc-d3b9-4c10-906e-8ad05a9e0dfa',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '870fc3b3a07e714038041e702528180e46b85d6ccb39e52c71094a9e62101634',
+                    'outcomeId': 'dynamic-deadline-labels:7:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'dynamic-deadline-labels',
+              'status': 'succeeded',
+              'stepId': 'archive.execute',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-finalize',
+                  'token': 'portable-1143d312113ab3668b5fdc60f87a3cafab022f1c5868a56a18b1b6ccf87cec97',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'dynamic-deadline-labels:8',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'dynamic-deadline-labels',
+                      'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 接受改代码方案, 我需要这个动态标签',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '7b9a20802124132b75c87fd67cc169b4f36c85d3f1808461e56ce5b29b622b23',
+              'outcome':
+                {
+                  'actionId': 'dynamic-deadline-labels:8',
+                  'attempt': 1,
+                  'claimToken': 'portable-1143d312113ab3668b5fdc60f87a3cafab022f1c5868a56a18b1b6ccf87cec97',
+                  'inputHash': '7b9a20802124132b75c87fd67cc169b4f36c85d3f1808461e56ce5b29b622b23',
+                  'outcomeId': 'dynamic-deadline-labels:8:1:executor-result',
+                  'output':
+                    {
+                      'archiveRef': '2026-11-20-dynamic-deadline-labels',
+                      'change': 'dynamic-deadline-labels',
+                      'runId': 'dynamic-deadline-labels',
+                      'specs': [{ 'capability': 'kanban-deadline-badges', 'operation': 'create' }],
+                      'stateVersion': 8,
+                      'transactionId': '3e36fcdc-d3b9-4c10-906e-8ad05a9e0dfa',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '50ff63fd9c4e2989ad99e3f78d331384f4b96e7fa6d6d9e1fc47b539082b9257',
+                    'outcomeId': 'dynamic-deadline-labels:8:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive-finalize',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'dynamic-deadline-labels',
+              'status': 'succeeded',
+              'stepId': 'archive.finalize',
+              'type': 'call_tool',
+            },
+          ],
+        'actionContexts':
+          {
+            'dynamic-deadline-labels:1': { 'results': {}, 'sequence': 1 },
+            'dynamic-deadline-labels:3': { 'results': {}, 'sequence': 3 },
+            'dynamic-deadline-labels:4': { 'results': {}, 'sequence': 4 },
+            'dynamic-deadline-labels:6': { 'results': {}, 'sequence': 6 },
+            'dynamic-deadline-labels:7': { 'results': {}, 'sequence': 7 },
+            'dynamic-deadline-labels:8': { 'results': {}, 'sequence': 8 },
+          },
+        'waits':
+          [
+            {
+              'id': 'dynamic-deadline-labels:2',
+              'stepId': 'shape.confirm',
+              'sequence': 2,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'dynamic-deadline-labels',
+                      'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 接受改代码方案, 我需要这个动态标签',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'A started card with a visible due date shows the 3-day indicator at zero through three days remaining, and the 5-day indicator at four and five days remaining. The date is visible and the two indicators never appear together.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'A past due date on an open card retains its overdue styling. A missing or invalid due date, a date more than five days away, and cards outside the started state show no upcoming indicator. An open board updates as the browser-local calendar day changes.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'A completed card with an actual completion date later than its deadline shows the late-completion indicator and the actual date next to its deadline. A deadline on October 8 and completion on October 15 should show October 15 in the indicator.',
+                              },
+                              {
+                                'id': 'A4',
+                                'source': 'brief.md',
+                                'text': 'On-time completion, early completion, cancellation and missing or invalid dates do not show a late-completion indicator. The system completion time is never substituted for the chosen actual date field.',
+                              },
+                              {
+                                'id': 'A5',
+                                'source': 'brief.md',
+                                'text': 'The actual date field can be selected from existing date custom fields, saved, reloaded and cleared. Missing or invalid selections do not break older views. When existing copy flows remap a saved view, the date field selection follows the mapped field or is cleared.',
+                              },
+                              {
+                                'id': 'A6',
+                                'source': 'brief.md',
+                                'text': 'Verify the indicators in regular and swimlane Kanban cards using test records. Card, status, label and date data remain unchanged, and existing layout behavior continues to work.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges':
+                            [
+                              {
+                                'capability': 'kanban-deadline-badges',
+                                'operation': 'create',
+                                'source': 'specs/kanban-deadline-badges/spec.md',
+                              },
+                            ],
+                        },
+                    },
+                },
+              'proposalHash': 'ef87f2030a1bbf5983a793b883c8e6d721361abc4b6b366b7673c32991f20031',
+              'choices': ['approved', 'rejected'],
+              'results': {},
+              'decision':
+                {
+                  'id': 'b97b082217f4679fbae1ecc43136c7d2d530d1445302a55e010796904eb99041',
+                  'choice': 'approved',
+                  'proposalHash': 'ef87f2030a1bbf5983a793b883c8e6d721361abc4b6b366b7673c32991f20031',
+                },
+            },
+            {
+              'id': 'dynamic-deadline-labels:5',
+              'stepId': 'verify.confirm',
+              'sequence': 5,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'activation':
+                    {
+                      'report':
+                        {
+                          'attempt': 1,
+                          'candidateId': 'dynamic-deadline-labels:3',
+                          'iteration': 1,
+                          'reportRef': 'docs/comet/changes/dynamic-deadline-labels/verification.md',
+                          'stateVersion': 6,
+                        },
+                    },
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'dynamic-deadline-labels',
+                      'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 接受改代码方案, 我需要这个动态标签',
+                    },
+                  'outputs':
+                    {
+                      'verify.verifier':
+                        {
+                          'candidateId': 'dynamic-deadline-labels:3',
+                          'checks':
+                            [
+                              {
+                                'name': 'Web regression suite',
+                                'note': 'apps/web: bun run test — 753 passed, 0 failed. The final fixture-only adjustment was rechecked in the focused suite.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Deadline, rollover, and view settings regression',
+                                'note': 'apps/web: bun test --preload ./test/setup.ts src/features/work-items/components/kanban/IssueCardDeadline.test.tsx src/context/relativeTimeContext.test.tsx src/utils/viewSettings.test.ts — 11 passed, 0 failed. Separate focused subtask regression — 3 passed.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Saved-view and template integration',
+                                'note': 'apps/api: bun --no-env-file test src/modules/project-templates/__tests__/integration/project-templates.test.ts src/modules/views/__tests__/integration/views.test.ts, against the disposable deadline_test Postgres database — 93 passed, 0 failed.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Types and changed-file quality',
+                                'note': 'Repository root: bun run --cwd apps/web typecheck; bun run --cwd apps/api typecheck; targeted ESLint in apps/web and apps/api, Prettier, git diff --check — exit 0.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Isolated Chrome Kanban acceptance',
+                                'note': "Dedicated Chrome extension tab 267696375, disposable http://deadline-test.localhost:3411, saved views 1 and 2. Checked both layouts on seeded tasks, original due dates, red overdue styling, missing and on-time completion, retained subtask row, and actual-completion field save, reload, clear and reload. The test instance's issue dates and parent record matched the seed after verification.",
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Direct project copy',
+                                'note': "Disposable API fixture: POST /projects/deadline-qa.DQA/copy then GET the copied project's fields and saved views. Actual date reference changed from source cf:1 to the copied date field cf:3.",
+                                'result': 'passed',
+                              },
+                            ],
+                          'response':
+                            {
+                              'kind': 'final-result',
+                              'result':
+                                {
+                                  'acceptance':
+                                    [
+                                      {
+                                        'id': 'A1',
+                                        'reason': 'Deadline component tests cover days 0–6. In both isolated Chrome layouts, DQA-1 (today) and DQA-2 (day 3) showed only the 3-day badge; DQA-3 (day 4) and DQA-4 (day 5) showed only the 5-day badge beside the existing date.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A2',
+                                        'reason': 'Chrome showed the original Nov 19 date in red with no upcoming badge and no upcoming badge on day 6 or unstarted DQA-10. Component tests cover invalid dates and state boundaries; a simulated midnight tick advances the browser-local day and the tested rendering transitions. IssueCardBody gates all badges on presence of a visible due date.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A3',
+                                        'reason': 'DQA-7 showed its original Oct 8 date and the badge with actual Oct 15 in both Chrome layouts using the configured date field. The focused test asserts the pair directly.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A4',
+                                        'reason': 'Chrome showed no late badge on DQA-9 with a missing date. Component cases suppressed same-day, early, invalid, missing, canceled and unconfigured values. Only the selected custom-field value is used; system state-entry time is excluded.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A5',
+                                        'reason': 'Chrome selected the existing date field, saved and reloaded with the badge, then cleared, saved and reloaded without it. Normalization tests cover legacy and malformed values. The isolated API copy and template tests check valid remapping and drop missing or non-date fields.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A6',
+                                        'reason': 'The Chrome extension tab verified the indicator, original date and retained subtask on both test layouts. The display mutation was confined to the test view. Read-back of the disposable task rows matched the seed, and the running instance remained on its original image.',
+                                        'result': 'passed',
+                                      },
+                                    ],
+                                  'attempt': 1,
+                                  'iteration': 1,
+                                  'requestReview':
+                                    {
+                                      'reason': 'The screenshot requests two dynamic card indicators; the approved Shape specifies the calendar cutoffs, selected actual date, the existing red overdue treatment and both card layouts. The user explicitly confirmed that scope and requested implementation and verification with the running instance excluded. The implementation and observed results match.',
+                                      'result': 'aligned',
+                                    },
+                                  'risks': [],
+                                  'summary': 'All six requirements passed in automated checks and the isolated Chrome acceptance. The running instance was not deployed to.',
+                                  'verdict': 'pass',
+                                },
+                            },
+                          'verifierExecutionRef': '01a1f688-d788-7362-9c0c-5eb98d6b3dcc',
+                        },
+                    },
+                },
+              'proposalHash': 'dd84000c27ecc8a440aec1f30303b0140c0fe5ad5cab838465114af315ce9522',
+              'choices': ['approved', 'rejected', 'reverify'],
+              'results': {},
+              'decision':
+                {
+                  'id': '9d794f6a4291f85a7b511ee124839b764c6ff4e7a9fb9b43a53d215287d2d124',
+                  'choice': 'approved',
+                  'proposalHash': 'dd84000c27ecc8a440aec1f30303b0140c0fe5ad5cab838465114af315ce9522',
+                  'reason': 'The user accepted the verified result and explicitly requested Comet archive, commit, push and a pull request, followed by deployment to the local instance.',
+                },
+            },
+          ],
+        'ready': [],
+        'joins': {},
+        'outputs': {},
+        'children': [],
+        'lineage': [],
+      },
+    'sourceRevision': 15,
+    'sourceHash': '3114622c678a1a1a392e195c5d1bc1f0bd8d78224c3bbaa6aba88b1e3c84f912',
+    'pool':
+      {
+        'version': 3,
+        'values':
+          [
+            {
+              'choice': 'approved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'dynamic-deadline-labels',
+                      'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 接受改代码方案, 我需要这个动态标签',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'A started card with a visible due date shows the 3-day indicator at zero through three days remaining, and the 5-day indicator at four and five days remaining. The date is visible and the two indicators never appear together.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'A past due date on an open card retains its overdue styling. A missing or invalid due date, a date more than five days away, and cards outside the started state show no upcoming indicator. An open board updates as the browser-local calendar day changes.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'A completed card with an actual completion date later than its deadline shows the late-completion indicator and the actual date next to its deadline. A deadline on October 8 and completion on October 15 should show October 15 in the indicator.',
+                              },
+                              {
+                                'id': 'A4',
+                                'source': 'brief.md',
+                                'text': 'On-time completion, early completion, cancellation and missing or invalid dates do not show a late-completion indicator. The system completion time is never substituted for the chosen actual date field.',
+                              },
+                              {
+                                'id': 'A5',
+                                'source': 'brief.md',
+                                'text': 'The actual date field can be selected from existing date custom fields, saved, reloaded and cleared. Missing or invalid selections do not break older views. When existing copy flows remap a saved view, the date field selection follows the mapped field or is cleared.',
+                              },
+                              {
+                                'id': 'A6',
+                                'source': 'brief.md',
+                                'text': 'Verify the indicators in regular and swimlane Kanban cards using test records. Card, status, label and date data remain unchanged, and existing layout behavior continues to work.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges':
+                            [
+                              {
+                                'capability': 'kanban-deadline-badges',
+                                'operation': 'create',
+                                'source': 'specs/kanban-deadline-badges/spec.md',
+                              },
+                            ],
+                        },
+                    },
+                },
+            },
+            {
+              'acceptance':
+                [
+                  {
+                    'id': 'A1',
+                    'source': 'brief.md',
+                    'text': 'A started card with a visible due date shows the 3-day indicator at zero through three days remaining, and the 5-day indicator at four and five days remaining. The date is visible and the two indicators never appear together.',
+                  },
+                  {
+                    'id': 'A2',
+                    'source': 'brief.md',
+                    'text': 'A past due date on an open card retains its overdue styling. A missing or invalid due date, a date more than five days away, and cards outside the started state show no upcoming indicator. An open board updates as the browser-local calendar day changes.',
+                  },
+                  {
+                    'id': 'A3',
+                    'source': 'brief.md',
+                    'text': 'A completed card with an actual completion date later than its deadline shows the late-completion indicator and the actual date next to its deadline. A deadline on October 8 and completion on October 15 should show October 15 in the indicator.',
+                  },
+                  {
+                    'id': 'A4',
+                    'source': 'brief.md',
+                    'text': 'On-time completion, early completion, cancellation and missing or invalid dates do not show a late-completion indicator. The system completion time is never substituted for the chosen actual date field.',
+                  },
+                  {
+                    'id': 'A5',
+                    'source': 'brief.md',
+                    'text': 'The actual date field can be selected from existing date custom fields, saved, reloaded and cleared. Missing or invalid selections do not break older views. When existing copy flows remap a saved view, the date field selection follows the mapped field or is cleared.',
+                  },
+                  {
+                    'id': 'A6',
+                    'source': 'brief.md',
+                    'text': 'Verify the indicators in regular and swimlane Kanban cards using test records. Card, status, label and date data remain unchanged, and existing layout behavior continues to work.',
+                  },
+                ],
+              'children': null,
+              'specChanges':
+                [
+                  {
+                    'capability': 'kanban-deadline-badges',
+                    'operation': 'create',
+                    'source': 'specs/kanban-deadline-badges/spec.md',
+                  },
+                ],
+            },
+            {
+              'addressedAcceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5', 'A6'],
+              'checks':
+                [
+                  {
+                    'name': 'Web regression suite',
+                    'note': 'apps/web: bun run test — 753 passed, 0 failed. The final fixture-only adjustment was rechecked in the focused suite.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Deadline, rollover, and view settings regression',
+                    'note': 'apps/web: bun test --preload ./test/setup.ts src/features/work-items/components/kanban/IssueCardDeadline.test.tsx src/context/relativeTimeContext.test.tsx src/utils/viewSettings.test.ts — 11 passed, 0 failed. Separate focused subtask regression — 3 passed.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Saved-view and template integration',
+                    'note': 'apps/api: bun --no-env-file test src/modules/project-templates/__tests__/integration/project-templates.test.ts src/modules/views/__tests__/integration/views.test.ts, against the disposable deadline_test Postgres database — 93 passed, 0 failed.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Types and changed-file quality',
+                    'note': 'Repository root: bun run --cwd apps/web typecheck; bun run --cwd apps/api typecheck; targeted ESLint in apps/web and apps/api, Prettier, git diff --check — exit 0.',
+                    'result': 'passed',
+                  },
+                ],
+              'knownLimits': [],
+              'requireIndependentReview': false,
+              'summary': 'Both Kanban layouts now render mutually exclusive upcoming badges using the shared clock and show the late-completion date from a saved, validated project date-field selection. Existing overdue display, card structure and records are preserved. View copies remap the selected field. Changes tested in a disposable instance; live deployment excluded.',
+            },
+            {
+              'choice': 'approved',
+              'proposal':
+                {
+                  'activation':
+                    {
+                      'report':
+                        {
+                          'attempt': 1,
+                          'candidateId': 'dynamic-deadline-labels:3',
+                          'iteration': 1,
+                          'reportRef': 'docs/comet/changes/dynamic-deadline-labels/verification.md',
+                          'stateVersion': 6,
+                        },
+                    },
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'dynamic-deadline-labels',
+                      'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 接受改代码方案, 我需要这个动态标签',
+                    },
+                  'outputs':
+                    {
+                      'verify.verifier':
+                        {
+                          'candidateId': 'dynamic-deadline-labels:3',
+                          'checks':
+                            [
+                              {
+                                'name': 'Web regression suite',
+                                'note': 'apps/web: bun run test — 753 passed, 0 failed. The final fixture-only adjustment was rechecked in the focused suite.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Deadline, rollover, and view settings regression',
+                                'note': 'apps/web: bun test --preload ./test/setup.ts src/features/work-items/components/kanban/IssueCardDeadline.test.tsx src/context/relativeTimeContext.test.tsx src/utils/viewSettings.test.ts — 11 passed, 0 failed. Separate focused subtask regression — 3 passed.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Saved-view and template integration',
+                                'note': 'apps/api: bun --no-env-file test src/modules/project-templates/__tests__/integration/project-templates.test.ts src/modules/views/__tests__/integration/views.test.ts, against the disposable deadline_test Postgres database — 93 passed, 0 failed.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Types and changed-file quality',
+                                'note': 'Repository root: bun run --cwd apps/web typecheck; bun run --cwd apps/api typecheck; targeted ESLint in apps/web and apps/api, Prettier, git diff --check — exit 0.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Isolated Chrome Kanban acceptance',
+                                'note': "Dedicated Chrome extension tab 267696375, disposable http://deadline-test.localhost:3411, saved views 1 and 2. Checked both layouts on seeded tasks, original due dates, red overdue styling, missing and on-time completion, retained subtask row, and actual-completion field save, reload, clear and reload. The test instance's issue dates and parent record matched the seed after verification.",
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Direct project copy',
+                                'note': "Disposable API fixture: POST /projects/deadline-qa.DQA/copy then GET the copied project's fields and saved views. Actual date reference changed from source cf:1 to the copied date field cf:3.",
+                                'result': 'passed',
+                              },
+                            ],
+                          'response':
+                            {
+                              'kind': 'final-result',
+                              'result':
+                                {
+                                  'acceptance':
+                                    [
+                                      {
+                                        'id': 'A1',
+                                        'reason': 'Deadline component tests cover days 0–6. In both isolated Chrome layouts, DQA-1 (today) and DQA-2 (day 3) showed only the 3-day badge; DQA-3 (day 4) and DQA-4 (day 5) showed only the 5-day badge beside the existing date.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A2',
+                                        'reason': 'Chrome showed the original Nov 19 date in red with no upcoming badge and no upcoming badge on day 6 or unstarted DQA-10. Component tests cover invalid dates and state boundaries; a simulated midnight tick advances the browser-local day and the tested rendering transitions. IssueCardBody gates all badges on presence of a visible due date.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A3',
+                                        'reason': 'DQA-7 showed its original Oct 8 date and the badge with actual Oct 15 in both Chrome layouts using the configured date field. The focused test asserts the pair directly.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A4',
+                                        'reason': 'Chrome showed no late badge on DQA-9 with a missing date. Component cases suppressed same-day, early, invalid, missing, canceled and unconfigured values. Only the selected custom-field value is used; system state-entry time is excluded.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A5',
+                                        'reason': 'Chrome selected the existing date field, saved and reloaded with the badge, then cleared, saved and reloaded without it. Normalization tests cover legacy and malformed values. The isolated API copy and template tests check valid remapping and drop missing or non-date fields.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A6',
+                                        'reason': 'The Chrome extension tab verified the indicator, original date and retained subtask on both test layouts. The display mutation was confined to the test view. Read-back of the disposable task rows matched the seed, and the running instance remained on its original image.',
+                                        'result': 'passed',
+                                      },
+                                    ],
+                                  'attempt': 1,
+                                  'iteration': 1,
+                                  'requestReview':
+                                    {
+                                      'reason': 'The screenshot requests two dynamic card indicators; the approved Shape specifies the calendar cutoffs, selected actual date, the existing red overdue treatment and both card layouts. The user explicitly confirmed that scope and requested implementation and verification with the running instance excluded. The implementation and observed results match.',
+                                      'result': 'aligned',
+                                    },
+                                  'risks': [],
+                                  'summary': 'All six requirements passed in automated checks and the isolated Chrome acceptance. The running instance was not deployed to.',
+                                  'verdict': 'pass',
+                                },
+                            },
+                          'verifierExecutionRef': '01a1f688-d788-7362-9c0c-5eb98d6b3dcc',
+                        },
+                    },
+                },
+            },
+            {
+              'candidateId': 'dynamic-deadline-labels:3',
+              'checks':
+                [
+                  {
+                    'name': 'Web regression suite',
+                    'note': 'apps/web: bun run test — 753 passed, 0 failed. The final fixture-only adjustment was rechecked in the focused suite.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Deadline, rollover, and view settings regression',
+                    'note': 'apps/web: bun test --preload ./test/setup.ts src/features/work-items/components/kanban/IssueCardDeadline.test.tsx src/context/relativeTimeContext.test.tsx src/utils/viewSettings.test.ts — 11 passed, 0 failed. Separate focused subtask regression — 3 passed.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Saved-view and template integration',
+                    'note': 'apps/api: bun --no-env-file test src/modules/project-templates/__tests__/integration/project-templates.test.ts src/modules/views/__tests__/integration/views.test.ts, against the disposable deadline_test Postgres database — 93 passed, 0 failed.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Types and changed-file quality',
+                    'note': 'Repository root: bun run --cwd apps/web typecheck; bun run --cwd apps/api typecheck; targeted ESLint in apps/web and apps/api, Prettier, git diff --check — exit 0.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Isolated Chrome Kanban acceptance',
+                    'note': "Dedicated Chrome extension tab 267696375, disposable http://deadline-test.localhost:3411, saved views 1 and 2. Checked both layouts on seeded tasks, original due dates, red overdue styling, missing and on-time completion, retained subtask row, and actual-completion field save, reload, clear and reload. The test instance's issue dates and parent record matched the seed after verification.",
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Direct project copy',
+                    'note': "Disposable API fixture: POST /projects/deadline-qa.DQA/copy then GET the copied project's fields and saved views. Actual date reference changed from source cf:1 to the copied date field cf:3.",
+                    'result': 'passed',
+                  },
+                ],
+              'response':
+                {
+                  'kind': 'final-result',
+                  'result':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'reason': 'Deadline component tests cover days 0–6. In both isolated Chrome layouts, DQA-1 (today) and DQA-2 (day 3) showed only the 3-day badge; DQA-3 (day 4) and DQA-4 (day 5) showed only the 5-day badge beside the existing date.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A2',
+                            'reason': 'Chrome showed the original Nov 19 date in red with no upcoming badge and no upcoming badge on day 6 or unstarted DQA-10. Component tests cover invalid dates and state boundaries; a simulated midnight tick advances the browser-local day and the tested rendering transitions. IssueCardBody gates all badges on presence of a visible due date.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A3',
+                            'reason': 'DQA-7 showed its original Oct 8 date and the badge with actual Oct 15 in both Chrome layouts using the configured date field. The focused test asserts the pair directly.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A4',
+                            'reason': 'Chrome showed no late badge on DQA-9 with a missing date. Component cases suppressed same-day, early, invalid, missing, canceled and unconfigured values. Only the selected custom-field value is used; system state-entry time is excluded.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A5',
+                            'reason': 'Chrome selected the existing date field, saved and reloaded with the badge, then cleared, saved and reloaded without it. Normalization tests cover legacy and malformed values. The isolated API copy and template tests check valid remapping and drop missing or non-date fields.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A6',
+                            'reason': 'The Chrome extension tab verified the indicator, original date and retained subtask on both test layouts. The display mutation was confined to the test view. Read-back of the disposable task rows matched the seed, and the running instance remained on its original image.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'attempt': 1,
+                      'iteration': 1,
+                      'requestReview':
+                        {
+                          'reason': 'The screenshot requests two dynamic card indicators; the approved Shape specifies the calendar cutoffs, selected actual date, the existing red overdue treatment and both card layouts. The user explicitly confirmed that scope and requested implementation and verification with the running instance excluded. The implementation and observed results match.',
+                          'result': 'aligned',
+                        },
+                      'risks': [],
+                      'summary': 'All six requirements passed in automated checks and the isolated Chrome acceptance. The running instance was not deployed to.',
+                      'verdict': 'pass',
+                    },
+                },
+              'verifierExecutionRef': '01a1f688-d788-7362-9c0c-5eb98d6b3dcc',
+            },
+            {
+              'archiveDirRef': 'docs/comet/archive/2026-11-20-dynamic-deadline-labels',
+              'blockers': [],
+              'candidateId': 'dynamic-deadline-labels:3',
+              'capabilityPeers': [],
+              'ready': true,
+              'reportRef': 'docs/comet/changes/dynamic-deadline-labels/verification.md',
+              'reportStateVersion': 6,
+              'requiresReverification': false,
+              'specPreview':
+                [
+                  {
+                    'capability': 'kanban-deadline-badges',
+                    'operation': 'create',
+                    'source': 'specs/kanban-deadline-badges/spec.md',
+                  },
+                ],
+              'stateVersion': 7,
+            },
+            {
+              'archiveRef': '2026-11-20-dynamic-deadline-labels',
+              'specCount': 1,
+              'stateVersion': 7,
+              'transactionId': '3e36fcdc-d3b9-4c10-906e-8ad05a9e0dfa',
+            },
+            {
+              'sequence': 2,
+              'value':
+                {
+                  'choice': 'approved',
+                  'proposal':
+                    {
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'dynamic-deadline-labels',
+                          'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 接受改代码方案, 我需要这个动态标签',
+                        },
+                      'outputs':
+                        {
+                          'shape.prepare':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'source': 'brief.md',
+                                    'text': 'A started card with a visible due date shows the 3-day indicator at zero through three days remaining, and the 5-day indicator at four and five days remaining. The date is visible and the two indicators never appear together.',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'source': 'brief.md',
+                                    'text': 'A past due date on an open card retains its overdue styling. A missing or invalid due date, a date more than five days away, and cards outside the started state show no upcoming indicator. An open board updates as the browser-local calendar day changes.',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'source': 'brief.md',
+                                    'text': 'A completed card with an actual completion date later than its deadline shows the late-completion indicator and the actual date next to its deadline. A deadline on October 8 and completion on October 15 should show October 15 in the indicator.',
+                                  },
+                                  {
+                                    'id': 'A4',
+                                    'source': 'brief.md',
+                                    'text': 'On-time completion, early completion, cancellation and missing or invalid dates do not show a late-completion indicator. The system completion time is never substituted for the chosen actual date field.',
+                                  },
+                                  {
+                                    'id': 'A5',
+                                    'source': 'brief.md',
+                                    'text': 'The actual date field can be selected from existing date custom fields, saved, reloaded and cleared. Missing or invalid selections do not break older views. When existing copy flows remap a saved view, the date field selection follows the mapped field or is cleared.',
+                                  },
+                                  {
+                                    'id': 'A6',
+                                    'source': 'brief.md',
+                                    'text': 'Verify the indicators in regular and swimlane Kanban cards using test records. Card, status, label and date data remain unchanged, and existing layout behavior continues to work.',
+                                  },
+                                ],
+                              'children': null,
+                              'specChanges':
+                                [
+                                  {
+                                    'capability': 'kanban-deadline-badges',
+                                    'operation': 'create',
+                                    'source': 'specs/kanban-deadline-badges/spec.md',
+                                  },
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 1,
+              'value':
+                {
+                  'acceptance':
+                    [
+                      {
+                        'id': 'A1',
+                        'source': 'brief.md',
+                        'text': 'A started card with a visible due date shows the 3-day indicator at zero through three days remaining, and the 5-day indicator at four and five days remaining. The date is visible and the two indicators never appear together.',
+                      },
+                      {
+                        'id': 'A2',
+                        'source': 'brief.md',
+                        'text': 'A past due date on an open card retains its overdue styling. A missing or invalid due date, a date more than five days away, and cards outside the started state show no upcoming indicator. An open board updates as the browser-local calendar day changes.',
+                      },
+                      {
+                        'id': 'A3',
+                        'source': 'brief.md',
+                        'text': 'A completed card with an actual completion date later than its deadline shows the late-completion indicator and the actual date next to its deadline. A deadline on October 8 and completion on October 15 should show October 15 in the indicator.',
+                      },
+                      {
+                        'id': 'A4',
+                        'source': 'brief.md',
+                        'text': 'On-time completion, early completion, cancellation and missing or invalid dates do not show a late-completion indicator. The system completion time is never substituted for the chosen actual date field.',
+                      },
+                      {
+                        'id': 'A5',
+                        'source': 'brief.md',
+                        'text': 'The actual date field can be selected from existing date custom fields, saved, reloaded and cleared. Missing or invalid selections do not break older views. When existing copy flows remap a saved view, the date field selection follows the mapped field or is cleared.',
+                      },
+                      {
+                        'id': 'A6',
+                        'source': 'brief.md',
+                        'text': 'Verify the indicators in regular and swimlane Kanban cards using test records. Card, status, label and date data remain unchanged, and existing layout behavior continues to work.',
+                      },
+                    ],
+                  'children': null,
+                  'specChanges':
+                    [
+                      {
+                        'capability': 'kanban-deadline-badges',
+                        'operation': 'create',
+                        'source': 'specs/kanban-deadline-badges/spec.md',
+                      },
+                    ],
+                },
+            },
+            {
+              'sequence': 3,
+              'value':
+                {
+                  'addressedAcceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5', 'A6'],
+                  'checks':
+                    [
+                      {
+                        'name': 'Web regression suite',
+                        'note': 'apps/web: bun run test — 753 passed, 0 failed. The final fixture-only adjustment was rechecked in the focused suite.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Deadline, rollover, and view settings regression',
+                        'note': 'apps/web: bun test --preload ./test/setup.ts src/features/work-items/components/kanban/IssueCardDeadline.test.tsx src/context/relativeTimeContext.test.tsx src/utils/viewSettings.test.ts — 11 passed, 0 failed. Separate focused subtask regression — 3 passed.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Saved-view and template integration',
+                        'note': 'apps/api: bun --no-env-file test src/modules/project-templates/__tests__/integration/project-templates.test.ts src/modules/views/__tests__/integration/views.test.ts, against the disposable deadline_test Postgres database — 93 passed, 0 failed.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Types and changed-file quality',
+                        'note': 'Repository root: bun run --cwd apps/web typecheck; bun run --cwd apps/api typecheck; targeted ESLint in apps/web and apps/api, Prettier, git diff --check — exit 0.',
+                        'result': 'passed',
+                      },
+                    ],
+                  'knownLimits': [],
+                  'requireIndependentReview': false,
+                  'summary': 'Both Kanban layouts now render mutually exclusive upcoming badges using the shared clock and show the late-completion date from a saved, validated project date-field selection. Existing overdue display, card structure and records are preserved. View copies remap the selected field. Changes tested in a disposable instance; live deployment excluded.',
+                },
+            },
+            {
+              'sequence': 5,
+              'value':
+                {
+                  'choice': 'approved',
+                  'proposal':
+                    {
+                      'activation':
+                        {
+                          'report':
+                            {
+                              'attempt': 1,
+                              'candidateId': 'dynamic-deadline-labels:3',
+                              'iteration': 1,
+                              'reportRef': 'docs/comet/changes/dynamic-deadline-labels/verification.md',
+                              'stateVersion': 6,
+                            },
+                        },
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'dynamic-deadline-labels',
+                          'task': '[$comet](/Users/poco/.agents/skills/comet/SKILL.md) 接受改代码方案, 我需要这个动态标签',
+                        },
+                      'outputs':
+                        {
+                          'verify.verifier':
+                            {
+                              'candidateId': 'dynamic-deadline-labels:3',
+                              'checks':
+                                [
+                                  {
+                                    'name': 'Web regression suite',
+                                    'note': 'apps/web: bun run test — 753 passed, 0 failed. The final fixture-only adjustment was rechecked in the focused suite.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Deadline, rollover, and view settings regression',
+                                    'note': 'apps/web: bun test --preload ./test/setup.ts src/features/work-items/components/kanban/IssueCardDeadline.test.tsx src/context/relativeTimeContext.test.tsx src/utils/viewSettings.test.ts — 11 passed, 0 failed. Separate focused subtask regression — 3 passed.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Saved-view and template integration',
+                                    'note': 'apps/api: bun --no-env-file test src/modules/project-templates/__tests__/integration/project-templates.test.ts src/modules/views/__tests__/integration/views.test.ts, against the disposable deadline_test Postgres database — 93 passed, 0 failed.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Types and changed-file quality',
+                                    'note': 'Repository root: bun run --cwd apps/web typecheck; bun run --cwd apps/api typecheck; targeted ESLint in apps/web and apps/api, Prettier, git diff --check — exit 0.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Isolated Chrome Kanban acceptance',
+                                    'note': "Dedicated Chrome extension tab 267696375, disposable http://deadline-test.localhost:3411, saved views 1 and 2. Checked both layouts on seeded tasks, original due dates, red overdue styling, missing and on-time completion, retained subtask row, and actual-completion field save, reload, clear and reload. The test instance's issue dates and parent record matched the seed after verification.",
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Direct project copy',
+                                    'note': "Disposable API fixture: POST /projects/deadline-qa.DQA/copy then GET the copied project's fields and saved views. Actual date reference changed from source cf:1 to the copied date field cf:3.",
+                                    'result': 'passed',
+                                  },
+                                ],
+                              'response':
+                                {
+                                  'kind': 'final-result',
+                                  'result':
+                                    {
+                                      'acceptance':
+                                        [
+                                          {
+                                            'id': 'A1',
+                                            'reason': 'Deadline component tests cover days 0–6. In both isolated Chrome layouts, DQA-1 (today) and DQA-2 (day 3) showed only the 3-day badge; DQA-3 (day 4) and DQA-4 (day 5) showed only the 5-day badge beside the existing date.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A2',
+                                            'reason': 'Chrome showed the original Nov 19 date in red with no upcoming badge and no upcoming badge on day 6 or unstarted DQA-10. Component tests cover invalid dates and state boundaries; a simulated midnight tick advances the browser-local day and the tested rendering transitions. IssueCardBody gates all badges on presence of a visible due date.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A3',
+                                            'reason': 'DQA-7 showed its original Oct 8 date and the badge with actual Oct 15 in both Chrome layouts using the configured date field. The focused test asserts the pair directly.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A4',
+                                            'reason': 'Chrome showed no late badge on DQA-9 with a missing date. Component cases suppressed same-day, early, invalid, missing, canceled and unconfigured values. Only the selected custom-field value is used; system state-entry time is excluded.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A5',
+                                            'reason': 'Chrome selected the existing date field, saved and reloaded with the badge, then cleared, saved and reloaded without it. Normalization tests cover legacy and malformed values. The isolated API copy and template tests check valid remapping and drop missing or non-date fields.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A6',
+                                            'reason': 'The Chrome extension tab verified the indicator, original date and retained subtask on both test layouts. The display mutation was confined to the test view. Read-back of the disposable task rows matched the seed, and the running instance remained on its original image.',
+                                            'result': 'passed',
+                                          },
+                                        ],
+                                      'attempt': 1,
+                                      'iteration': 1,
+                                      'requestReview':
+                                        {
+                                          'reason': 'The screenshot requests two dynamic card indicators; the approved Shape specifies the calendar cutoffs, selected actual date, the existing red overdue treatment and both card layouts. The user explicitly confirmed that scope and requested implementation and verification with the running instance excluded. The implementation and observed results match.',
+                                          'result': 'aligned',
+                                        },
+                                      'risks': [],
+                                      'summary': 'All six requirements passed in automated checks and the isolated Chrome acceptance. The running instance was not deployed to.',
+                                      'verdict': 'pass',
+                                    },
+                                },
+                              'verifierExecutionRef': '01a1f688-d788-7362-9c0c-5eb98d6b3dcc',
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 4,
+              'value':
+                {
+                  'candidateId': 'dynamic-deadline-labels:3',
+                  'checks':
+                    [
+                      {
+                        'name': 'Web regression suite',
+                        'note': 'apps/web: bun run test — 753 passed, 0 failed. The final fixture-only adjustment was rechecked in the focused suite.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Deadline, rollover, and view settings regression',
+                        'note': 'apps/web: bun test --preload ./test/setup.ts src/features/work-items/components/kanban/IssueCardDeadline.test.tsx src/context/relativeTimeContext.test.tsx src/utils/viewSettings.test.ts — 11 passed, 0 failed. Separate focused subtask regression — 3 passed.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Saved-view and template integration',
+                        'note': 'apps/api: bun --no-env-file test src/modules/project-templates/__tests__/integration/project-templates.test.ts src/modules/views/__tests__/integration/views.test.ts, against the disposable deadline_test Postgres database — 93 passed, 0 failed.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Types and changed-file quality',
+                        'note': 'Repository root: bun run --cwd apps/web typecheck; bun run --cwd apps/api typecheck; targeted ESLint in apps/web and apps/api, Prettier, git diff --check — exit 0.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Isolated Chrome Kanban acceptance',
+                        'note': "Dedicated Chrome extension tab 267696375, disposable http://deadline-test.localhost:3411, saved views 1 and 2. Checked both layouts on seeded tasks, original due dates, red overdue styling, missing and on-time completion, retained subtask row, and actual-completion field save, reload, clear and reload. The test instance's issue dates and parent record matched the seed after verification.",
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Direct project copy',
+                        'note': "Disposable API fixture: POST /projects/deadline-qa.DQA/copy then GET the copied project's fields and saved views. Actual date reference changed from source cf:1 to the copied date field cf:3.",
+                        'result': 'passed',
+                      },
+                    ],
+                  'response':
+                    {
+                      'kind': 'final-result',
+                      'result':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'reason': 'Deadline component tests cover days 0–6. In both isolated Chrome layouts, DQA-1 (today) and DQA-2 (day 3) showed only the 3-day badge; DQA-3 (day 4) and DQA-4 (day 5) showed only the 5-day badge beside the existing date.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A2',
+                                'reason': 'Chrome showed the original Nov 19 date in red with no upcoming badge and no upcoming badge on day 6 or unstarted DQA-10. Component tests cover invalid dates and state boundaries; a simulated midnight tick advances the browser-local day and the tested rendering transitions. IssueCardBody gates all badges on presence of a visible due date.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A3',
+                                'reason': 'DQA-7 showed its original Oct 8 date and the badge with actual Oct 15 in both Chrome layouts using the configured date field. The focused test asserts the pair directly.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A4',
+                                'reason': 'Chrome showed no late badge on DQA-9 with a missing date. Component cases suppressed same-day, early, invalid, missing, canceled and unconfigured values. Only the selected custom-field value is used; system state-entry time is excluded.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A5',
+                                'reason': 'Chrome selected the existing date field, saved and reloaded with the badge, then cleared, saved and reloaded without it. Normalization tests cover legacy and malformed values. The isolated API copy and template tests check valid remapping and drop missing or non-date fields.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A6',
+                                'reason': 'The Chrome extension tab verified the indicator, original date and retained subtask on both test layouts. The display mutation was confined to the test view. Read-back of the disposable task rows matched the seed, and the running instance remained on its original image.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'attempt': 1,
+                          'iteration': 1,
+                          'requestReview':
+                            {
+                              'reason': 'The screenshot requests two dynamic card indicators; the approved Shape specifies the calendar cutoffs, selected actual date, the existing red overdue treatment and both card layouts. The user explicitly confirmed that scope and requested implementation and verification with the running instance excluded. The implementation and observed results match.',
+                              'result': 'aligned',
+                            },
+                          'risks': [],
+                          'summary': 'All six requirements passed in automated checks and the isolated Chrome acceptance. The running instance was not deployed to.',
+                          'verdict': 'pass',
+                        },
+                    },
+                  'verifierExecutionRef': '01a1f688-d788-7362-9c0c-5eb98d6b3dcc',
+                },
+            },
+            {
+              'sequence': 6,
+              'value':
+                {
+                  'archiveDirRef': 'docs/comet/archive/2026-11-20-dynamic-deadline-labels',
+                  'blockers': [],
+                  'candidateId': 'dynamic-deadline-labels:3',
+                  'capabilityPeers': [],
+                  'ready': true,
+                  'reportRef': 'docs/comet/changes/dynamic-deadline-labels/verification.md',
+                  'reportStateVersion': 6,
+                  'requiresReverification': false,
+                  'specPreview':
+                    [
+                      {
+                        'capability': 'kanban-deadline-badges',
+                        'operation': 'create',
+                        'source': 'specs/kanban-deadline-badges/spec.md',
+                      },
+                    ],
+                  'stateVersion': 7,
+                },
+            },
+            {
+              'sequence': 7,
+              'value':
+                {
+                  'archiveRef': '2026-11-20-dynamic-deadline-labels',
+                  'specCount': 1,
+                  'stateVersion': 7,
+                  'transactionId': '3e36fcdc-d3b9-4c10-906e-8ad05a9e0dfa',
+                },
+            },
+            {
+              'sequence': 8,
+              'value':
+                {
+                  'archiveRef': '2026-11-20-dynamic-deadline-labels',
+                  'change': 'dynamic-deadline-labels',
+                  'runId': 'dynamic-deadline-labels',
+                  'specs': [{ 'capability': 'kanban-deadline-badges', 'operation': 'create' }],
+                  'stateVersion': 8,
+                  'transactionId': '3e36fcdc-d3b9-4c10-906e-8ad05a9e0dfa',
+                },
+            },
+          ],
+        'nodes':
+          [
+            { 'key': 'shape.prepare', 'value': 1, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': null, 'right': 0, 'height': 2 },
+            { 'key': 'build.builder', 'value': 2, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 2, 'right': 0, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 1, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 4, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.confirm', 'value': 3, 'left': 4, 'right': 5, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 2, 'right': 6, 'height': 3 },
+            { 'key': 'archive.prepare', 'value': 5, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 2, 'left': 8, 'right': null, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 9, 'right': 6, 'height': 3 },
+            { 'key': 'archive.execute', 'value': 6, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 2, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.prepare', 'value': 5, 'left': 11, 'right': 12, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 13, 'right': 6, 'height': 3 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': null, 'right': 15, 'height': 2 },
+            { 'key': 'build.builder', 'value': 9, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 17, 'right': 15, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 11, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.confirm', 'value': 10, 'left': 19, 'right': 20, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 17, 'right': 21, 'height': 3 },
+            { 'key': 'archive.prepare', 'value': 12, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 9, 'left': 23, 'right': null, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 24, 'right': 21, 'height': 3 },
+            { 'key': 'archive.execute', 'value': 13, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 9, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.prepare', 'value': 12, 'left': 26, 'right': 27, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 28, 'right': 21, 'height': 3 },
+            { 'key': 'archive.finalize', 'value': 14, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.execute', 'value': 13, 'left': null, 'right': 30, 'height': 2 },
+            { 'key': 'archive.prepare', 'value': 12, 'left': 31, 'right': 27, 'height': 3 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 32, 'right': 21, 'height': 4 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 9, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 11, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': 36, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 35, 'right': 37, 'height': 3 },
+          ],
+        'maps': [null, 1, 3, 7, 10, 14, 16, 18, 22, 25, 29, 33, 34, 38],
+        'bindings':
+          [
+            { 'path': ['actions', '0', 'input', 'outputs'], 'map': 0 },
+            { 'path': ['actions', '1', 'input', 'outputs'], 'map': 1 },
+            { 'path': ['actions', '2', 'input', 'outputs'], 'map': 2 },
+            { 'path': ['actions', '3', 'input', 'outputs'], 'map': 3 },
+            { 'path': ['actions', '4', 'input', 'outputs'], 'map': 4 },
+            { 'path': ['actions', '5', 'input', 'outputs'], 'map': 5 },
+            { 'path': ['actionContexts', 'dynamic-deadline-labels:1', 'results'], 'map': 0 },
+            { 'path': ['actionContexts', 'dynamic-deadline-labels:3', 'results'], 'map': 6 },
+            { 'path': ['actionContexts', 'dynamic-deadline-labels:4', 'results'], 'map': 7 },
+            { 'path': ['actionContexts', 'dynamic-deadline-labels:6', 'results'], 'map': 8 },
+            { 'path': ['actionContexts', 'dynamic-deadline-labels:7', 'results'], 'map': 9 },
+            { 'path': ['actionContexts', 'dynamic-deadline-labels:8', 'results'], 'map': 10 },
+            { 'path': ['outputs'], 'map': 11 },
+            { 'path': ['waits', '0', 'results'], 'map': 12 },
+            { 'path': ['waits', '1', 'results'], 'map': 13 },
+          ],
+      },
+    'storageHash': '91867dcab93af074349d0b1d2f27509161a08a6aeddfa79ad9aa1e3f7c222347',
+  }

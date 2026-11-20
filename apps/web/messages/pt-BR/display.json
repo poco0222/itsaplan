@@ -70,10 +70,12 @@
     "1": "Segunda-feira"
   },
   "dateFields": {
+    "unset": "Nenhuma",
     "dueDate": "Data de vencimento",
     "startDate": "Data de início"
   },
   "rows": {
+    "actualCompletionDateField": "Data real de conclusão",
     "columns": "Colunas",
     "grouping": "Agrupamento",
     "swimlanes": "Raias",

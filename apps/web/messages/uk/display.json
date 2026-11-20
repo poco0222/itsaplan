@@ -70,10 +70,12 @@
     "1": "Понеділок"
   },
   "dateFields": {
+    "unset": "Немає",
     "dueDate": "Дедлайн",
     "startDate": "Дата початку"
   },
   "rows": {
+    "actualCompletionDateField": "Фактична дата завершення",
     "columns": "Колонки",
     "grouping": "Групування",
     "swimlanes": "Доріжки",

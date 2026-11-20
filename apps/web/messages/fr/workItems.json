@@ -1,4 +1,9 @@
 {
+  "deadline": {
+    "dueWithinThreeDays": "Échéance sous 3 jours",
+    "dueWithinFiveDays": "Échéance sous 5 jours",
+    "completedLate": "Terminé en retard · {date}"
+  },
   "newIssue": "Nouveau ticket",
   "addWorkItem": "Ajouter une tâche",
   "pin": "Épingler",

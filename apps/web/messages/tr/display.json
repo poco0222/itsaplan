@@ -70,10 +70,12 @@
     "1": "Pazartesi"
   },
   "dateFields": {
+    "unset": "Yok",
     "dueDate": "Bitiş tarihi",
     "startDate": "Başlangıç tarihi"
   },
   "rows": {
+    "actualCompletionDateField": "Gerçek tamamlanma tarihi",
     "columns": "Sütunlar",
     "grouping": "Gruplama",
     "swimlanes": "Kulvarlar (Swimlanes)",

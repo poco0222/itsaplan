@@ -1,4 +1,9 @@
 {
+  "deadline": {
+    "dueWithinThreeDays": "3 日內到期",
+    "dueWithinFiveDays": "5 日內到期",
+    "completedLate": "延期完成 · 實際 {date}"
+  },
   "newIssue": "新建工作項目",
   "addWorkItem": "新增工作項目",
   "pin": "固定",

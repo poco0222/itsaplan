@@ -1,4 +1,9 @@
 {
+  "deadline": {
+    "dueWithinThreeDays": "До терміну не більше 3 днів",
+    "dueWithinFiveDays": "До терміну не більше 5 днів",
+    "completedLate": "Завершено із запізненням · {date}"
+  },
   "newIssue": "Нова задача",
   "addWorkItem": "Додати задачу",
   "pin": "Закріпити",

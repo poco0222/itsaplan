@@ -70,10 +70,12 @@
     "1": "週一"
   },
   "dateFields": {
+    "unset": "不選擇",
     "dueDate": "截止日期",
     "startDate": "開始日期"
   },
   "rows": {
+    "actualCompletionDateField": "實際完成日期",
     "columns": "狀態欄",
     "grouping": "分組",
     "swimlanes": "泳道",

@@ -1,4 +1,9 @@
 {
+  "deadline": {
+    "dueWithinThreeDays": "Due within 3 days",
+    "dueWithinFiveDays": "Due within 5 days",
+    "completedLate": "Completed late · Actual {date}"
+  },
   "newIssue": "New issue",
   "addWorkItem": "Add work item",
   "pin": "Pin",

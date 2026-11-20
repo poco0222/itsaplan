@@ -418,13 +418,25 @@ describe('project templates', () => {
       const src = api.projects({ projectKey: 'SRC' });
       const done = (await src.get()).data!.columns.find((c) => c.name === 'Done')!;
       const size = (await src['custom-fields'].post({ name: 'Size', fieldType: 'select' })).data!;
+      const actual = (
+        await src['custom-fields'].post({ name: 'Actual completion date', fieldType: 'date' })
+      ).data!;
       await src.views.post({
         name: 'Board',
         display: {
           group: `cf:${size.id}`,
+          actualCompletionDateField: `cf:${actual.id}`,
           collapsedGroups: [`c${done.id}`, 'i7'],
           pinnedGroup: `c${done.id}`,
         },
+      });
+      await src.views.post({
+        name: 'Stale board',
+        display: { actualCompletionDateField: 'cf:0' },
+      });
+      await src.views.post({
+        name: 'Invalid board',
+        display: { actualCompletionDateField: `cf:${size.id}` },
       });
       const status = { conditions: [{ id: 'q', field: 'status', op: 'is', values: [done.id] }] };
       await src.dashboards.post({
@@ -442,12 +454,16 @@ describe('project templates', () => {
       const project = (await created.get()).data!;
       const newDone = project.columns.find((c) => c.name === 'Done')!;
       const newSize = project.customFields.find((f) => f.name === 'Size')!;
-      const view = (await created.views.get()).data!.find((v) => v.name === 'Board')!;
-      expect(view.display).toMatchObject({
+      const newActual = project.customFields.find((f) => f.name === actual.name)!;
+      const views = (await created.views.get()).data!;
+      expect(views.find((v) => v.name === 'Board')?.display).toMatchObject({
         group: `cf:${newSize.id}`,
+        actualCompletionDateField: `cf:${newActual.id}`,
         collapsedGroups: [`c${newDone.id}`, 'i7'],
         pinnedGroup: `c${newDone.id}`,
       });
+      expect(views.find((v) => v.name === 'Stale board')?.display).toEqual({});
+      expect(views.find((v) => v.name === 'Invalid board')?.display).toEqual({});
       expect((await created.dashboards.get()).data![0].layout).toEqual([
         {
           id: '1',

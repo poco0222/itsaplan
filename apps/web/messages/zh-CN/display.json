@@ -70,10 +70,12 @@
     "1": "周一"
   },
   "dateFields": {
+    "unset": "不选择",
     "dueDate": "截止日期",
     "startDate": "开始日期"
   },
   "rows": {
+    "actualCompletionDateField": "实际完成日期",
     "columns": "状态列",
     "grouping": "分组",
     "swimlanes": "泳道",
