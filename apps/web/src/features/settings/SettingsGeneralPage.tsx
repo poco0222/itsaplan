@@ -1,61 +1,10 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
-import type { ProjectDetail } from '@/lib/api/endpoints/projects';
 import { useShell } from '@/context/shellContext';
-import { usePermissions } from '@/hooks/usePermissions';
-import { settingsSection } from '@/utils/settingsSections';
-import { useSettingsSectionText } from '@/hooks/useSectionLabels';
-import { Button } from '@/components/ui/button';
-import SectionPageView from '@/components/common/page/SectionPageView';
-import RequirePermission from '@/components/common/permissions/RequirePermission';
-import { SettingsResourceProvider } from './context/settingsPermission';
-import SettingsGeneral from './components/general/SettingsGeneral';
-import SettingsFeatures from './components/general/SettingsFeatures';
-import SettingsWeeklyReport from './components/general/SettingsWeeklyReport';
-import { useGeneralForm } from './hooks/useGeneralForm';
-import { useFeatureToggles } from './hooks/useFeatureToggles';
+import SettingsGeneralContent from './components/general/SettingsGeneralContent';
 
-const section = settingsSection('general');
-
-// The General settings page (/:team/:projectKey/settings/general). Edits the
-// project name and description; the key is shown read-only. Save lives in the page
-// header.
 export default function SettingsGeneralPage() {
   const { project } = useShell();
   if (!project) return null;
-  return <GeneralPage project={project} />;
-}
-
-function GeneralPage({ project }: { project: ProjectDetail }) {
-  const t = useTranslations('common');
-  const { can } = usePermissions(project);
-  const sectionText = useSettingsSectionText()(section.slug);
-  const form = useGeneralForm(project);
-  const features = useFeatureToggles(project);
-  return (
-    <SectionPageView
-      title={sectionText.label}
-      description={sectionText.description}
-      actions={
-        form.editable ? (
-          <Button size="sm" onClick={() => void form.save()} disabled={!form.canSave}>
-            {t('save')}
-          </Button>
-        ) : undefined
-      }
-    >
-      <SettingsResourceProvider resource={section.resource}>
-        <RequirePermission resource={section.resource} action="read">
-          <div className="space-y-10">
-            <SettingsGeneral form={form} />
-            <SettingsFeatures form={features} />
-            {can('workflow_config', 'read') && (
-              <SettingsWeeklyReport key={project.project.ref} project={project} />
-            )}
-          </div>
-        </RequirePermission>
-      </SettingsResourceProvider>
-    </SectionPageView>
-  );
+  return <SettingsGeneralContent project={project} />;
 }
