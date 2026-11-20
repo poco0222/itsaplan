@@ -161,7 +161,14 @@ export function TableRow({
         )}
 
         {subtasks.open && (
-          <TableRowSubtasks issueId={issue.id} maps={maps} onOpenIssue={onOpenIssue} />
+          <TableRowSubtasks
+            issueId={issue.id}
+            maps={maps}
+            orderedColumns={orderedColumns}
+            showId={showId}
+            alignTop={alignTop}
+            onOpenIssue={onOpenIssue}
+          />
         )}
         <TableRowLinks links={issue.links} maps={maps} onOpenIssue={onOpenIssue} />
       </div>
