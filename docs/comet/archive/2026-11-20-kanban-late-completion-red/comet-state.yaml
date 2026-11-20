@@ -1,0 +1,3083 @@
+# comet-execution: managed-run
+schema: comet.native.v4
+name: kanban-late-completion-red
+language: en
+phase: archive
+status: done
+state_version: 14
+brief: brief.md
+document_constraints_version: 3
+spec_changes:
+  - capability: kanban-deadline-badges
+    operation: modify
+    source: specs/kanban-deadline-badges/spec.md
+workspace:
+  isolation: current
+  change_branch: main
+  target_branch: main
+  finish: null
+loop:
+  stage: done
+  goal_cycle: 1
+  iteration: 1
+  attempt: 1
+  retry_epoch: 0
+  failed_iteration_count: 0
+  no_progress_count: 0
+  execution_failure_count: 0
+  previous_unresolved_ids: []
+  next_action: null
+acceptance:
+  - id: A1
+    source: brief.md
+    text: A late-completion badge shares the native overdue date pill's foreground
+      and fill styles in light and dark themes. The planned date on a completed
+      card retains its neutral style. An open overdue card retains its native
+      red date pill.
+    result: passed
+    reason:
+      text: DateBadge and the late-completion badge share OVERDUE_PILL. Chrome
+        measured the same red foreground and tinted fill for the late badge and
+        the open overdue date in each default theme. The completed card's
+        October 8 planned date was neutral.
+      truncated: false
+  - id: A2
+    source: brief.md
+    text: A completed card with an October 8 deadline and October 15 actual
+      completion displays “延期完成 · 10月15日” in Simplified Chinese. The label
+      retains the actual date and drops its prefix in the affected languages.
+    result: passed
+    reason:
+      text: The October 8 planned / October 15 actual fixture shows 延期完成 · 10月15日 in
+        Chrome and the focused test. English, Korean, Simplified Chinese, and
+        Traditional Chinese translations retain {date} and omit the extra
+        prefix. English and Chinese render tests passed.
+      truncated: false
+  - id: A3
+    source: brief.md
+    text: A started card due in zero through three calendar days shows one badge
+      with its fill taken directly from the app's active initiative status color
+      and the app's existing dark foreground for yellow surfaces in both themes.
+      In Simplified Chinese it reads “3日内到期”.
+    result: passed
+    reason:
+      text: The focused render test checks the existing active initiative color from
+        STATUS_META, project yellow foreground, and exclusive warning for zero
+        through three calendar days. Chrome showed 3日内到期 in both themes, with
+        8.38:1 contrast.
+      truncated: false
+  - id: A4
+    source: brief.md
+    text: A started card due in four or five calendar days shows one badge using the
+      model price source badge's blue foreground and tinted fill in each theme.
+      In Simplified Chinese it reads “5日内到期”. Dates more than five days away
+      show no upcoming badge.
+    result: passed
+    reason:
+      text: The focused test checks the existing model-price badge blue classes for
+        four and five days, no upcoming badge at six days, and the Simplified
+        Chinese translation. Chrome confirmed the blue tint and copy in both
+        themes.
+      truncated: false
+builder_handoff:
+  candidate_id: kanban-late-completion-red:9
+  identity_provider: skill-coordinated
+  builder_execution_ref: 01a1f721-e201-7503-b87c-d2cf5a2eb7fd
+  iteration: 1
+  summary:
+    text: Updated the shared Kanban deadline card to reuse the native overdue
+      styles, active initiative yellow, and existing blue badge palette.
+      Tightened day-count and late-completion labels in the affected locales.
+    truncated: false
+  addressed_acceptance_ids:
+    - A1
+    - A2
+    - A3
+    - A4
+  checks:
+    - name:
+        text: bun --filter=web run test
+        truncated: false
+      result: passed
+      note:
+        text: '/Users/poco/Projects/itsaplan: 754 passed across 153 files, zero
+          failures.'
+        truncated: false
+    - name:
+        text: bun test --preload ./test/setup.ts
+          src/features/work-items/components/kanban/IssueCardDeadline.test.tsx
+        truncated: false
+      result: passed
+      note:
+        text: '/Users/poco/Projects/itsaplan/apps/web: 4 passed after formatting,
+          covering colors, date boundaries, and Simplified Chinese output.'
+        truncated: false
+    - name:
+        text: bun --filter=web run typecheck and bun --filter=web run lint
+        truncated: false
+      result: passed
+      note:
+        text: '/Users/poco/Projects/itsaplan: TypeScript and ESLint exited 0.'
+        truncated: false
+    - name:
+        text: Targeted Prettier check and git diff --check
+        truncated: false
+      result: passed
+      note:
+        text: '/Users/poco/Projects/itsaplan: all seven changed web files passed
+          Prettier and the diff had no whitespace errors.'
+        truncated: false
+    - name:
+        text: Impeccable detector and source review
+        truncated: false
+      result: passed
+      note:
+        text: '/Users/poco/Projects/itsaplan: Impeccable returned an empty issue list
+          for both production TSX files. Focused code and security review found
+          no actionable issues.'
+        truncated: false
+  checks_truncated: false
+  known_limits: []
+  known_limits_truncated: false
+  review: null
+  submitted_at: 2026-11-20T04:09:09.018Z
+blockers: []
+verification:
+  candidate_id: kanban-late-completion-red:9
+  identity_provider: skill-coordinated
+  verifier_execution_ref: 01a1f721-e201-7503-b87c-d2cf5a2eb7fd
+  iteration: 1
+  attempt: 1
+  assurance: self-reviewed
+  verdict: pass
+  checks: []
+  reported_checks:
+    - name:
+        text: bun --filter=web run test
+        truncated: false
+      result: passed
+      note:
+        text: '/Users/poco/Projects/itsaplan: 754 passed across 153 files, zero
+          failures.'
+        truncated: false
+    - name:
+        text: bun test --preload ./test/setup.ts
+          src/features/work-items/components/kanban/IssueCardDeadline.test.tsx
+        truncated: false
+      result: passed
+      note:
+        text: '/Users/poco/Projects/itsaplan/apps/web: 4 passed after formatting,
+          covering colors, date boundaries, and Simplified Chinese output.'
+        truncated: false
+    - name:
+        text: bun --filter=web run typecheck and bun --filter=web run lint
+        truncated: false
+      result: passed
+      note:
+        text: '/Users/poco/Projects/itsaplan: TypeScript and ESLint exited 0.'
+        truncated: false
+    - name:
+        text: Targeted Prettier check and git diff --check
+        truncated: false
+      result: passed
+      note:
+        text: '/Users/poco/Projects/itsaplan: all seven changed web files passed
+          Prettier and the diff had no whitespace errors.'
+        truncated: false
+    - name:
+        text: Impeccable detector and source review
+        truncated: false
+      result: passed
+      note:
+        text: '/Users/poco/Projects/itsaplan: Impeccable returned an empty issue list
+          for both production TSX files. Focused code and security review found
+          no actionable issues.'
+        truncated: false
+    - name:
+        text: Chrome extension visual and computed-style check on local component
+          fixture
+        truncated: false
+      result: passed
+      note:
+        text: 'Local QA page rendered IssueCardDeadline with the compiled
+          apps/web/src/app/globals.css at regular card width (Chrome task tab
+          267696399). Both default themes showed all three color treatments and
+          exact Simplified Chinese labels without clipping. Late-completion and
+          original open-overdue foreground/background matched in each theme.
+          Yellow, blue, red contrast in light: 8.38, 5.62, 5.30; dark: 8.38,
+          6.00, 7.95. Fixture used synthetic cards.'
+        truncated: false
+  summary:
+    text: All four approved acceptance items passed. Web tests, type checking, lint,
+      formatting, focused reviews, and the default light and dark browser
+      fixture passed.
+    truncated: false
+  risks:
+    - text: Browser verification used a local component fixture with synthetic dates.
+        The signed-in board and swimlane share the component according to the
+        source.
+      truncated: false
+  risks_truncated: false
+  completed_at: 2026-11-20T04:10:12.513Z
+history:
+  - goal_cycle: 1
+    iteration: 1
+    attempt: 1
+    outcome: pass
+    unresolved_ids: []
+    summary:
+      text: All four approved acceptance items passed. Web tests, type checking, lint,
+        formatting, focused reviews, and the default light and dark browser
+        fixture passed.
+      truncated: false
+    completed_at: 2026-11-20T04:10:12.513Z
+history_overflow:
+  dropped_entries: 0
+  first_dropped_at: null
+  last_dropped_at: null
+  outcome_counts:
+    pass: 0
+    fail: 0
+    blocked: 0
+    execution-error: 0
+    recovery: 0
+verification_result: pass
+verification_report: verification.md
+archived: true
+created_at: 2026-11-20T04:06:12.780Z
+archive_receipt:
+  runId: kanban-late-completion-red
+  change: kanban-late-completion-red
+  archiveRef: 2026-11-20-kanban-late-completion-red
+  transactionId: 46a8401c-c007-430d-9a28-17a4153acc0f
+  stateVersion: 14
+  specs:
+    - capability: kanban-deadline-badges
+      operation: modify
+run_checkpoint:
+  {
+    'schema': 'comet.workflow-run-checkpoint.v2',
+    'hash': 'eac8e9d0f8c3ecc59e3a420e329843b76f1a1504a3c953c3360bece731470188',
+    'run':
+      {
+        'protocolVersion': 1,
+        'schemaVersion': 1,
+        'runId': 'kanban-late-completion-red',
+        'revision': 1,
+        'workflow':
+          {
+            'id': 'comet-native',
+            'version': '4',
+            'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+          },
+        'definitionHashes':
+          {
+            '["comet-native","4"]': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+          },
+        'initialStateHash': '56f9bd57150270d89c6076c819b14af94049674556ab5179733e37ff114eeb68',
+        'input':
+          {
+            'artifactRootRef': 'docs',
+            'name': 'kanban-late-completion-red',
+            'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+          },
+        'state':
+          {
+            'acceptance':
+              [
+                {
+                  'id': 'A1',
+                  'reason':
+                    {
+                      'text': "DateBadge and the late-completion badge share OVERDUE_PILL. Chrome measured the same red foreground and tinted fill for the late badge and the open overdue date in each default theme. The completed card's October 8 planned date was neutral.",
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': "A late-completion badge shares the native overdue date pill's foreground and fill styles in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.",
+                },
+                {
+                  'id': 'A2',
+                  'reason':
+                    {
+                      'text': 'The October 8 planned / October 15 actual fixture shows 延期完成 · 10月15日 in Chrome and the focused test. English, Korean, Simplified Chinese, and Traditional Chinese translations retain {date} and omit the extra prefix. English and Chinese render tests passed.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                },
+                {
+                  'id': 'A3',
+                  'reason':
+                    {
+                      'text': 'The focused render test checks the existing active initiative color from STATUS_META, project yellow foreground, and exclusive warning for zero through three calendar days. Chrome showed 3日内到期 in both themes, with 8.38:1 contrast.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': "A started card due in zero through three calendar days shows one badge with its fill taken directly from the app's active initiative status color and the app's existing dark foreground for yellow surfaces in both themes. In Simplified Chinese it reads “3日内到期”.",
+                },
+                {
+                  'id': 'A4',
+                  'reason':
+                    {
+                      'text': 'The focused test checks the existing model-price badge blue classes for four and five days, no upcoming badge at six days, and the Simplified Chinese translation. Chrome confirmed the blue tint and copy in both themes.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': "A started card due in four or five calendar days shows one badge using the model price source badge's blue foreground and tinted fill in each theme. In Simplified Chinese it reads “5日内到期”. Dates more than five days away show no upcoming badge.",
+                },
+              ],
+            'archived': true,
+            'blockers': [],
+            'brief': 'brief.md',
+            'builder_handoff':
+              {
+                'addressed_acceptance_ids': ['A1', 'A2', 'A3', 'A4'],
+                'builder_execution_ref': '01a1f721-e201-7503-b87c-d2cf5a2eb7fd',
+                'candidate_id': 'kanban-late-completion-red:9',
+                'checks':
+                  [
+                    {
+                      'name': { 'text': 'bun --filter=web run test', 'truncated': false },
+                      'note':
+                        {
+                          'text': '/Users/poco/Projects/itsaplan: 754 passed across 153 files, zero failures.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'bun test --preload ./test/setup.ts src/features/work-items/components/kanban/IssueCardDeadline.test.tsx',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': '/Users/poco/Projects/itsaplan/apps/web: 4 passed after formatting, covering colors, date boundaries, and Simplified Chinese output.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'bun --filter=web run typecheck and bun --filter=web run lint',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': '/Users/poco/Projects/itsaplan: TypeScript and ESLint exited 0.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Targeted Prettier check and git diff --check',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': '/Users/poco/Projects/itsaplan: all seven changed web files passed Prettier and the diff had no whitespace errors.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        { 'text': 'Impeccable detector and source review', 'truncated': false },
+                      'note':
+                        {
+                          'text': '/Users/poco/Projects/itsaplan: Impeccable returned an empty issue list for both production TSX files. Focused code and security review found no actionable issues.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                  ],
+                'checks_truncated': false,
+                'identity_provider': 'skill-coordinated',
+                'iteration': 1,
+                'known_limits': [],
+                'known_limits_truncated': false,
+                'review': null,
+                'submitted_at': '2026-11-20T04:09:09.018Z',
+                'summary':
+                  {
+                    'text': 'Updated the shared Kanban deadline card to reuse the native overdue styles, active initiative yellow, and existing blue badge palette. Tightened day-count and late-completion labels in the affected locales.',
+                    'truncated': false,
+                  },
+              },
+            'created_at': '2026-11-20T04:06:12.780Z',
+            'document_constraints_version': 3,
+            'history':
+              [
+                {
+                  'attempt': 1,
+                  'completed_at': '2026-11-20T04:10:12.513Z',
+                  'goal_cycle': 1,
+                  'iteration': 1,
+                  'outcome': 'pass',
+                  'summary':
+                    {
+                      'text': 'All four approved acceptance items passed. Web tests, type checking, lint, formatting, focused reviews, and the default light and dark browser fixture passed.',
+                      'truncated': false,
+                    },
+                  'unresolved_ids': [],
+                },
+              ],
+            'history_overflow':
+              {
+                'dropped_entries': 0,
+                'first_dropped_at': null,
+                'last_dropped_at': null,
+                'outcome_counts':
+                  { 'blocked': 0, 'execution-error': 0, 'fail': 0, 'pass': 0, 'recovery': 0 },
+              },
+            'language': 'en',
+            'loop':
+              {
+                'attempt': 1,
+                'execution_failure_count': 0,
+                'failed_iteration_count': 0,
+                'goal_cycle': 1,
+                'iteration': 1,
+                'next_action': null,
+                'no_progress_count': 0,
+                'previous_unresolved_ids': [],
+                'retry_epoch': 0,
+                'stage': 'done',
+              },
+            'name': 'kanban-late-completion-red',
+            'phase': 'archive',
+            'schema': 'comet.native.v4',
+            'spec_changes':
+              [
+                {
+                  'capability': 'kanban-deadline-badges',
+                  'operation': 'modify',
+                  'source': 'specs/kanban-deadline-badges/spec.md',
+                },
+              ],
+            'state_version': 14,
+            'status': 'done',
+            'verification':
+              {
+                'assurance': 'self-reviewed',
+                'attempt': 1,
+                'candidate_id': 'kanban-late-completion-red:9',
+                'checks': [],
+                'completed_at': '2026-11-20T04:10:12.513Z',
+                'identity_provider': 'skill-coordinated',
+                'iteration': 1,
+                'reported_checks':
+                  [
+                    {
+                      'name': { 'text': 'bun --filter=web run test', 'truncated': false },
+                      'note':
+                        {
+                          'text': '/Users/poco/Projects/itsaplan: 754 passed across 153 files, zero failures.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'bun test --preload ./test/setup.ts src/features/work-items/components/kanban/IssueCardDeadline.test.tsx',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': '/Users/poco/Projects/itsaplan/apps/web: 4 passed after formatting, covering colors, date boundaries, and Simplified Chinese output.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'bun --filter=web run typecheck and bun --filter=web run lint',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': '/Users/poco/Projects/itsaplan: TypeScript and ESLint exited 0.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Targeted Prettier check and git diff --check',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': '/Users/poco/Projects/itsaplan: all seven changed web files passed Prettier and the diff had no whitespace errors.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        { 'text': 'Impeccable detector and source review', 'truncated': false },
+                      'note':
+                        {
+                          'text': '/Users/poco/Projects/itsaplan: Impeccable returned an empty issue list for both production TSX files. Focused code and security review found no actionable issues.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Chrome extension visual and computed-style check on local component fixture',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'Local QA page rendered IssueCardDeadline with the compiled apps/web/src/app/globals.css at regular card width (Chrome task tab 267696399). Both default themes showed all three color treatments and exact Simplified Chinese labels without clipping. Late-completion and original open-overdue foreground/background matched in each theme. Yellow, blue, red contrast in light: 8.38, 5.62, 5.30; dark: 8.38, 6.00, 7.95. Fixture used synthetic cards.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                  ],
+                'risks':
+                  [
+                    {
+                      'text': 'Browser verification used a local component fixture with synthetic dates. The signed-in board and swimlane share the component according to the source.',
+                      'truncated': false,
+                    },
+                  ],
+                'risks_truncated': false,
+                'summary':
+                  {
+                    'text': 'All four approved acceptance items passed. Web tests, type checking, lint, formatting, focused reviews, and the default light and dark browser fixture passed.',
+                    'truncated': false,
+                  },
+                'verdict': 'pass',
+                'verifier_execution_ref': '01a1f721-e201-7503-b87c-d2cf5a2eb7fd',
+              },
+            'verification_report': 'verification.md',
+            'verification_result': 'pass',
+            'workspace':
+              {
+                'change_branch': 'main',
+                'finish': null,
+                'isolation': 'current',
+                'target_branch': 'main',
+              },
+          },
+        'status': 'completed',
+        'sequence': 14,
+        'actions':
+          [
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-cli',
+                  'token': 'portable-93ca760b9a3980205218b3d6ce8fe7f0f67a32be331516e027a1aa75267fa875',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'kanban-late-completion-red:1',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'kanban-late-completion-red',
+                      'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': 'f48771698f367a185300e6c507a80ac09c535ad72913ee1031c4bee722129130',
+              'outcome':
+                {
+                  'actionId': 'kanban-late-completion-red:1',
+                  'attempt': 1,
+                  'claimToken': 'portable-93ca760b9a3980205218b3d6ce8fe7f0f67a32be331516e027a1aa75267fa875',
+                  'inputHash': 'f48771698f367a185300e6c507a80ac09c535ad72913ee1031c4bee722129130',
+                  'outcomeId': '70ba2466-cbb3-453d-b3a0-64f28885adc3',
+                  'output':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'source': 'brief.md',
+                            'text': 'A late-completion badge uses the same foreground and fill as the native overdue date pill in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.',
+                          },
+                          {
+                            'id': 'A2',
+                            'source': 'brief.md',
+                            'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                          },
+                          {
+                            'id': 'A3',
+                            'source': 'brief.md',
+                            'text': 'A started card due in zero through three calendar days shows one amber badge, with the existing emphasis and the compact “3日内到期” label in Simplified Chinese.',
+                          },
+                          {
+                            'id': 'A4',
+                            'source': 'brief.md',
+                            'text': 'A started card due in four or five calendar days shows one blue badge with the compact “5日内到期” label in Simplified Chinese. Dates more than five days away show no upcoming badge.',
+                          },
+                        ],
+                      'children': null,
+                      'specChanges':
+                        [
+                          {
+                            'capability': 'kanban-deadline-badges',
+                            'operation': 'modify',
+                            'source': 'specs/kanban-deadline-badges/spec.md',
+                          },
+                        ],
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'aff0388e49238111f6bbdb92c524eb00a496706eb1237ac3129b2ff0a6ddb8e4',
+                    'outcomeId': '70ba2466-cbb3-453d-b3a0-64f28885adc3',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-shape-prepare',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'kanban-late-completion-red',
+              'status': 'succeeded',
+              'stepId': 'shape.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-cli',
+                  'token': 'portable-95d98b0abe2541f47baf519124b64c4dff5ccc5664a3516b64002c0a7bd6a789',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'kanban-late-completion-red:3',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'kanban-late-completion-red',
+                      'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '1b03703f8ba29d1ee4a9d4b2cf25289ba753219c07631f9d02fcda04982ed5d0',
+              'outcome':
+                {
+                  'actionId': 'kanban-late-completion-red:3',
+                  'attempt': 1,
+                  'claimToken': 'portable-95d98b0abe2541f47baf519124b64c4dff5ccc5664a3516b64002c0a7bd6a789',
+                  'inputHash': '1b03703f8ba29d1ee4a9d4b2cf25289ba753219c07631f9d02fcda04982ed5d0',
+                  'outcomeId': '40d56eb8-8db9-4cdd-9495-58d4f43f44aa',
+                  'output':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'source': 'brief.md',
+                            'text': 'A late-completion badge uses the same foreground and fill as the native overdue date pill in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.',
+                          },
+                          {
+                            'id': 'A2',
+                            'source': 'brief.md',
+                            'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                          },
+                          {
+                            'id': 'A3',
+                            'source': 'brief.md',
+                            'text': 'A started card due in zero through three calendar days shows one badge with the native initiative status yellow fill and readable dark text in both themes. In Simplified Chinese it reads “3日内到期”.',
+                          },
+                          {
+                            'id': 'A4',
+                            'source': 'brief.md',
+                            'text': 'A started card due in four or five calendar days shows one blue badge with the compact “5日内到期” label in Simplified Chinese. Dates more than five days away show no upcoming badge.',
+                          },
+                        ],
+                      'children': null,
+                      'specChanges':
+                        [
+                          {
+                            'capability': 'kanban-deadline-badges',
+                            'operation': 'modify',
+                            'source': 'specs/kanban-deadline-badges/spec.md',
+                          },
+                        ],
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'e1bdcf4f243d2dbec902bb70444419641581a6bac1fc5755ec38c54493ed3251',
+                    'outcomeId': '40d56eb8-8db9-4cdd-9495-58d4f43f44aa',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-shape-prepare',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'kanban-late-completion-red',
+              'status': 'succeeded',
+              'stepId': 'shape.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-cli',
+                  'token': 'portable-0024f63fbeb9021ca590f1778068fefb5f6d194434e2dca271fbf492a088347a',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'kanban-late-completion-red:5',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'kanban-late-completion-red',
+                      'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '1a461d3413824342ec73b2eb5f8e85ba7590116a4ed145d0436669558d9e5930',
+              'outcome':
+                {
+                  'actionId': 'kanban-late-completion-red:5',
+                  'attempt': 1,
+                  'claimToken': 'portable-0024f63fbeb9021ca590f1778068fefb5f6d194434e2dca271fbf492a088347a',
+                  'inputHash': '1a461d3413824342ec73b2eb5f8e85ba7590116a4ed145d0436669558d9e5930',
+                  'outcomeId': '44f3977d-1519-4173-89df-c9aa201ec9f9',
+                  'output':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'source': 'brief.md',
+                            'text': "A late-completion badge shares the native overdue date pill's foreground and fill styles in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.",
+                          },
+                          {
+                            'id': 'A2',
+                            'source': 'brief.md',
+                            'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                          },
+                          {
+                            'id': 'A3',
+                            'source': 'brief.md',
+                            'text': "A started card due in zero through three calendar days shows one badge with its fill taken directly from the app's active initiative status color and readable dark text in both themes. In Simplified Chinese it reads “3日内到期”.",
+                          },
+                          {
+                            'id': 'A4',
+                            'source': 'brief.md',
+                            'text': 'A started card due in four or five calendar days shows one blue badge with the compact “5日内到期” label in Simplified Chinese. Dates more than five days away show no upcoming badge.',
+                          },
+                        ],
+                      'children': null,
+                      'specChanges':
+                        [
+                          {
+                            'capability': 'kanban-deadline-badges',
+                            'operation': 'modify',
+                            'source': 'specs/kanban-deadline-badges/spec.md',
+                          },
+                        ],
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '09fd0021be5eb66fad6e987ca8007eaf0f36f7a2848de6786243b515042813cf',
+                    'outcomeId': '44f3977d-1519-4173-89df-c9aa201ec9f9',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-shape-prepare',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'kanban-late-completion-red',
+              'status': 'succeeded',
+              'stepId': 'shape.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-cli',
+                  'token': 'portable-f6032b1da1e2c4f44461be1433613dfe6e4d5ab4f0518722dd6ffe87107d38e5',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'kanban-late-completion-red:7',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'kanban-late-completion-red',
+                      'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '9ee7b9141e97e0d07f9ddd77c626ab8bd9f66722cb4f2940b58027cf48dd1fd4',
+              'outcome':
+                {
+                  'actionId': 'kanban-late-completion-red:7',
+                  'attempt': 1,
+                  'claimToken': 'portable-f6032b1da1e2c4f44461be1433613dfe6e4d5ab4f0518722dd6ffe87107d38e5',
+                  'inputHash': '9ee7b9141e97e0d07f9ddd77c626ab8bd9f66722cb4f2940b58027cf48dd1fd4',
+                  'outcomeId': 'ed7b95c7-fb2b-4c38-b0e6-638b2b9eea66',
+                  'output':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'source': 'brief.md',
+                            'text': "A late-completion badge shares the native overdue date pill's foreground and fill styles in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.",
+                          },
+                          {
+                            'id': 'A2',
+                            'source': 'brief.md',
+                            'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                          },
+                          {
+                            'id': 'A3',
+                            'source': 'brief.md',
+                            'text': "A started card due in zero through three calendar days shows one badge with its fill taken directly from the app's active initiative status color and the app's existing dark foreground for yellow surfaces in both themes. In Simplified Chinese it reads “3日内到期”.",
+                          },
+                          {
+                            'id': 'A4',
+                            'source': 'brief.md',
+                            'text': "A started card due in four or five calendar days shows one badge using the model price source badge's blue foreground and tinted fill in each theme. In Simplified Chinese it reads “5日内到期”. Dates more than five days away show no upcoming badge.",
+                          },
+                        ],
+                      'children': null,
+                      'specChanges':
+                        [
+                          {
+                            'capability': 'kanban-deadline-badges',
+                            'operation': 'modify',
+                            'source': 'specs/kanban-deadline-badges/spec.md',
+                          },
+                        ],
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'aef83519b4c9b9816a5c69fb9170983ebc9d6018a59d9ad804274fba92e5a89f',
+                    'outcomeId': 'ed7b95c7-fb2b-4c38-b0e6-638b2b9eea66',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-shape-prepare',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'kanban-late-completion-red',
+              'status': 'succeeded',
+              'stepId': 'shape.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a1f721-e201-7503-b87c-d2cf5a2eb7fd',
+                  'token': 'portable-049b5320025a3a9ee102d25cabe5e648e1ac788dcecdbf406d9af608f3bb73c1',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'kanban-late-completion-red:9',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'kanban-late-completion-red',
+                      'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '95eb49cc9058f978af114ccde1a200a392e65169c7e025600dfec7be50eb04c9',
+              'outcome':
+                {
+                  'actionId': 'kanban-late-completion-red:9',
+                  'attempt': 1,
+                  'claimToken': 'portable-049b5320025a3a9ee102d25cabe5e648e1ac788dcecdbf406d9af608f3bb73c1',
+                  'inputHash': '95eb49cc9058f978af114ccde1a200a392e65169c7e025600dfec7be50eb04c9',
+                  'outcomeId': 'native-result-36ae86f8e3b19e495465c960a0a50fbc9636d63afed447f22b5535dd0ff88752',
+                  'output':
+                    {
+                      'addressedAcceptanceIds': ['A1', 'A2', 'A3', 'A4'],
+                      'checks':
+                        [
+                          {
+                            'name': 'bun --filter=web run test',
+                            'note': '/Users/poco/Projects/itsaplan: 754 passed across 153 files, zero failures.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun test --preload ./test/setup.ts src/features/work-items/components/kanban/IssueCardDeadline.test.tsx',
+                            'note': '/Users/poco/Projects/itsaplan/apps/web: 4 passed after formatting, covering colors, date boundaries, and Simplified Chinese output.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun --filter=web run typecheck and bun --filter=web run lint',
+                            'note': '/Users/poco/Projects/itsaplan: TypeScript and ESLint exited 0.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Targeted Prettier check and git diff --check',
+                            'note': '/Users/poco/Projects/itsaplan: all seven changed web files passed Prettier and the diff had no whitespace errors.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Impeccable detector and source review',
+                            'note': '/Users/poco/Projects/itsaplan: Impeccable returned an empty issue list for both production TSX files. Focused code and security review found no actionable issues.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'knownLimits': [],
+                      'requireIndependentReview': false,
+                      'summary': 'Updated the shared Kanban deadline card to reuse the native overdue styles, active initiative yellow, and existing blue badge palette. Tightened day-count and late-completion labels in the affected locales.',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '5125d43781ce38ba618a43543618dac26ce5029db2ff2f11fd5a1eb560322389',
+                    'outcomeId': 'native-result-36ae86f8e3b19e495465c960a0a50fbc9636d63afed447f22b5535dd0ff88752',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-builder',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'kanban-late-completion-red',
+              'status': 'succeeded',
+              'stepId': 'build.builder',
+              'type': 'handoff',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a1f721-e201-7503-b87c-d2cf5a2eb7fd',
+                  'token': 'portable-cbc9dd072710faa7c9d3d50e653a3699fd537596832a1d49e62e166dbea86308',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'kanban-late-completion-red:10',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'kanban-late-completion-red',
+                      'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '003b86d4a2acae21436b80f946e656c151332bed391fa6d4e7e2a9f20251eb78',
+              'outcome':
+                {
+                  'actionId': 'kanban-late-completion-red:10',
+                  'attempt': 1,
+                  'claimToken': 'portable-cbc9dd072710faa7c9d3d50e653a3699fd537596832a1d49e62e166dbea86308',
+                  'inputHash': '003b86d4a2acae21436b80f946e656c151332bed391fa6d4e7e2a9f20251eb78',
+                  'outcomeId': 'native-result-1113ebfb2717829707ddd82d01160ccd8b989963f2faf31695fc35fc8634b44a',
+                  'output':
+                    {
+                      'candidateId': 'kanban-late-completion-red:9',
+                      'checks':
+                        [
+                          {
+                            'name': 'bun --filter=web run test',
+                            'note': '/Users/poco/Projects/itsaplan: 754 passed across 153 files, zero failures.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun test --preload ./test/setup.ts src/features/work-items/components/kanban/IssueCardDeadline.test.tsx',
+                            'note': '/Users/poco/Projects/itsaplan/apps/web: 4 passed after formatting, covering colors, date boundaries, and Simplified Chinese output.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun --filter=web run typecheck and bun --filter=web run lint',
+                            'note': '/Users/poco/Projects/itsaplan: TypeScript and ESLint exited 0.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Targeted Prettier check and git diff --check',
+                            'note': '/Users/poco/Projects/itsaplan: all seven changed web files passed Prettier and the diff had no whitespace errors.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Impeccable detector and source review',
+                            'note': '/Users/poco/Projects/itsaplan: Impeccable returned an empty issue list for both production TSX files. Focused code and security review found no actionable issues.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Chrome extension visual and computed-style check on local component fixture',
+                            'note': 'Local QA page rendered IssueCardDeadline with the compiled apps/web/src/app/globals.css at regular card width (Chrome task tab 267696399). Both default themes showed all three color treatments and exact Simplified Chinese labels without clipping. Late-completion and original open-overdue foreground/background matched in each theme. Yellow, blue, red contrast in light: 8.38, 5.62, 5.30; dark: 8.38, 6.00, 7.95. Fixture used synthetic cards.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'response':
+                        {
+                          'kind': 'final-result',
+                          'result':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'reason': "DateBadge and the late-completion badge share OVERDUE_PILL. Chrome measured the same red foreground and tinted fill for the late badge and the open overdue date in each default theme. The completed card's October 8 planned date was neutral.",
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'reason': 'The October 8 planned / October 15 actual fixture shows 延期完成 · 10月15日 in Chrome and the focused test. English, Korean, Simplified Chinese, and Traditional Chinese translations retain {date} and omit the extra prefix. English and Chinese render tests passed.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'reason': 'The focused render test checks the existing active initiative color from STATUS_META, project yellow foreground, and exclusive warning for zero through three calendar days. Chrome showed 3日内到期 in both themes, with 8.38:1 contrast.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A4',
+                                    'reason': 'The focused test checks the existing model-price badge blue classes for four and five days, no upcoming badge at six days, and the Simplified Chinese translation. Chrome confirmed the blue tint and copy in both themes.',
+                                    'result': 'passed',
+                                  },
+                                ],
+                              'attempt': 1,
+                              'iteration': 1,
+                              'requestReview':
+                                {
+                                  'reason': "The original written request requires the native overdue red. The confirmed scope includes both date warnings, localized label cleanup, reuse of the project's native yellow and blue palette, and ordinary and swimlane cards. Source and checks match the confirmed scope.",
+                                  'result': 'aligned',
+                                },
+                              'risks':
+                                [
+                                  'Browser verification used a local component fixture with synthetic dates. The signed-in board and swimlane share the component according to the source.',
+                                ],
+                              'summary': 'All four approved acceptance items passed. Web tests, type checking, lint, formatting, focused reviews, and the default light and dark browser fixture passed.',
+                              'verdict': 'pass',
+                            },
+                        },
+                      'verifierExecutionRef': '01a1f721-e201-7503-b87c-d2cf5a2eb7fd',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'c0e56c7c92cb40d62bb5380f9258694797e4bbf521fe325350d8ab1c414896b4',
+                    'outcomeId': 'native-result-1113ebfb2717829707ddd82d01160ccd8b989963f2faf31695fc35fc8634b44a',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-verifier',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'kanban-late-completion-red',
+              'status': 'succeeded',
+              'stepId': 'verify.verifier',
+              'type': 'handoff',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-preflight',
+                  'token': 'portable-96062fc1e2bd706ff92e9f70f29b84ee8533f36771461767f59e0d24fcc6d48c',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'kanban-late-completion-red:12',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'kanban-late-completion-red',
+                      'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '70fdca77736512e610749ef21c00e711a23709f0ae6a4e49124c78dc79a2f694',
+              'outcome':
+                {
+                  'actionId': 'kanban-late-completion-red:12',
+                  'attempt': 1,
+                  'claimToken': 'portable-96062fc1e2bd706ff92e9f70f29b84ee8533f36771461767f59e0d24fcc6d48c',
+                  'inputHash': '70fdca77736512e610749ef21c00e711a23709f0ae6a4e49124c78dc79a2f694',
+                  'outcomeId': 'kanban-late-completion-red:12:1:executor-result',
+                  'output':
+                    {
+                      'archiveDirRef': 'docs/comet/archive/2026-11-20-kanban-late-completion-red',
+                      'blockers': [],
+                      'candidateId': 'kanban-late-completion-red:9',
+                      'capabilityPeers': [],
+                      'ready': true,
+                      'reportRef': 'docs/comet/changes/kanban-late-completion-red/verification.md',
+                      'reportStateVersion': 12,
+                      'requiresReverification': false,
+                      'specPreview':
+                        [
+                          {
+                            'capability': 'kanban-deadline-badges',
+                            'operation': 'modify',
+                            'source': 'specs/kanban-deadline-badges/spec.md',
+                          },
+                        ],
+                      'stateVersion': 13,
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'd690c0e279ccd04d63621c95e694b8ca81146c7f530abbdc200f48a86d0bd369',
+                    'outcomeId': 'kanban-late-completion-red:12:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive-preflight',
+              'requiredCapabilities': [],
+              'retry': 'idempotent',
+              'runId': 'kanban-late-completion-red',
+              'status': 'succeeded',
+              'stepId': 'archive.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-apply',
+                  'token': 'portable-7ad6e0228a56383107750714f5ecaa5605404448861eddd8b0f64fc5019a05f6',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'kanban-late-completion-red:13',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'kanban-late-completion-red',
+                      'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': 'd38414189a6a1d99ac43f179edd572a1685004ec200206443ff083324f36ba20',
+              'outcome':
+                {
+                  'actionId': 'kanban-late-completion-red:13',
+                  'attempt': 1,
+                  'claimToken': 'portable-7ad6e0228a56383107750714f5ecaa5605404448861eddd8b0f64fc5019a05f6',
+                  'inputHash': 'd38414189a6a1d99ac43f179edd572a1685004ec200206443ff083324f36ba20',
+                  'outcomeId': 'kanban-late-completion-red:13:1:executor-result',
+                  'output':
+                    {
+                      'archiveRef': '2026-11-20-kanban-late-completion-red',
+                      'specCount': 1,
+                      'stateVersion': 13,
+                      'transactionId': '46a8401c-c007-430d-9a28-17a4153acc0f',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '0f2efc32f4229b6b014b35003db628809571722d2258f5dac7439f72b3556e67',
+                    'outcomeId': 'kanban-late-completion-red:13:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'kanban-late-completion-red',
+              'status': 'succeeded',
+              'stepId': 'archive.execute',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-finalize',
+                  'token': 'portable-5cc94c05808273262e345331f9e3c2c16ca52d8f3e8f7902c1f039220c06b2ce',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'kanban-late-completion-red:14',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'kanban-late-completion-red',
+                      'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '289eb6a66db43cad239c2c7e0665bfb087f9dedd45c25f90d2762e78f4f884d4',
+              'outcome':
+                {
+                  'actionId': 'kanban-late-completion-red:14',
+                  'attempt': 1,
+                  'claimToken': 'portable-5cc94c05808273262e345331f9e3c2c16ca52d8f3e8f7902c1f039220c06b2ce',
+                  'inputHash': '289eb6a66db43cad239c2c7e0665bfb087f9dedd45c25f90d2762e78f4f884d4',
+                  'outcomeId': 'kanban-late-completion-red:14:1:executor-result',
+                  'output':
+                    {
+                      'archiveRef': '2026-11-20-kanban-late-completion-red',
+                      'change': 'kanban-late-completion-red',
+                      'runId': 'kanban-late-completion-red',
+                      'specs': [{ 'capability': 'kanban-deadline-badges', 'operation': 'modify' }],
+                      'stateVersion': 14,
+                      'transactionId': '46a8401c-c007-430d-9a28-17a4153acc0f',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '4bd125c9a959841338b5123fd56ee817d31654c307de45afd3635c4da525914f',
+                    'outcomeId': 'kanban-late-completion-red:14:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive-finalize',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'kanban-late-completion-red',
+              'status': 'succeeded',
+              'stepId': 'archive.finalize',
+              'type': 'call_tool',
+            },
+          ],
+        'actionContexts':
+          {
+            'kanban-late-completion-red:1': { 'results': {}, 'sequence': 1 },
+            'kanban-late-completion-red:10': { 'results': {}, 'sequence': 10 },
+            'kanban-late-completion-red:12': { 'results': {}, 'sequence': 12 },
+            'kanban-late-completion-red:13': { 'results': {}, 'sequence': 13 },
+            'kanban-late-completion-red:14': { 'results': {}, 'sequence': 14 },
+            'kanban-late-completion-red:3': { 'results': {}, 'sequence': 3 },
+            'kanban-late-completion-red:5': { 'results': {}, 'sequence': 5 },
+            'kanban-late-completion-red:7': { 'results': {}, 'sequence': 7 },
+            'kanban-late-completion-red:9': { 'results': {}, 'sequence': 9 },
+          },
+        'waits':
+          [
+            {
+              'id': 'kanban-late-completion-red:2',
+              'stepId': 'shape.confirm',
+              'sequence': 2,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'kanban-late-completion-red',
+                      'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'A late-completion badge uses the same foreground and fill as the native overdue date pill in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'A started card due in zero through three calendar days shows one amber badge, with the existing emphasis and the compact “3日内到期” label in Simplified Chinese.',
+                              },
+                              {
+                                'id': 'A4',
+                                'source': 'brief.md',
+                                'text': 'A started card due in four or five calendar days shows one blue badge with the compact “5日内到期” label in Simplified Chinese. Dates more than five days away show no upcoming badge.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges':
+                            [
+                              {
+                                'capability': 'kanban-deadline-badges',
+                                'operation': 'modify',
+                                'source': 'specs/kanban-deadline-badges/spec.md',
+                              },
+                            ],
+                        },
+                    },
+                },
+              'proposalHash': '26fc986093b74ea8d86c32cd388bc64f38ba4dd02e555bd511867e8d7c0e234d',
+              'choices': ['approved', 'rejected'],
+              'results': {},
+              'decision':
+                {
+                  'id': '97a3814696a86cf6c8d1ea0649e547d5b4b639fb957a1fac9d528b4e6ddc94e8',
+                  'choice': 'rejected',
+                  'proposalHash': '26fc986093b74ea8d86c32cd388bc64f38ba4dd02e555bd511867e8d7c0e234d',
+                },
+            },
+            {
+              'id': 'kanban-late-completion-red:4',
+              'stepId': 'shape.confirm',
+              'sequence': 4,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'kanban-late-completion-red',
+                      'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'A late-completion badge uses the same foreground and fill as the native overdue date pill in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'A started card due in zero through three calendar days shows one badge with the native initiative status yellow fill and readable dark text in both themes. In Simplified Chinese it reads “3日内到期”.',
+                              },
+                              {
+                                'id': 'A4',
+                                'source': 'brief.md',
+                                'text': 'A started card due in four or five calendar days shows one blue badge with the compact “5日内到期” label in Simplified Chinese. Dates more than five days away show no upcoming badge.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges':
+                            [
+                              {
+                                'capability': 'kanban-deadline-badges',
+                                'operation': 'modify',
+                                'source': 'specs/kanban-deadline-badges/spec.md',
+                              },
+                            ],
+                        },
+                    },
+                },
+              'proposalHash': 'b4ad92b5f071983814c9ea4a53b33cf5d94dd039ed4d8f7f7b32772b2d2f17c8',
+              'choices': ['approved', 'rejected'],
+              'results': {},
+              'decision':
+                {
+                  'id': 'ce2709cf14bd88caf189f44c477ccb82ed0bf514df1df3e0f46706e2478acba6',
+                  'choice': 'rejected',
+                  'proposalHash': 'b4ad92b5f071983814c9ea4a53b33cf5d94dd039ed4d8f7f7b32772b2d2f17c8',
+                },
+            },
+            {
+              'id': 'kanban-late-completion-red:6',
+              'stepId': 'shape.confirm',
+              'sequence': 6,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'kanban-late-completion-red',
+                      'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': "A late-completion badge shares the native overdue date pill's foreground and fill styles in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.",
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': "A started card due in zero through three calendar days shows one badge with its fill taken directly from the app's active initiative status color and readable dark text in both themes. In Simplified Chinese it reads “3日内到期”.",
+                              },
+                              {
+                                'id': 'A4',
+                                'source': 'brief.md',
+                                'text': 'A started card due in four or five calendar days shows one blue badge with the compact “5日内到期” label in Simplified Chinese. Dates more than five days away show no upcoming badge.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges':
+                            [
+                              {
+                                'capability': 'kanban-deadline-badges',
+                                'operation': 'modify',
+                                'source': 'specs/kanban-deadline-badges/spec.md',
+                              },
+                            ],
+                        },
+                    },
+                },
+              'proposalHash': 'f7a18b78f091af17f3b628477059bba90eec0bba7fceac5520747a3e0a84deb4',
+              'choices': ['approved', 'rejected'],
+              'results': {},
+              'decision':
+                {
+                  'id': 'd7c51148df639a94d1581b075cb9b53dbc32db56ea00095201d310864157ea23',
+                  'choice': 'rejected',
+                  'proposalHash': 'f7a18b78f091af17f3b628477059bba90eec0bba7fceac5520747a3e0a84deb4',
+                },
+            },
+            {
+              'id': 'kanban-late-completion-red:8',
+              'stepId': 'shape.confirm',
+              'sequence': 8,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'kanban-late-completion-red',
+                      'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': "A late-completion badge shares the native overdue date pill's foreground and fill styles in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.",
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': "A started card due in zero through three calendar days shows one badge with its fill taken directly from the app's active initiative status color and the app's existing dark foreground for yellow surfaces in both themes. In Simplified Chinese it reads “3日内到期”.",
+                              },
+                              {
+                                'id': 'A4',
+                                'source': 'brief.md',
+                                'text': "A started card due in four or five calendar days shows one badge using the model price source badge's blue foreground and tinted fill in each theme. In Simplified Chinese it reads “5日内到期”. Dates more than five days away show no upcoming badge.",
+                              },
+                            ],
+                          'children': null,
+                          'specChanges':
+                            [
+                              {
+                                'capability': 'kanban-deadline-badges',
+                                'operation': 'modify',
+                                'source': 'specs/kanban-deadline-badges/spec.md',
+                              },
+                            ],
+                        },
+                    },
+                },
+              'proposalHash': '24a29d1ba603650688dc6bd211af6aa2fa435b7bc141eb609c37721d386d78fd',
+              'choices': ['approved', 'rejected'],
+              'results': {},
+              'decision':
+                {
+                  'id': '22885e0656e1dae9fa15e4ebf3beecdf7116655cd861ca60a68229d81f7de14e',
+                  'choice': 'approved',
+                  'proposalHash': '24a29d1ba603650688dc6bd211af6aa2fa435b7bc141eb609c37721d386d78fd',
+                },
+            },
+            {
+              'id': 'kanban-late-completion-red:11',
+              'stepId': 'verify.confirm',
+              'sequence': 11,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'activation':
+                    {
+                      'report':
+                        {
+                          'attempt': 1,
+                          'candidateId': 'kanban-late-completion-red:9',
+                          'iteration': 1,
+                          'reportRef': 'docs/comet/changes/kanban-late-completion-red/verification.md',
+                          'stateVersion': 12,
+                        },
+                    },
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'kanban-late-completion-red',
+                      'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                    },
+                  'outputs':
+                    {
+                      'verify.verifier':
+                        {
+                          'candidateId': 'kanban-late-completion-red:9',
+                          'checks':
+                            [
+                              {
+                                'name': 'bun --filter=web run test',
+                                'note': '/Users/poco/Projects/itsaplan: 754 passed across 153 files, zero failures.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun test --preload ./test/setup.ts src/features/work-items/components/kanban/IssueCardDeadline.test.tsx',
+                                'note': '/Users/poco/Projects/itsaplan/apps/web: 4 passed after formatting, covering colors, date boundaries, and Simplified Chinese output.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun --filter=web run typecheck and bun --filter=web run lint',
+                                'note': '/Users/poco/Projects/itsaplan: TypeScript and ESLint exited 0.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Targeted Prettier check and git diff --check',
+                                'note': '/Users/poco/Projects/itsaplan: all seven changed web files passed Prettier and the diff had no whitespace errors.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Impeccable detector and source review',
+                                'note': '/Users/poco/Projects/itsaplan: Impeccable returned an empty issue list for both production TSX files. Focused code and security review found no actionable issues.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Chrome extension visual and computed-style check on local component fixture',
+                                'note': 'Local QA page rendered IssueCardDeadline with the compiled apps/web/src/app/globals.css at regular card width (Chrome task tab 267696399). Both default themes showed all three color treatments and exact Simplified Chinese labels without clipping. Late-completion and original open-overdue foreground/background matched in each theme. Yellow, blue, red contrast in light: 8.38, 5.62, 5.30; dark: 8.38, 6.00, 7.95. Fixture used synthetic cards.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'response':
+                            {
+                              'kind': 'final-result',
+                              'result':
+                                {
+                                  'acceptance':
+                                    [
+                                      {
+                                        'id': 'A1',
+                                        'reason': "DateBadge and the late-completion badge share OVERDUE_PILL. Chrome measured the same red foreground and tinted fill for the late badge and the open overdue date in each default theme. The completed card's October 8 planned date was neutral.",
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A2',
+                                        'reason': 'The October 8 planned / October 15 actual fixture shows 延期完成 · 10月15日 in Chrome and the focused test. English, Korean, Simplified Chinese, and Traditional Chinese translations retain {date} and omit the extra prefix. English and Chinese render tests passed.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A3',
+                                        'reason': 'The focused render test checks the existing active initiative color from STATUS_META, project yellow foreground, and exclusive warning for zero through three calendar days. Chrome showed 3日内到期 in both themes, with 8.38:1 contrast.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A4',
+                                        'reason': 'The focused test checks the existing model-price badge blue classes for four and five days, no upcoming badge at six days, and the Simplified Chinese translation. Chrome confirmed the blue tint and copy in both themes.',
+                                        'result': 'passed',
+                                      },
+                                    ],
+                                  'attempt': 1,
+                                  'iteration': 1,
+                                  'requestReview':
+                                    {
+                                      'reason': "The original written request requires the native overdue red. The confirmed scope includes both date warnings, localized label cleanup, reuse of the project's native yellow and blue palette, and ordinary and swimlane cards. Source and checks match the confirmed scope.",
+                                      'result': 'aligned',
+                                    },
+                                  'risks':
+                                    [
+                                      'Browser verification used a local component fixture with synthetic dates. The signed-in board and swimlane share the component according to the source.',
+                                    ],
+                                  'summary': 'All four approved acceptance items passed. Web tests, type checking, lint, formatting, focused reviews, and the default light and dark browser fixture passed.',
+                                  'verdict': 'pass',
+                                },
+                            },
+                          'verifierExecutionRef': '01a1f721-e201-7503-b87c-d2cf5a2eb7fd',
+                        },
+                    },
+                },
+              'proposalHash': 'effaa9e5b91eb28b0ed83c8ba0f902cd008e7775a0ede9da8c6769dc6c08ba52',
+              'choices': ['approved', 'rejected', 'reverify'],
+              'results': {},
+              'decision':
+                {
+                  'id': '16ad4b813cc80e4b765b17177a9373e3a2be6b7ce01c2a9504747f1f6a686b20',
+                  'choice': 'approved',
+                  'proposalHash': 'effaa9e5b91eb28b0ed83c8ba0f902cd008e7775a0ede9da8c6769dc6c08ba52',
+                  'reason': '用户明确接受四项验收结果并要求归档。随后提交、推送、创建 PR，再部署本地。',
+                },
+            },
+          ],
+        'ready': [],
+        'joins': {},
+        'outputs': {},
+        'children': [],
+        'lineage': [],
+      },
+    'sourceRevision': 20,
+    'sourceHash': 'bd4f7d66a48eef322c97245c25d62a6589c4a78c1032acd7359803ab8e2e3e2f',
+    'pool':
+      {
+        'version': 3,
+        'values':
+          [
+            {
+              'choice': 'rejected',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'kanban-late-completion-red',
+                      'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'A late-completion badge uses the same foreground and fill as the native overdue date pill in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'A started card due in zero through three calendar days shows one amber badge, with the existing emphasis and the compact “3日内到期” label in Simplified Chinese.',
+                              },
+                              {
+                                'id': 'A4',
+                                'source': 'brief.md',
+                                'text': 'A started card due in four or five calendar days shows one blue badge with the compact “5日内到期” label in Simplified Chinese. Dates more than five days away show no upcoming badge.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges':
+                            [
+                              {
+                                'capability': 'kanban-deadline-badges',
+                                'operation': 'modify',
+                                'source': 'specs/kanban-deadline-badges/spec.md',
+                              },
+                            ],
+                        },
+                    },
+                },
+            },
+            {
+              'acceptance':
+                [
+                  {
+                    'id': 'A1',
+                    'source': 'brief.md',
+                    'text': 'A late-completion badge uses the same foreground and fill as the native overdue date pill in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.',
+                  },
+                  {
+                    'id': 'A2',
+                    'source': 'brief.md',
+                    'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                  },
+                  {
+                    'id': 'A3',
+                    'source': 'brief.md',
+                    'text': 'A started card due in zero through three calendar days shows one amber badge, with the existing emphasis and the compact “3日内到期” label in Simplified Chinese.',
+                  },
+                  {
+                    'id': 'A4',
+                    'source': 'brief.md',
+                    'text': 'A started card due in four or five calendar days shows one blue badge with the compact “5日内到期” label in Simplified Chinese. Dates more than five days away show no upcoming badge.',
+                  },
+                ],
+              'children': null,
+              'specChanges':
+                [
+                  {
+                    'capability': 'kanban-deadline-badges',
+                    'operation': 'modify',
+                    'source': 'specs/kanban-deadline-badges/spec.md',
+                  },
+                ],
+            },
+            {
+              'choice': 'rejected',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'kanban-late-completion-red',
+                      'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'A late-completion badge uses the same foreground and fill as the native overdue date pill in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'A started card due in zero through three calendar days shows one badge with the native initiative status yellow fill and readable dark text in both themes. In Simplified Chinese it reads “3日内到期”.',
+                              },
+                              {
+                                'id': 'A4',
+                                'source': 'brief.md',
+                                'text': 'A started card due in four or five calendar days shows one blue badge with the compact “5日内到期” label in Simplified Chinese. Dates more than five days away show no upcoming badge.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges':
+                            [
+                              {
+                                'capability': 'kanban-deadline-badges',
+                                'operation': 'modify',
+                                'source': 'specs/kanban-deadline-badges/spec.md',
+                              },
+                            ],
+                        },
+                    },
+                },
+            },
+            {
+              'acceptance':
+                [
+                  {
+                    'id': 'A1',
+                    'source': 'brief.md',
+                    'text': 'A late-completion badge uses the same foreground and fill as the native overdue date pill in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.',
+                  },
+                  {
+                    'id': 'A2',
+                    'source': 'brief.md',
+                    'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                  },
+                  {
+                    'id': 'A3',
+                    'source': 'brief.md',
+                    'text': 'A started card due in zero through three calendar days shows one badge with the native initiative status yellow fill and readable dark text in both themes. In Simplified Chinese it reads “3日内到期”.',
+                  },
+                  {
+                    'id': 'A4',
+                    'source': 'brief.md',
+                    'text': 'A started card due in four or five calendar days shows one blue badge with the compact “5日内到期” label in Simplified Chinese. Dates more than five days away show no upcoming badge.',
+                  },
+                ],
+              'children': null,
+              'specChanges':
+                [
+                  {
+                    'capability': 'kanban-deadline-badges',
+                    'operation': 'modify',
+                    'source': 'specs/kanban-deadline-badges/spec.md',
+                  },
+                ],
+            },
+            {
+              'choice': 'rejected',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'kanban-late-completion-red',
+                      'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': "A late-completion badge shares the native overdue date pill's foreground and fill styles in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.",
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': "A started card due in zero through three calendar days shows one badge with its fill taken directly from the app's active initiative status color and readable dark text in both themes. In Simplified Chinese it reads “3日内到期”.",
+                              },
+                              {
+                                'id': 'A4',
+                                'source': 'brief.md',
+                                'text': 'A started card due in four or five calendar days shows one blue badge with the compact “5日内到期” label in Simplified Chinese. Dates more than five days away show no upcoming badge.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges':
+                            [
+                              {
+                                'capability': 'kanban-deadline-badges',
+                                'operation': 'modify',
+                                'source': 'specs/kanban-deadline-badges/spec.md',
+                              },
+                            ],
+                        },
+                    },
+                },
+            },
+            {
+              'acceptance':
+                [
+                  {
+                    'id': 'A1',
+                    'source': 'brief.md',
+                    'text': "A late-completion badge shares the native overdue date pill's foreground and fill styles in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.",
+                  },
+                  {
+                    'id': 'A2',
+                    'source': 'brief.md',
+                    'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                  },
+                  {
+                    'id': 'A3',
+                    'source': 'brief.md',
+                    'text': "A started card due in zero through three calendar days shows one badge with its fill taken directly from the app's active initiative status color and readable dark text in both themes. In Simplified Chinese it reads “3日内到期”.",
+                  },
+                  {
+                    'id': 'A4',
+                    'source': 'brief.md',
+                    'text': 'A started card due in four or five calendar days shows one blue badge with the compact “5日内到期” label in Simplified Chinese. Dates more than five days away show no upcoming badge.',
+                  },
+                ],
+              'children': null,
+              'specChanges':
+                [
+                  {
+                    'capability': 'kanban-deadline-badges',
+                    'operation': 'modify',
+                    'source': 'specs/kanban-deadline-badges/spec.md',
+                  },
+                ],
+            },
+            {
+              'choice': 'approved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'kanban-late-completion-red',
+                      'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': "A late-completion badge shares the native overdue date pill's foreground and fill styles in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.",
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': "A started card due in zero through three calendar days shows one badge with its fill taken directly from the app's active initiative status color and the app's existing dark foreground for yellow surfaces in both themes. In Simplified Chinese it reads “3日内到期”.",
+                              },
+                              {
+                                'id': 'A4',
+                                'source': 'brief.md',
+                                'text': "A started card due in four or five calendar days shows one badge using the model price source badge's blue foreground and tinted fill in each theme. In Simplified Chinese it reads “5日内到期”. Dates more than five days away show no upcoming badge.",
+                              },
+                            ],
+                          'children': null,
+                          'specChanges':
+                            [
+                              {
+                                'capability': 'kanban-deadline-badges',
+                                'operation': 'modify',
+                                'source': 'specs/kanban-deadline-badges/spec.md',
+                              },
+                            ],
+                        },
+                    },
+                },
+            },
+            {
+              'acceptance':
+                [
+                  {
+                    'id': 'A1',
+                    'source': 'brief.md',
+                    'text': "A late-completion badge shares the native overdue date pill's foreground and fill styles in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.",
+                  },
+                  {
+                    'id': 'A2',
+                    'source': 'brief.md',
+                    'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                  },
+                  {
+                    'id': 'A3',
+                    'source': 'brief.md',
+                    'text': "A started card due in zero through three calendar days shows one badge with its fill taken directly from the app's active initiative status color and the app's existing dark foreground for yellow surfaces in both themes. In Simplified Chinese it reads “3日内到期”.",
+                  },
+                  {
+                    'id': 'A4',
+                    'source': 'brief.md',
+                    'text': "A started card due in four or five calendar days shows one badge using the model price source badge's blue foreground and tinted fill in each theme. In Simplified Chinese it reads “5日内到期”. Dates more than five days away show no upcoming badge.",
+                  },
+                ],
+              'children': null,
+              'specChanges':
+                [
+                  {
+                    'capability': 'kanban-deadline-badges',
+                    'operation': 'modify',
+                    'source': 'specs/kanban-deadline-badges/spec.md',
+                  },
+                ],
+            },
+            {
+              'addressedAcceptanceIds': ['A1', 'A2', 'A3', 'A4'],
+              'checks':
+                [
+                  {
+                    'name': 'bun --filter=web run test',
+                    'note': '/Users/poco/Projects/itsaplan: 754 passed across 153 files, zero failures.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun test --preload ./test/setup.ts src/features/work-items/components/kanban/IssueCardDeadline.test.tsx',
+                    'note': '/Users/poco/Projects/itsaplan/apps/web: 4 passed after formatting, covering colors, date boundaries, and Simplified Chinese output.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun --filter=web run typecheck and bun --filter=web run lint',
+                    'note': '/Users/poco/Projects/itsaplan: TypeScript and ESLint exited 0.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Targeted Prettier check and git diff --check',
+                    'note': '/Users/poco/Projects/itsaplan: all seven changed web files passed Prettier and the diff had no whitespace errors.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Impeccable detector and source review',
+                    'note': '/Users/poco/Projects/itsaplan: Impeccable returned an empty issue list for both production TSX files. Focused code and security review found no actionable issues.',
+                    'result': 'passed',
+                  },
+                ],
+              'knownLimits': [],
+              'requireIndependentReview': false,
+              'summary': 'Updated the shared Kanban deadline card to reuse the native overdue styles, active initiative yellow, and existing blue badge palette. Tightened day-count and late-completion labels in the affected locales.',
+            },
+            {
+              'choice': 'approved',
+              'proposal':
+                {
+                  'activation':
+                    {
+                      'report':
+                        {
+                          'attempt': 1,
+                          'candidateId': 'kanban-late-completion-red:9',
+                          'iteration': 1,
+                          'reportRef': 'docs/comet/changes/kanban-late-completion-red/verification.md',
+                          'stateVersion': 12,
+                        },
+                    },
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'kanban-late-completion-red',
+                      'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                    },
+                  'outputs':
+                    {
+                      'verify.verifier':
+                        {
+                          'candidateId': 'kanban-late-completion-red:9',
+                          'checks':
+                            [
+                              {
+                                'name': 'bun --filter=web run test',
+                                'note': '/Users/poco/Projects/itsaplan: 754 passed across 153 files, zero failures.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun test --preload ./test/setup.ts src/features/work-items/components/kanban/IssueCardDeadline.test.tsx',
+                                'note': '/Users/poco/Projects/itsaplan/apps/web: 4 passed after formatting, covering colors, date boundaries, and Simplified Chinese output.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun --filter=web run typecheck and bun --filter=web run lint',
+                                'note': '/Users/poco/Projects/itsaplan: TypeScript and ESLint exited 0.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Targeted Prettier check and git diff --check',
+                                'note': '/Users/poco/Projects/itsaplan: all seven changed web files passed Prettier and the diff had no whitespace errors.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Impeccable detector and source review',
+                                'note': '/Users/poco/Projects/itsaplan: Impeccable returned an empty issue list for both production TSX files. Focused code and security review found no actionable issues.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Chrome extension visual and computed-style check on local component fixture',
+                                'note': 'Local QA page rendered IssueCardDeadline with the compiled apps/web/src/app/globals.css at regular card width (Chrome task tab 267696399). Both default themes showed all three color treatments and exact Simplified Chinese labels without clipping. Late-completion and original open-overdue foreground/background matched in each theme. Yellow, blue, red contrast in light: 8.38, 5.62, 5.30; dark: 8.38, 6.00, 7.95. Fixture used synthetic cards.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'response':
+                            {
+                              'kind': 'final-result',
+                              'result':
+                                {
+                                  'acceptance':
+                                    [
+                                      {
+                                        'id': 'A1',
+                                        'reason': "DateBadge and the late-completion badge share OVERDUE_PILL. Chrome measured the same red foreground and tinted fill for the late badge and the open overdue date in each default theme. The completed card's October 8 planned date was neutral.",
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A2',
+                                        'reason': 'The October 8 planned / October 15 actual fixture shows 延期完成 · 10月15日 in Chrome and the focused test. English, Korean, Simplified Chinese, and Traditional Chinese translations retain {date} and omit the extra prefix. English and Chinese render tests passed.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A3',
+                                        'reason': 'The focused render test checks the existing active initiative color from STATUS_META, project yellow foreground, and exclusive warning for zero through three calendar days. Chrome showed 3日内到期 in both themes, with 8.38:1 contrast.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A4',
+                                        'reason': 'The focused test checks the existing model-price badge blue classes for four and five days, no upcoming badge at six days, and the Simplified Chinese translation. Chrome confirmed the blue tint and copy in both themes.',
+                                        'result': 'passed',
+                                      },
+                                    ],
+                                  'attempt': 1,
+                                  'iteration': 1,
+                                  'requestReview':
+                                    {
+                                      'reason': "The original written request requires the native overdue red. The confirmed scope includes both date warnings, localized label cleanup, reuse of the project's native yellow and blue palette, and ordinary and swimlane cards. Source and checks match the confirmed scope.",
+                                      'result': 'aligned',
+                                    },
+                                  'risks':
+                                    [
+                                      'Browser verification used a local component fixture with synthetic dates. The signed-in board and swimlane share the component according to the source.',
+                                    ],
+                                  'summary': 'All four approved acceptance items passed. Web tests, type checking, lint, formatting, focused reviews, and the default light and dark browser fixture passed.',
+                                  'verdict': 'pass',
+                                },
+                            },
+                          'verifierExecutionRef': '01a1f721-e201-7503-b87c-d2cf5a2eb7fd',
+                        },
+                    },
+                },
+            },
+            {
+              'candidateId': 'kanban-late-completion-red:9',
+              'checks':
+                [
+                  {
+                    'name': 'bun --filter=web run test',
+                    'note': '/Users/poco/Projects/itsaplan: 754 passed across 153 files, zero failures.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun test --preload ./test/setup.ts src/features/work-items/components/kanban/IssueCardDeadline.test.tsx',
+                    'note': '/Users/poco/Projects/itsaplan/apps/web: 4 passed after formatting, covering colors, date boundaries, and Simplified Chinese output.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun --filter=web run typecheck and bun --filter=web run lint',
+                    'note': '/Users/poco/Projects/itsaplan: TypeScript and ESLint exited 0.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Targeted Prettier check and git diff --check',
+                    'note': '/Users/poco/Projects/itsaplan: all seven changed web files passed Prettier and the diff had no whitespace errors.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Impeccable detector and source review',
+                    'note': '/Users/poco/Projects/itsaplan: Impeccable returned an empty issue list for both production TSX files. Focused code and security review found no actionable issues.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Chrome extension visual and computed-style check on local component fixture',
+                    'note': 'Local QA page rendered IssueCardDeadline with the compiled apps/web/src/app/globals.css at regular card width (Chrome task tab 267696399). Both default themes showed all three color treatments and exact Simplified Chinese labels without clipping. Late-completion and original open-overdue foreground/background matched in each theme. Yellow, blue, red contrast in light: 8.38, 5.62, 5.30; dark: 8.38, 6.00, 7.95. Fixture used synthetic cards.',
+                    'result': 'passed',
+                  },
+                ],
+              'response':
+                {
+                  'kind': 'final-result',
+                  'result':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'reason': "DateBadge and the late-completion badge share OVERDUE_PILL. Chrome measured the same red foreground and tinted fill for the late badge and the open overdue date in each default theme. The completed card's October 8 planned date was neutral.",
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A2',
+                            'reason': 'The October 8 planned / October 15 actual fixture shows 延期完成 · 10月15日 in Chrome and the focused test. English, Korean, Simplified Chinese, and Traditional Chinese translations retain {date} and omit the extra prefix. English and Chinese render tests passed.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A3',
+                            'reason': 'The focused render test checks the existing active initiative color from STATUS_META, project yellow foreground, and exclusive warning for zero through three calendar days. Chrome showed 3日内到期 in both themes, with 8.38:1 contrast.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A4',
+                            'reason': 'The focused test checks the existing model-price badge blue classes for four and five days, no upcoming badge at six days, and the Simplified Chinese translation. Chrome confirmed the blue tint and copy in both themes.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'attempt': 1,
+                      'iteration': 1,
+                      'requestReview':
+                        {
+                          'reason': "The original written request requires the native overdue red. The confirmed scope includes both date warnings, localized label cleanup, reuse of the project's native yellow and blue palette, and ordinary and swimlane cards. Source and checks match the confirmed scope.",
+                          'result': 'aligned',
+                        },
+                      'risks':
+                        [
+                          'Browser verification used a local component fixture with synthetic dates. The signed-in board and swimlane share the component according to the source.',
+                        ],
+                      'summary': 'All four approved acceptance items passed. Web tests, type checking, lint, formatting, focused reviews, and the default light and dark browser fixture passed.',
+                      'verdict': 'pass',
+                    },
+                },
+              'verifierExecutionRef': '01a1f721-e201-7503-b87c-d2cf5a2eb7fd',
+            },
+            {
+              'archiveDirRef': 'docs/comet/archive/2026-11-20-kanban-late-completion-red',
+              'blockers': [],
+              'candidateId': 'kanban-late-completion-red:9',
+              'capabilityPeers': [],
+              'ready': true,
+              'reportRef': 'docs/comet/changes/kanban-late-completion-red/verification.md',
+              'reportStateVersion': 12,
+              'requiresReverification': false,
+              'specPreview':
+                [
+                  {
+                    'capability': 'kanban-deadline-badges',
+                    'operation': 'modify',
+                    'source': 'specs/kanban-deadline-badges/spec.md',
+                  },
+                ],
+              'stateVersion': 13,
+            },
+            {
+              'archiveRef': '2026-11-20-kanban-late-completion-red',
+              'specCount': 1,
+              'stateVersion': 13,
+              'transactionId': '46a8401c-c007-430d-9a28-17a4153acc0f',
+            },
+            {
+              'sequence': 9,
+              'value':
+                {
+                  'addressedAcceptanceIds': ['A1', 'A2', 'A3', 'A4'],
+                  'checks':
+                    [
+                      {
+                        'name': 'bun --filter=web run test',
+                        'note': '/Users/poco/Projects/itsaplan: 754 passed across 153 files, zero failures.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun test --preload ./test/setup.ts src/features/work-items/components/kanban/IssueCardDeadline.test.tsx',
+                        'note': '/Users/poco/Projects/itsaplan/apps/web: 4 passed after formatting, covering colors, date boundaries, and Simplified Chinese output.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun --filter=web run typecheck and bun --filter=web run lint',
+                        'note': '/Users/poco/Projects/itsaplan: TypeScript and ESLint exited 0.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Targeted Prettier check and git diff --check',
+                        'note': '/Users/poco/Projects/itsaplan: all seven changed web files passed Prettier and the diff had no whitespace errors.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Impeccable detector and source review',
+                        'note': '/Users/poco/Projects/itsaplan: Impeccable returned an empty issue list for both production TSX files. Focused code and security review found no actionable issues.',
+                        'result': 'passed',
+                      },
+                    ],
+                  'knownLimits': [],
+                  'requireIndependentReview': false,
+                  'summary': 'Updated the shared Kanban deadline card to reuse the native overdue styles, active initiative yellow, and existing blue badge palette. Tightened day-count and late-completion labels in the affected locales.',
+                },
+            },
+            {
+              'sequence': 8,
+              'value':
+                {
+                  'choice': 'approved',
+                  'proposal':
+                    {
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'kanban-late-completion-red',
+                          'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                        },
+                      'outputs':
+                        {
+                          'shape.prepare':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'source': 'brief.md',
+                                    'text': "A late-completion badge shares the native overdue date pill's foreground and fill styles in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.",
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'source': 'brief.md',
+                                    'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'source': 'brief.md',
+                                    'text': "A started card due in zero through three calendar days shows one badge with its fill taken directly from the app's active initiative status color and the app's existing dark foreground for yellow surfaces in both themes. In Simplified Chinese it reads “3日内到期”.",
+                                  },
+                                  {
+                                    'id': 'A4',
+                                    'source': 'brief.md',
+                                    'text': "A started card due in four or five calendar days shows one badge using the model price source badge's blue foreground and tinted fill in each theme. In Simplified Chinese it reads “5日内到期”. Dates more than five days away show no upcoming badge.",
+                                  },
+                                ],
+                              'children': null,
+                              'specChanges':
+                                [
+                                  {
+                                    'capability': 'kanban-deadline-badges',
+                                    'operation': 'modify',
+                                    'source': 'specs/kanban-deadline-badges/spec.md',
+                                  },
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 7,
+              'value':
+                {
+                  'acceptance':
+                    [
+                      {
+                        'id': 'A1',
+                        'source': 'brief.md',
+                        'text': "A late-completion badge shares the native overdue date pill's foreground and fill styles in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.",
+                      },
+                      {
+                        'id': 'A2',
+                        'source': 'brief.md',
+                        'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                      },
+                      {
+                        'id': 'A3',
+                        'source': 'brief.md',
+                        'text': "A started card due in zero through three calendar days shows one badge with its fill taken directly from the app's active initiative status color and the app's existing dark foreground for yellow surfaces in both themes. In Simplified Chinese it reads “3日内到期”.",
+                      },
+                      {
+                        'id': 'A4',
+                        'source': 'brief.md',
+                        'text': "A started card due in four or five calendar days shows one badge using the model price source badge's blue foreground and tinted fill in each theme. In Simplified Chinese it reads “5日内到期”. Dates more than five days away show no upcoming badge.",
+                      },
+                    ],
+                  'children': null,
+                  'specChanges':
+                    [
+                      {
+                        'capability': 'kanban-deadline-badges',
+                        'operation': 'modify',
+                        'source': 'specs/kanban-deadline-badges/spec.md',
+                      },
+                    ],
+                },
+            },
+            {
+              'sequence': 11,
+              'value':
+                {
+                  'choice': 'approved',
+                  'proposal':
+                    {
+                      'activation':
+                        {
+                          'report':
+                            {
+                              'attempt': 1,
+                              'candidateId': 'kanban-late-completion-red:9',
+                              'iteration': 1,
+                              'reportRef': 'docs/comet/changes/kanban-late-completion-red/verification.md',
+                              'stateVersion': 12,
+                            },
+                        },
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'kanban-late-completion-red',
+                          'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                        },
+                      'outputs':
+                        {
+                          'verify.verifier':
+                            {
+                              'candidateId': 'kanban-late-completion-red:9',
+                              'checks':
+                                [
+                                  {
+                                    'name': 'bun --filter=web run test',
+                                    'note': '/Users/poco/Projects/itsaplan: 754 passed across 153 files, zero failures.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'bun test --preload ./test/setup.ts src/features/work-items/components/kanban/IssueCardDeadline.test.tsx',
+                                    'note': '/Users/poco/Projects/itsaplan/apps/web: 4 passed after formatting, covering colors, date boundaries, and Simplified Chinese output.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'bun --filter=web run typecheck and bun --filter=web run lint',
+                                    'note': '/Users/poco/Projects/itsaplan: TypeScript and ESLint exited 0.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Targeted Prettier check and git diff --check',
+                                    'note': '/Users/poco/Projects/itsaplan: all seven changed web files passed Prettier and the diff had no whitespace errors.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Impeccable detector and source review',
+                                    'note': '/Users/poco/Projects/itsaplan: Impeccable returned an empty issue list for both production TSX files. Focused code and security review found no actionable issues.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Chrome extension visual and computed-style check on local component fixture',
+                                    'note': 'Local QA page rendered IssueCardDeadline with the compiled apps/web/src/app/globals.css at regular card width (Chrome task tab 267696399). Both default themes showed all three color treatments and exact Simplified Chinese labels without clipping. Late-completion and original open-overdue foreground/background matched in each theme. Yellow, blue, red contrast in light: 8.38, 5.62, 5.30; dark: 8.38, 6.00, 7.95. Fixture used synthetic cards.',
+                                    'result': 'passed',
+                                  },
+                                ],
+                              'response':
+                                {
+                                  'kind': 'final-result',
+                                  'result':
+                                    {
+                                      'acceptance':
+                                        [
+                                          {
+                                            'id': 'A1',
+                                            'reason': "DateBadge and the late-completion badge share OVERDUE_PILL. Chrome measured the same red foreground and tinted fill for the late badge and the open overdue date in each default theme. The completed card's October 8 planned date was neutral.",
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A2',
+                                            'reason': 'The October 8 planned / October 15 actual fixture shows 延期完成 · 10月15日 in Chrome and the focused test. English, Korean, Simplified Chinese, and Traditional Chinese translations retain {date} and omit the extra prefix. English and Chinese render tests passed.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A3',
+                                            'reason': 'The focused render test checks the existing active initiative color from STATUS_META, project yellow foreground, and exclusive warning for zero through three calendar days. Chrome showed 3日内到期 in both themes, with 8.38:1 contrast.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A4',
+                                            'reason': 'The focused test checks the existing model-price badge blue classes for four and five days, no upcoming badge at six days, and the Simplified Chinese translation. Chrome confirmed the blue tint and copy in both themes.',
+                                            'result': 'passed',
+                                          },
+                                        ],
+                                      'attempt': 1,
+                                      'iteration': 1,
+                                      'requestReview':
+                                        {
+                                          'reason': "The original written request requires the native overdue red. The confirmed scope includes both date warnings, localized label cleanup, reuse of the project's native yellow and blue palette, and ordinary and swimlane cards. Source and checks match the confirmed scope.",
+                                          'result': 'aligned',
+                                        },
+                                      'risks':
+                                        [
+                                          'Browser verification used a local component fixture with synthetic dates. The signed-in board and swimlane share the component according to the source.',
+                                        ],
+                                      'summary': 'All four approved acceptance items passed. Web tests, type checking, lint, formatting, focused reviews, and the default light and dark browser fixture passed.',
+                                      'verdict': 'pass',
+                                    },
+                                },
+                              'verifierExecutionRef': '01a1f721-e201-7503-b87c-d2cf5a2eb7fd',
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 10,
+              'value':
+                {
+                  'candidateId': 'kanban-late-completion-red:9',
+                  'checks':
+                    [
+                      {
+                        'name': 'bun --filter=web run test',
+                        'note': '/Users/poco/Projects/itsaplan: 754 passed across 153 files, zero failures.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun test --preload ./test/setup.ts src/features/work-items/components/kanban/IssueCardDeadline.test.tsx',
+                        'note': '/Users/poco/Projects/itsaplan/apps/web: 4 passed after formatting, covering colors, date boundaries, and Simplified Chinese output.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun --filter=web run typecheck and bun --filter=web run lint',
+                        'note': '/Users/poco/Projects/itsaplan: TypeScript and ESLint exited 0.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Targeted Prettier check and git diff --check',
+                        'note': '/Users/poco/Projects/itsaplan: all seven changed web files passed Prettier and the diff had no whitespace errors.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Impeccable detector and source review',
+                        'note': '/Users/poco/Projects/itsaplan: Impeccable returned an empty issue list for both production TSX files. Focused code and security review found no actionable issues.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Chrome extension visual and computed-style check on local component fixture',
+                        'note': 'Local QA page rendered IssueCardDeadline with the compiled apps/web/src/app/globals.css at regular card width (Chrome task tab 267696399). Both default themes showed all three color treatments and exact Simplified Chinese labels without clipping. Late-completion and original open-overdue foreground/background matched in each theme. Yellow, blue, red contrast in light: 8.38, 5.62, 5.30; dark: 8.38, 6.00, 7.95. Fixture used synthetic cards.',
+                        'result': 'passed',
+                      },
+                    ],
+                  'response':
+                    {
+                      'kind': 'final-result',
+                      'result':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'reason': "DateBadge and the late-completion badge share OVERDUE_PILL. Chrome measured the same red foreground and tinted fill for the late badge and the open overdue date in each default theme. The completed card's October 8 planned date was neutral.",
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A2',
+                                'reason': 'The October 8 planned / October 15 actual fixture shows 延期完成 · 10月15日 in Chrome and the focused test. English, Korean, Simplified Chinese, and Traditional Chinese translations retain {date} and omit the extra prefix. English and Chinese render tests passed.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A3',
+                                'reason': 'The focused render test checks the existing active initiative color from STATUS_META, project yellow foreground, and exclusive warning for zero through three calendar days. Chrome showed 3日内到期 in both themes, with 8.38:1 contrast.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A4',
+                                'reason': 'The focused test checks the existing model-price badge blue classes for four and five days, no upcoming badge at six days, and the Simplified Chinese translation. Chrome confirmed the blue tint and copy in both themes.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'attempt': 1,
+                          'iteration': 1,
+                          'requestReview':
+                            {
+                              'reason': "The original written request requires the native overdue red. The confirmed scope includes both date warnings, localized label cleanup, reuse of the project's native yellow and blue palette, and ordinary and swimlane cards. Source and checks match the confirmed scope.",
+                              'result': 'aligned',
+                            },
+                          'risks':
+                            [
+                              'Browser verification used a local component fixture with synthetic dates. The signed-in board and swimlane share the component according to the source.',
+                            ],
+                          'summary': 'All four approved acceptance items passed. Web tests, type checking, lint, formatting, focused reviews, and the default light and dark browser fixture passed.',
+                          'verdict': 'pass',
+                        },
+                    },
+                  'verifierExecutionRef': '01a1f721-e201-7503-b87c-d2cf5a2eb7fd',
+                },
+            },
+            {
+              'sequence': 12,
+              'value':
+                {
+                  'archiveDirRef': 'docs/comet/archive/2026-11-20-kanban-late-completion-red',
+                  'blockers': [],
+                  'candidateId': 'kanban-late-completion-red:9',
+                  'capabilityPeers': [],
+                  'ready': true,
+                  'reportRef': 'docs/comet/changes/kanban-late-completion-red/verification.md',
+                  'reportStateVersion': 12,
+                  'requiresReverification': false,
+                  'specPreview':
+                    [
+                      {
+                        'capability': 'kanban-deadline-badges',
+                        'operation': 'modify',
+                        'source': 'specs/kanban-deadline-badges/spec.md',
+                      },
+                    ],
+                  'stateVersion': 13,
+                },
+            },
+            {
+              'sequence': 13,
+              'value':
+                {
+                  'archiveRef': '2026-11-20-kanban-late-completion-red',
+                  'specCount': 1,
+                  'stateVersion': 13,
+                  'transactionId': '46a8401c-c007-430d-9a28-17a4153acc0f',
+                },
+            },
+            {
+              'sequence': 2,
+              'value':
+                {
+                  'choice': 'rejected',
+                  'proposal':
+                    {
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'kanban-late-completion-red',
+                          'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                        },
+                      'outputs':
+                        {
+                          'shape.prepare':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'source': 'brief.md',
+                                    'text': 'A late-completion badge uses the same foreground and fill as the native overdue date pill in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'source': 'brief.md',
+                                    'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'source': 'brief.md',
+                                    'text': 'A started card due in zero through three calendar days shows one amber badge, with the existing emphasis and the compact “3日内到期” label in Simplified Chinese.',
+                                  },
+                                  {
+                                    'id': 'A4',
+                                    'source': 'brief.md',
+                                    'text': 'A started card due in four or five calendar days shows one blue badge with the compact “5日内到期” label in Simplified Chinese. Dates more than five days away show no upcoming badge.',
+                                  },
+                                ],
+                              'children': null,
+                              'specChanges':
+                                [
+                                  {
+                                    'capability': 'kanban-deadline-badges',
+                                    'operation': 'modify',
+                                    'source': 'specs/kanban-deadline-badges/spec.md',
+                                  },
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 1,
+              'value':
+                {
+                  'acceptance':
+                    [
+                      {
+                        'id': 'A1',
+                        'source': 'brief.md',
+                        'text': 'A late-completion badge uses the same foreground and fill as the native overdue date pill in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.',
+                      },
+                      {
+                        'id': 'A2',
+                        'source': 'brief.md',
+                        'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                      },
+                      {
+                        'id': 'A3',
+                        'source': 'brief.md',
+                        'text': 'A started card due in zero through three calendar days shows one amber badge, with the existing emphasis and the compact “3日内到期” label in Simplified Chinese.',
+                      },
+                      {
+                        'id': 'A4',
+                        'source': 'brief.md',
+                        'text': 'A started card due in four or five calendar days shows one blue badge with the compact “5日内到期” label in Simplified Chinese. Dates more than five days away show no upcoming badge.',
+                      },
+                    ],
+                  'children': null,
+                  'specChanges':
+                    [
+                      {
+                        'capability': 'kanban-deadline-badges',
+                        'operation': 'modify',
+                        'source': 'specs/kanban-deadline-badges/spec.md',
+                      },
+                    ],
+                },
+            },
+            {
+              'sequence': 4,
+              'value':
+                {
+                  'choice': 'rejected',
+                  'proposal':
+                    {
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'kanban-late-completion-red',
+                          'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                        },
+                      'outputs':
+                        {
+                          'shape.prepare':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'source': 'brief.md',
+                                    'text': 'A late-completion badge uses the same foreground and fill as the native overdue date pill in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'source': 'brief.md',
+                                    'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'source': 'brief.md',
+                                    'text': 'A started card due in zero through three calendar days shows one badge with the native initiative status yellow fill and readable dark text in both themes. In Simplified Chinese it reads “3日内到期”.',
+                                  },
+                                  {
+                                    'id': 'A4',
+                                    'source': 'brief.md',
+                                    'text': 'A started card due in four or five calendar days shows one blue badge with the compact “5日内到期” label in Simplified Chinese. Dates more than five days away show no upcoming badge.',
+                                  },
+                                ],
+                              'children': null,
+                              'specChanges':
+                                [
+                                  {
+                                    'capability': 'kanban-deadline-badges',
+                                    'operation': 'modify',
+                                    'source': 'specs/kanban-deadline-badges/spec.md',
+                                  },
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 3,
+              'value':
+                {
+                  'acceptance':
+                    [
+                      {
+                        'id': 'A1',
+                        'source': 'brief.md',
+                        'text': 'A late-completion badge uses the same foreground and fill as the native overdue date pill in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.',
+                      },
+                      {
+                        'id': 'A2',
+                        'source': 'brief.md',
+                        'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                      },
+                      {
+                        'id': 'A3',
+                        'source': 'brief.md',
+                        'text': 'A started card due in zero through three calendar days shows one badge with the native initiative status yellow fill and readable dark text in both themes. In Simplified Chinese it reads “3日内到期”.',
+                      },
+                      {
+                        'id': 'A4',
+                        'source': 'brief.md',
+                        'text': 'A started card due in four or five calendar days shows one blue badge with the compact “5日内到期” label in Simplified Chinese. Dates more than five days away show no upcoming badge.',
+                      },
+                    ],
+                  'children': null,
+                  'specChanges':
+                    [
+                      {
+                        'capability': 'kanban-deadline-badges',
+                        'operation': 'modify',
+                        'source': 'specs/kanban-deadline-badges/spec.md',
+                      },
+                    ],
+                },
+            },
+            {
+              'sequence': 6,
+              'value':
+                {
+                  'choice': 'rejected',
+                  'proposal':
+                    {
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'kanban-late-completion-red',
+                          'task': '并且延期完成这个标签用红色, 和原生的保持一致',
+                        },
+                      'outputs':
+                        {
+                          'shape.prepare':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'source': 'brief.md',
+                                    'text': "A late-completion badge shares the native overdue date pill's foreground and fill styles in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.",
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'source': 'brief.md',
+                                    'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'source': 'brief.md',
+                                    'text': "A started card due in zero through three calendar days shows one badge with its fill taken directly from the app's active initiative status color and readable dark text in both themes. In Simplified Chinese it reads “3日内到期”.",
+                                  },
+                                  {
+                                    'id': 'A4',
+                                    'source': 'brief.md',
+                                    'text': 'A started card due in four or five calendar days shows one blue badge with the compact “5日内到期” label in Simplified Chinese. Dates more than five days away show no upcoming badge.',
+                                  },
+                                ],
+                              'children': null,
+                              'specChanges':
+                                [
+                                  {
+                                    'capability': 'kanban-deadline-badges',
+                                    'operation': 'modify',
+                                    'source': 'specs/kanban-deadline-badges/spec.md',
+                                  },
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 5,
+              'value':
+                {
+                  'acceptance':
+                    [
+                      {
+                        'id': 'A1',
+                        'source': 'brief.md',
+                        'text': "A late-completion badge shares the native overdue date pill's foreground and fill styles in light and dark themes. The planned date on a completed card retains its neutral style. An open overdue card retains its native red date pill.",
+                      },
+                      {
+                        'id': 'A2',
+                        'source': 'brief.md',
+                        'text': 'A completed card with an October 8 deadline and October 15 actual completion displays “延期完成 · 10月15日” in Simplified Chinese. The label retains the actual date and drops its prefix in the affected languages.',
+                      },
+                      {
+                        'id': 'A3',
+                        'source': 'brief.md',
+                        'text': "A started card due in zero through three calendar days shows one badge with its fill taken directly from the app's active initiative status color and readable dark text in both themes. In Simplified Chinese it reads “3日内到期”.",
+                      },
+                      {
+                        'id': 'A4',
+                        'source': 'brief.md',
+                        'text': 'A started card due in four or five calendar days shows one blue badge with the compact “5日内到期” label in Simplified Chinese. Dates more than five days away show no upcoming badge.',
+                      },
+                    ],
+                  'children': null,
+                  'specChanges':
+                    [
+                      {
+                        'capability': 'kanban-deadline-badges',
+                        'operation': 'modify',
+                        'source': 'specs/kanban-deadline-badges/spec.md',
+                      },
+                    ],
+                },
+            },
+            {
+              'sequence': 14,
+              'value':
+                {
+                  'archiveRef': '2026-11-20-kanban-late-completion-red',
+                  'change': 'kanban-late-completion-red',
+                  'runId': 'kanban-late-completion-red',
+                  'specs': [{ 'capability': 'kanban-deadline-badges', 'operation': 'modify' }],
+                  'stateVersion': 14,
+                  'transactionId': '46a8401c-c007-430d-9a28-17a4153acc0f',
+                },
+            },
+          ],
+        'nodes':
+          [
+            { 'key': 'shape.prepare', 'value': 1, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': null, 'right': 0, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 3, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 2, 'left': null, 'right': 2, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 5, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 4, 'left': null, 'right': 4, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 7, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 6, 'left': null, 'right': 6, 'height': 2 },
+            { 'key': 'build.builder', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 6, 'left': 8, 'right': 6, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 7, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 10, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.confirm', 'value': 9, 'left': 10, 'right': 11, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 6, 'left': 8, 'right': 12, 'height': 3 },
+            { 'key': 'archive.prepare', 'value': 11, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 8, 'left': 14, 'right': null, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 6, 'left': 15, 'right': 12, 'height': 3 },
+            { 'key': 'archive.execute', 'value': 12, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.prepare', 'value': 11, 'left': 17, 'right': 18, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 6, 'left': 19, 'right': 12, 'height': 3 },
+            { 'key': 'build.builder', 'value': 13, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.prepare', 'value': 15, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 14, 'left': 21, 'right': 22, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 15, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 17, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.confirm', 'value': 16, 'left': 24, 'right': 25, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 14, 'left': 21, 'right': 26, 'height': 3 },
+            { 'key': 'archive.prepare', 'value': 18, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 13, 'left': 28, 'right': null, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 14, 'left': 29, 'right': 26, 'height': 3 },
+            { 'key': 'archive.execute', 'value': 19, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 13, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.prepare', 'value': 18, 'left': 31, 'right': 32, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 14, 'left': 33, 'right': 26, 'height': 3 },
+            { 'key': 'shape.prepare', 'value': 21, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 20, 'left': null, 'right': 35, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 23, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 22, 'left': null, 'right': 37, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 25, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 24, 'left': null, 'right': 39, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 15, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 14, 'left': null, 'right': 41, 'height': 2 },
+            { 'key': 'archive.execute', 'value': 19, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.finalize', 'value': 26, 'left': 43, 'right': null, 'height': 2 },
+            { 'key': 'build.builder', 'value': 13, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.prepare', 'value': 15, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 17, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.confirm', 'value': 16, 'left': 46, 'right': 47, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 14, 'left': 45, 'right': 48, 'height': 3 },
+            { 'key': 'archive.prepare', 'value': 18, 'left': 44, 'right': 49, 'height': 4 },
+            { 'key': 'shape.prepare', 'value': 21, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.prepare', 'value': 23, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 20, 'left': null, 'right': 52, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 25, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 22, 'left': null, 'right': 54, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 15, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 24, 'left': null, 'right': 56, 'height': 2 },
+            { 'key': 'build.builder', 'value': 13, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 17, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.prepare', 'value': 15, 'left': null, 'right': 59, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 14, 'left': 58, 'right': 60, 'height': 3 },
+          ],
+        'maps':
+          [null, 1, 3, 5, 7, 9, 13, 16, 20, 23, 27, 30, 34, 36, 38, 40, 42, 50, 51, 53, 55, 57, 61],
+        'bindings':
+          [
+            { 'path': ['actions', '0', 'input', 'outputs'], 'map': 0 },
+            { 'path': ['actions', '1', 'input', 'outputs'], 'map': 1 },
+            { 'path': ['actions', '2', 'input', 'outputs'], 'map': 2 },
+            { 'path': ['actions', '3', 'input', 'outputs'], 'map': 3 },
+            { 'path': ['actions', '4', 'input', 'outputs'], 'map': 4 },
+            { 'path': ['actions', '5', 'input', 'outputs'], 'map': 5 },
+            { 'path': ['actions', '6', 'input', 'outputs'], 'map': 6 },
+            { 'path': ['actions', '7', 'input', 'outputs'], 'map': 7 },
+            { 'path': ['actions', '8', 'input', 'outputs'], 'map': 8 },
+            { 'path': ['actionContexts', 'kanban-late-completion-red:1', 'results'], 'map': 0 },
+            { 'path': ['actionContexts', 'kanban-late-completion-red:10', 'results'], 'map': 9 },
+            { 'path': ['actionContexts', 'kanban-late-completion-red:12', 'results'], 'map': 10 },
+            { 'path': ['actionContexts', 'kanban-late-completion-red:13', 'results'], 'map': 11 },
+            { 'path': ['actionContexts', 'kanban-late-completion-red:14', 'results'], 'map': 12 },
+            { 'path': ['actionContexts', 'kanban-late-completion-red:3', 'results'], 'map': 13 },
+            { 'path': ['actionContexts', 'kanban-late-completion-red:5', 'results'], 'map': 14 },
+            { 'path': ['actionContexts', 'kanban-late-completion-red:7', 'results'], 'map': 15 },
+            { 'path': ['actionContexts', 'kanban-late-completion-red:9', 'results'], 'map': 16 },
+            { 'path': ['outputs'], 'map': 17 },
+            { 'path': ['waits', '0', 'results'], 'map': 18 },
+            { 'path': ['waits', '1', 'results'], 'map': 19 },
+            { 'path': ['waits', '2', 'results'], 'map': 20 },
+            { 'path': ['waits', '3', 'results'], 'map': 21 },
+            { 'path': ['waits', '4', 'results'], 'map': 22 },
+          ],
+      },
+    'storageHash': '75c4d959827a114d57c9780c6c62ec03b0a3c9720db0f1e8b8f799a71b550076',
+  }

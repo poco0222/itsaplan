@@ -2,7 +2,7 @@
   "deadline": {
     "dueWithinThreeDays": "Due within 3 days",
     "dueWithinFiveDays": "Due within 5 days",
-    "completedLate": "Completed late · Actual {date}"
+    "completedLate": "Completed late · {date}"
   },
   "newIssue": "New issue",
   "addWorkItem": "Add work item",

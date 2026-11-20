@@ -5,7 +5,10 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import type { StateType } from '@/lib/api/endpoints/columns';
 import type { IssueFieldValueEntry } from '@/lib/api/endpoints/issues';
+import { getDisplayLocale, setDisplayLocale } from '@/utils/dates';
+import { STATUS_META } from '@/utils/initiativeMeta';
 import workItems from '../../../../../messages/en/workItems.json';
+import workItemsZh from '../../../../../messages/zh-CN/workItems.json';
 import { KanbanDeadlineContext } from '../../context/kanbanDeadlineContext';
 import { IssueCardDeadline } from './IssueCardDeadline';
 
@@ -15,12 +18,14 @@ function card({
   stateType = 'started',
   actual,
   actualDateFieldId = 2,
+  locale = 'en',
 }: {
   dueDate?: string;
   today?: string;
   stateType?: StateType;
   actual?: IssueFieldValueEntry['value'];
   actualDateFieldId?: number | null;
+  locale?: 'en' | 'zh-CN';
 } = {}) {
   const issue = {
     statusSince: '2026-12-01T00:00:00.000Z',
@@ -28,7 +33,11 @@ function card({
       actual === undefined ? [] : [{ fieldId: 2, value: actual, valueEnd: null, optionIds: [] }],
   };
   return renderToStaticMarkup(
-    <NextIntlClientProvider locale="en" messages={{ workItems }} timeZone="UTC">
+    <NextIntlClientProvider
+      locale={locale}
+      messages={{ workItems: locale === 'zh-CN' ? workItemsZh : workItems }}
+      timeZone="UTC"
+    >
       <TooltipProvider>
         <KanbanDeadlineContext.Provider
           value={{ today, actualDateFieldId: actualDateFieldId ?? undefined }}
@@ -44,14 +53,22 @@ describe('Kanban deadline badges', () => {
   it('uses exclusive calendar-day windows and changes at the day boundary', () => {
     for (const day of [20, 21, 22, 23, 24, 25, 26]) {
       const html = card({ dueDate: `2026-11-${day}` });
-      assert.equal(html.includes('Due within 3 days'), day <= 23);
-      assert.equal(html.includes('Due within 5 days'), day === 24 || day === 25);
+      const withinThreeDays = day <= 23;
+      const withinFiveDays = day === 24 || day === 25;
+      assert.equal(html.includes('Due within 3 days'), withinThreeDays);
+      assert.equal(html.includes(`background-color:${STATUS_META.active.color}`), withinThreeDays);
+      assert.equal(html.includes('text-pro-foreground'), withinThreeDays);
+      assert.equal(html.includes('Due within 5 days'), withinFiveDays);
+      assert.equal(
+        html.includes('bg-blue-500/10 text-blue-700 dark:text-blue-400'),
+        withinFiveDays,
+      );
     }
     assert.match(card({ dueDate: '2026-11-24', today: '2026-11-21' }), /Due within 3 days/);
     assert.match(card({ today: '2026-11-24' }), /bg-overdue/);
   });
 
-  it('preserves overdue styling only for a valid past deadline on an open issue', () => {
+  it('uses the red due date style for a valid past deadline on an open issue', () => {
     assert.match(card({ dueDate: '2026-11-19', stateType: 'unstarted' }), /bg-overdue/);
     for (const html of [
       card({ dueDate: '2026-10-40' }),
@@ -67,8 +84,9 @@ describe('Kanban deadline badges', () => {
     const completed = { dueDate, stateType: 'completed' as const };
     const html = card({ ...completed, actual: '2026-10-15' });
     assert.match(html, /Oct 8/);
-    assert.match(html, /Completed late · Actual Oct 15/);
-    assert.doesNotMatch(html, /Dec 1|bg-overdue/);
+    assert.match(html, /bg-overdue[^"]*text-destructive-text[^"]*"[^>]*>Completed late · Oct 15/);
+    assert.equal(html.match(/bg-overdue/g)?.length, 1);
+    assert.doesNotMatch(html, /Dec 1/);
     for (const actual of [undefined, '', '2026-10-08', '2026-10-07', '2026-10-40', 1]) {
       assert.doesNotMatch(card({ ...completed, actual }), /Completed late/);
     }
@@ -80,5 +98,21 @@ describe('Kanban deadline badges', () => {
       card({ ...completed, actual: '2026-10-15', stateType: 'canceled' }),
       /Completed late/,
     );
+  });
+
+  it('renders compact Simplified Chinese labels and the localized completion date', () => {
+    const locale = 'zh-CN';
+    const previousLocale = getDisplayLocale();
+    setDisplayLocale(locale);
+    try {
+      assert.match(card({ locale }), /3日内到期/);
+      assert.match(card({ locale, dueDate: '2026-11-25' }), /5日内到期/);
+      assert.match(
+        card({ locale, dueDate: '2026-10-08', actual: '2026-10-15', stateType: 'completed' }),
+        /延期完成 · 10月15日/,
+      );
+    } finally {
+      setDisplayLocale(previousLocale);
+    }
   });
 });
