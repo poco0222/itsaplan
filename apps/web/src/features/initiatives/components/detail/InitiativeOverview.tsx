@@ -1,9 +1,13 @@
 'use client';
 
+import Link from 'next/link';
 import { useTranslations } from 'next-intl';
+import { usePermissions } from '@/hooks/usePermissions';
 import { useProjectFeatures } from '@/hooks/useProjectFeatures';
 import type { Initiative } from '@/lib/api/endpoints/initiatives';
 import MarkdownEditor from '@/components/common/editor/MarkdownEditor';
+import { issuePath } from '@/utils/paths';
+import InitiativeDeliveryProgress from '../shared/InitiativeDeliveryProgress';
 import InitiativeAttachments from './InitiativeAttachments';
 import InitiativeDocuments from './InitiativeDocuments';
 
@@ -19,6 +23,8 @@ export default function InitiativeOverview({
 }) {
   const t = useTranslations('initiatives');
   const features = useProjectFeatures();
+  const { can } = usePermissions();
+  const sourceNumber = initiative.delivery?.sourceNumber;
   const hasDescription = initiative.description.trim().length > 0;
 
   return (
@@ -28,6 +34,19 @@ export default function InitiativeOverview({
       <div className="flex flex-col gap-8 @4xl:flex-row">
         <div className="max-w-3xl min-w-0 flex-1">
           <h1 className="text-2xl font-semibold tracking-tight">{initiative.title}</h1>
+          {initiative.delivery && (
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <InitiativeDeliveryProgress delivery={initiative.delivery} />
+              {sourceNumber != null && can('work_items', 'read') && (
+                <Link
+                  href={issuePath(projectKey, sourceNumber)}
+                  className="text-xs text-muted-foreground underline hover:text-foreground"
+                >
+                  {t('originalModule')}
+                </Link>
+              )}
+            </div>
+          )}
           {hasDescription ? (
             <MarkdownEditor
               className="mt-4 text-sm"

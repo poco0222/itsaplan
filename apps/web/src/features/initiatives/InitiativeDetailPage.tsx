@@ -85,7 +85,10 @@ export default function InitiativeDetailPage({
               <InitiativeProgress initiative={initiative} project={project} />
             </TabsContent>
             <TabsContent value="issues" className="mt-0 flex min-h-0 flex-1 flex-col">
-              <InitiativeIssuesBoard initiativeId={initiative.id} />
+              <InitiativeIssuesBoard
+                initiativeId={initiative.id}
+                nodeTypeId={initiative.delivery?.nodeTypeId}
+              />
             </TabsContent>
           </Tabs>
         </>

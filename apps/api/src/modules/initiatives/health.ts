@@ -1,6 +1,6 @@
 // Initiative health is not stored — it is computed on the fly from the
 // initiative's issue progress against its timeline. The idea: compare how much
-// work is done (share of completed issues) with how much of the timeline has
+// work is done with how much of the timeline has
 // elapsed. Being ahead of, or level with, the schedule is on_track; falling
 // behind is at_risk, then off_track.
 
@@ -17,6 +17,7 @@ export interface HealthInput {
   completed: number; // issues in a 'completed' state
   total: number; // all issues linked to the initiative
   canceled: number; // issues in a 'canceled' state (excluded from progress)
+  weightedPercent?: number | null;
   startDate: string | null; // 'YYYY-MM-DD'; falls back to createdAt
   targetDate: string | null; // 'YYYY-MM-DD'
   createdAt: string; // ISO timestamp
@@ -31,8 +32,11 @@ function clamp01(v: number): number {
 // (denominator zero) or no target date to measure progress against.
 export function computeHealth(input: HealthInput): Health | null {
   const denom = input.total - input.canceled;
-  if (denom <= 0) return null; // no active issues yet
-  const progress = clamp01(input.completed / denom);
+  if (input.weightedPercent === null || (input.weightedPercent === undefined && denom <= 0))
+    return null;
+  const progress = clamp01(
+    input.weightedPercent === undefined ? input.completed / denom : input.weightedPercent / 100,
+  );
   if (progress >= 1) return 'on_track'; // everything closed
 
   if (!input.targetDate) return null; // no timeline to judge against

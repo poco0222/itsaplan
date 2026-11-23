@@ -27,6 +27,12 @@ export interface Initiative {
   updatedAt: string;
   labelIds: number[];
   progress: InitiativeProgress;
+  delivery?: {
+    nodeTypeId: number;
+    sourceNumber: number | null;
+    progress: number | null;
+    problem: 'children' | 'weights' | 'child' | null;
+  };
   health: InitiativeHealth | null;
   favorite: boolean;
 }

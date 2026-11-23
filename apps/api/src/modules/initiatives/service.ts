@@ -5,20 +5,18 @@ import {
   initiativeLabel,
   issue,
   label,
+  lockIssueTree,
   projectColumn,
   user,
 } from '@repo/db';
 import { and, asc, desc, eq, ilike, inArray, or, sql } from 'drizzle-orm';
+import type { DeliveryPlan } from '#modules/delivery-workflow/model';
+import { readDeliveryPlans } from '#modules/delivery-workflow/service';
 import { labelNames, rowSide } from '#modules/issues/activity';
 import { assertAssignableMember } from '#modules/members/service';
 import { HttpError, iso, num } from '#shared/lib';
 import { computeHealth, type Health } from './health';
 import { recordActivity, logInitiativeUpdate, type InitiativeSnapshot } from './activity';
-
-// Data access for initiatives: a project-scoped grouping of issues. Issues link
-// to an initiative through issue.initiative_id. status is a fixed lifecycle enum;
-// progress and health are derived from the linked issues' states and are not
-// stored (see health.ts).
 
 export interface InitiativeProgress {
   completed: number;
@@ -41,6 +39,7 @@ export interface InitiativeRow {
   updatedAt: string;
   labelIds: number[];
   progress: InitiativeProgress;
+  delivery?: DeliveryPlan;
   health: Health | null;
   favorite: boolean;
 }
@@ -112,6 +111,7 @@ function mapInitiative(
   labelIds: number[],
   progress: InitiativeProgress,
   favorite: boolean,
+  delivery?: DeliveryPlan,
 ): InitiativeRow {
   return {
     id: row.id,
@@ -128,8 +128,10 @@ function mapInitiative(
     updatedAt: iso(row.updatedAt),
     labelIds,
     progress,
+    ...(delivery && { delivery }),
     health: computeHealth({
       ...progress,
+      weightedPercent: delivery?.progress,
       startDate: row.startDate,
       targetDate: row.targetDate,
       createdAt: iso(row.createdAt),
@@ -213,10 +215,11 @@ export async function listInitiatives(
     .where(where);
 
   const ids = rows.map((r) => r.id);
-  const [counts, labels, favorites] = await Promise.all([
+  const [counts, labels, favorites, delivery] = await Promise.all([
     countsFor(ids),
     labelsFor(ids),
     favoritesFor(ids, userId),
+    readDeliveryPlans(projectId, ids),
   ]);
   return {
     items: rows.map((row) =>
@@ -225,6 +228,7 @@ export async function listInitiatives(
         labels.get(row.id) ?? [],
         counts.get(row.id) ?? EMPTY_PROGRESS,
         favorites.has(row.id),
+        delivery.get(row.id),
       ),
     ),
     total: Number(total),
@@ -345,16 +349,18 @@ export async function getInitiative(
 ): Promise<InitiativeRow | null> {
   const rows = await db.select().from(initiative).where(eq(initiative.id, id));
   if (!rows[0]) return null;
-  const [counts, labels, favorites] = await Promise.all([
+  const [counts, labels, favorites, delivery] = await Promise.all([
     countsFor([id]),
     labelsFor([id]),
     favoritesFor([id], userId),
+    readDeliveryPlans(rows[0].projectId, [id]),
   ]);
   return mapInitiative(
     rows[0],
     labels.get(id) ?? [],
     counts.get(id) ?? EMPTY_PROGRESS,
     favorites.has(id),
+    delivery.get(id),
   );
 }
 
@@ -506,7 +512,16 @@ export async function updateInitiative(
 // Linked issues keep existing (issue.initiative_id is set null by the FK); the
 // initiative's own activity rows and label links cascade.
 export async function deleteInitiative(id: number): Promise<void> {
-  await db.delete(initiative).where(eq(initiative.id, id));
+  await db.transaction(async (tx) => {
+    const [row] = await tx
+      .select({ projectId: initiative.projectId })
+      .from(initiative)
+      .where(eq(initiative.id, id));
+    if (row) {
+      await lockIssueTree(tx, row.projectId);
+      await tx.delete(initiative).where(eq(initiative.id, id));
+    }
+  });
 }
 
 // Replaces the initiative's full label set (not an add/remove diff) and logs the

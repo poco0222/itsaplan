@@ -15,6 +15,14 @@ export const DeliverySettings = t.Object({
 });
 export type DeliverySettings = Static<typeof DeliverySettings>;
 
+export const DeliveryPlan = t.Object({
+  nodeTypeId: id,
+  sourceNumber: t.Nullable(id),
+  progress: t.Nullable(t.Number()),
+  problem: t.Nullable(t.Union([t.Literal('children'), t.Literal('weights'), t.Literal('child')])),
+});
+export type DeliveryPlan = Static<typeof DeliveryPlan>;
+
 export const DeliveryItem = t.Object({
   id,
   moduleId: t.Nullable(id),

@@ -6,6 +6,7 @@ import type { Initiative } from '@/lib/api/endpoints/initiatives';
 import { formatDate } from '@/utils/dates';
 import HealthBadge from '../shared/HealthBadge';
 import HealthInfoPopover from '../shared/HealthInfoPopover';
+import InitiativeDeliveryProgress from '../shared/InitiativeDeliveryProgress';
 import InitiativeTimelineMeter from './InitiativeTimelineMeter';
 
 // The initiative's schedule and pace: health, start/target dates, days remaining,
@@ -74,10 +75,16 @@ export default function InitiativeTimeline({ initiative }: { initiative: Initiat
       {targetDate ? (
         <div className="flex flex-col gap-2.5">
           <InitiativeTimelineMeter label={t('timeElapsed')} pct={elapsed ?? 0} />
-          <InitiativeTimelineMeter label={t('workDone')} pct={work} />
+          {!initiative.delivery && <InitiativeTimelineMeter label={t('workDone')} pct={work} />}
         </div>
       ) : (
         <p className="text-sm text-muted-foreground">{t('noTargetDate')}</p>
+      )}
+      {initiative.delivery && (
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+          <span className="text-xs text-muted-foreground">{t('workDone')}</span>
+          <InitiativeDeliveryProgress delivery={initiative.delivery} />
+        </div>
       )}
     </div>
   );

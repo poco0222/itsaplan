@@ -8,7 +8,10 @@ import { Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useShell } from '@/context/shellContext';
 import { usePermissions } from '@/hooks/usePermissions';
+import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 import { useInitiativeCountsQuery, useInitiativesQuery } from '@/services/initiatives.service';
+import { qk } from '@/services/queryKeys';
+import { revScope } from '@/utils/revScopes';
 import { INITIATIVE_SORTS, type InitiativeSort } from '@/lib/api/endpoints/initiatives';
 import { useDndSensors } from '@/lib/dnd';
 import { initiativesTabPath, type InitiativesTab } from '@/utils/paths';
@@ -59,6 +62,11 @@ export default function InitiativesPage({ tab }: { tab: InitiativesTab }) {
     pageSize: PAGE_SIZE,
   });
   const counts = useInitiativeCountsQuery(projectKey).data;
+  useLiveRefresh({
+    scope: revScope.board(project?.project.id ?? 0),
+    targets: [qk.initiativesForProject(projectKey ?? '')],
+    enabled: !!projectKey && !!query.data?.items.some((item) => item.delivery),
+  });
 
   if (!project) return null;
 
