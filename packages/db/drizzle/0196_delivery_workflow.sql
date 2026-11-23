@@ -1,3 +1,14 @@
+-- The fork recorded this schema under 0187 before adopting the upstream journal.
+DO $delivery_workflow$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM drizzle.__drizzle_migrations
+    WHERE created_at = 1795158939711
+      AND hash = '07401cf6e90f2837a2dc37e8dcd5e8d58743ca3e81e644238a656e1ea81ce984'
+  ) THEN
+    RETURN;
+  END IF;
+
 CREATE TABLE "delivery_handoff" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"module_id" integer NOT NULL,
@@ -7,21 +18,21 @@ CREATE TABLE "delivery_handoff" (
 	"reversed_at" timestamp with time zone,
 	"reversal_reason" text
 );
---> statement-breakpoint
-ALTER TABLE "issue" ADD COLUMN "delivery_unknown_completion_id" integer;--> statement-breakpoint
-ALTER TABLE "delivery_handoff" ADD CONSTRAINT "delivery_handoff_module_id_issue_id_fk" FOREIGN KEY ("module_id") REFERENCES "public"."issue"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "delivery_handoff" ADD CONSTRAINT "delivery_handoff_confirmed_by_user_id_fk" FOREIGN KEY ("confirmed_by") REFERENCES "public"."user"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "delivery_handoff" ADD CONSTRAINT "delivery_handoff_reversed_by_user_id_fk" FOREIGN KEY ("reversed_by") REFERENCES "public"."user"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
-CREATE INDEX "delivery_handoff_module_idx" ON "delivery_handoff" USING btree ("module_id","id");--> statement-breakpoint
+
+ALTER TABLE "issue" ADD COLUMN "delivery_unknown_completion_id" integer;
+ALTER TABLE "delivery_handoff" ADD CONSTRAINT "delivery_handoff_module_id_issue_id_fk" FOREIGN KEY ("module_id") REFERENCES "public"."issue"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "delivery_handoff" ADD CONSTRAINT "delivery_handoff_confirmed_by_user_id_fk" FOREIGN KEY ("confirmed_by") REFERENCES "public"."user"("id") ON DELETE set null ON UPDATE no action;
+ALTER TABLE "delivery_handoff" ADD CONSTRAINT "delivery_handoff_reversed_by_user_id_fk" FOREIGN KEY ("reversed_by") REFERENCES "public"."user"("id") ON DELETE set null ON UPDATE no action;
+CREATE INDEX "delivery_handoff_module_idx" ON "delivery_handoff" USING btree ("module_id","id");
 CREATE UNIQUE INDEX "delivery_handoff_active_idx" ON "delivery_handoff" USING btree ("module_id") WHERE "delivery_handoff"."reversed_at" IS NULL;
---> statement-breakpoint
+
 CREATE TRIGGER delivery_handoff_rev AFTER INSERT OR UPDATE OR DELETE ON delivery_handoff
   FOR EACH ROW EXECUTE FUNCTION rev_issue_child('module_id', 'board');
---> statement-breakpoint
+
 CREATE FUNCTION delivery_settings(pid integer) RETURNS jsonb LANGUAGE sql STABLE AS $$
   SELECT value FROM project_setting WHERE project_id = pid AND key = 'delivery_workflow'
 $$;
---> statement-breakpoint
+
 CREATE FUNCTION delivery_role(settings jsonb, tid integer) RETURNS text LANGUAGE sql IMMUTABLE AS $$
   SELECT CASE tid
     WHEN (settings->>'moduleTypeId')::integer THEN 'module'
@@ -30,7 +41,7 @@ CREATE FUNCTION delivery_role(settings jsonb, tid integer) RETURNS text LANGUAGE
     WHEN (settings->>'maintenanceTypeId')::integer THEN 'maintenance'
   END
 $$;
---> statement-breakpoint
+
 CREATE FUNCTION delivery_rollup(pid integer) RETURNS TABLE (
   id integer, module_id integer, role text, state text, valid boolean, progress numeric,
   problem text, managed boolean, ready boolean
@@ -115,7 +126,7 @@ CREATE FUNCTION delivery_rollup(pid integer) RETURNS TABLE (
          ELSE coalesce(n.ready, false) END
   FROM scopes s LEFT JOIN nodes n ON n.id = s.id LEFT JOIN node_groups g ON g.parent_id = s.id
 $$;
---> statement-breakpoint
+
 CREATE FUNCTION delivery_sync(pid integer, roots integer[], complete_only boolean DEFAULT false)
 RETURNS void LANGUAGE plpgsql AS $$
 DECLARE
@@ -143,7 +154,7 @@ BEGIN
   PERFORM set_config('itsaplan.delivery_sync', 'no', true);
 END
 $$;
---> statement-breakpoint
+
 CREATE FUNCTION delivery_root(pid integer, own_id integer, own_role text, parent integer)
 RETURNS integer LANGUAGE sql STABLE AS $$
   SELECT CASE own_role
@@ -152,7 +163,7 @@ RETURNS integer LANGUAGE sql STABLE AS $$
     WHEN 'task' THEN (SELECT parent_id FROM issue WHERE id = parent AND project_id = pid)
   END
 $$;
---> statement-breakpoint
+
 CREATE FUNCTION delivery_check_issue() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE
   old_settings jsonb;
@@ -234,10 +245,10 @@ BEGIN
   RETURN NEW;
 END
 $$;
---> statement-breakpoint
+
 CREATE TRIGGER delivery_issue_guard BEFORE INSERT OR UPDATE OF project_id,type_id,parent_id,column_id,due_date OR DELETE ON issue
   FOR EACH ROW EXECUTE FUNCTION delivery_check_issue();
---> statement-breakpoint
+
 CREATE FUNCTION delivery_issue_changed() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE
   settings jsonb;
@@ -273,10 +284,10 @@ BEGIN
   RETURN NULL;
 END
 $$;
---> statement-breakpoint
+
 CREATE TRIGGER delivery_issue_rollup AFTER INSERT OR UPDATE OF project_id,type_id,parent_id,column_id OR DELETE ON issue
   FOR EACH ROW EXECUTE FUNCTION delivery_issue_changed();
---> statement-breakpoint
+
 CREATE FUNCTION delivery_field_changed() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE
   item issue%ROWTYPE;
@@ -312,13 +323,13 @@ BEGIN
   IF TG_OP = 'DELETE' THEN RETURN OLD; ELSE RETURN NEW; END IF;
 END
 $$;
---> statement-breakpoint
+
 CREATE TRIGGER delivery_field_guard BEFORE INSERT OR UPDATE OR DELETE ON issue_field_value
   FOR EACH ROW EXECUTE FUNCTION delivery_field_changed();
---> statement-breakpoint
+
 CREATE TRIGGER delivery_field_rollup AFTER INSERT OR UPDATE OR DELETE ON issue_field_value
   FOR EACH ROW EXECUTE FUNCTION delivery_field_changed();
---> statement-breakpoint
+
 CREATE FUNCTION delivery_completion(target integer)
 RETURNS TABLE (id integer, entered_at timestamptz) LANGUAGE sql STABLE AS $$
   SELECT s.id, s.entered_at FROM issue_status s
@@ -329,7 +340,7 @@ RETURNS TABLE (id integer, entered_at timestamptz) LANGUAGE sql STABLE AS $$
     )
   ORDER BY s.entered_at, s.id LIMIT 1
 $$;
---> statement-breakpoint
+
 CREATE FUNCTION delivery_check_binding() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE
   settings jsonb;
@@ -361,22 +372,24 @@ BEGIN
   IF TG_OP = 'DELETE' THEN RETURN OLD; ELSE RETURN NEW; END IF;
 END
 $$;
---> statement-breakpoint
+
 CREATE TRIGGER delivery_type_binding BEFORE DELETE ON issue_type
   FOR EACH ROW EXECUTE FUNCTION delivery_check_binding();
---> statement-breakpoint
+
 CREATE TRIGGER delivery_field_binding BEFORE UPDATE OF field_type,issue_type_id OR DELETE ON custom_field
   FOR EACH ROW EXECUTE FUNCTION delivery_check_binding();
---> statement-breakpoint
+
 CREATE TRIGGER delivery_column_binding BEFORE UPDATE OF state_type OR DELETE ON project_column
   FOR EACH ROW EXECUTE FUNCTION delivery_check_binding();
---> statement-breakpoint
+
 CREATE FUNCTION delivery_settings_changed() RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
   PERFORM bump_rev('board:' || NEW.project_id, NEW.project_id);
   RETURN NULL;
 END
 $$;
---> statement-breakpoint
+
 CREATE TRIGGER delivery_settings_rev AFTER INSERT OR UPDATE ON project_setting
   FOR EACH ROW WHEN (NEW.key = 'delivery_workflow') EXECUTE FUNCTION delivery_settings_changed();
+END;
+$delivery_workflow$;
