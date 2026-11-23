@@ -1438,6 +1438,7 @@ export async function updateIssue(
     const updated = await db.transaction(async (tx) => {
       if (
         patch.parentId !== undefined ||
+        patch.initiativeId !== undefined ||
         patch.columnId !== undefined ||
         patch.typeId !== undefined ||
         patch.dueDate !== undefined

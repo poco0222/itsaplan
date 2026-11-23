@@ -12,12 +12,64 @@ import {
 import { and, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
 import { HttpError } from '#shared/lib';
 import { getProjectSetting } from '#shared/project-settings';
-import type { DeliveryHandoff, DeliveryItem, DeliverySettings } from './model';
+import type { DeliveryHandoff, DeliveryItem, DeliveryPlan, DeliverySettings } from './model';
 
 const key = 'delivery_workflow';
 
 export function readDeliverySettings(projectId: number, executor: DbExecutor = db) {
   return getProjectSetting<DeliverySettings>(projectId, key, executor);
+}
+
+function readDeliveryPlanRows(projectId: number, ids?: number[]) {
+  const where = ids
+    ? sql`WHERE n.id IN (${sql.join(
+        ids.map((id) => sql`${id}`),
+        sql`, `,
+      )})`
+    : sql``;
+  return db.execute<DeliveryPlan & { id: number; progressFieldId: number }>(sql`
+    WITH config AS MATERIALIZED (
+      SELECT m.project_id, m.value AS sources, w.value AS bindings
+      FROM project_setting m JOIN project_setting w ON w.project_id = m.project_id
+      WHERE m.project_id = ${projectId} AND m.key = 'delivery_plan_hierarchy' AND w.key = ${key}
+    ), groups AS (
+      SELECT i.initiative_id, sum(w.value_number * d.progress) / 100 AS rate,
+        bool_and(coalesce(w.value_number BETWEEN 0 AND 100, false)) AND sum(w.value_number) = 100 AS allocated,
+        bool_and(d.progress IS NOT NULL) AS rates_known
+      FROM config c CROSS JOIN LATERAL delivery_rollup(c.project_id) d
+      JOIN issue i ON i.id = d.id
+      LEFT JOIN issue_field_value w ON w.issue_id = i.id AND w.field_id = (c.bindings->>'nodeWeightId')::integer
+      WHERE d.role = 'node' AND d.state <> 'canceled' AND i.initiative_id IS NOT NULL
+      GROUP BY i.initiative_id
+    )
+    SELECT n.id, (c.bindings->>'nodeTypeId')::integer AS "nodeTypeId",
+      (c.bindings->>'nodeProgressId')::integer AS "progressFieldId",
+      (c.sources->>n.id::text)::integer AS "sourceNumber",
+      CASE WHEN g.allocated AND g.rates_known THEN g.rate::float8 END AS progress,
+      CASE WHEN g.initiative_id IS NULL THEN 'children'
+        WHEN NOT g.allocated THEN 'weights' WHEN NOT g.rates_known THEN 'child' END AS problem
+    FROM config c JOIN initiative n ON n.project_id = c.project_id
+    LEFT JOIN groups g ON g.initiative_id = n.id
+    ${where}
+  `);
+}
+
+export async function readDeliveryPlans(projectId: number, ids: number[]) {
+  if (!ids.length) return new Map<number, DeliveryPlan>();
+  const rows = await readDeliveryPlanRows(projectId, ids);
+  return new Map(
+    rows.map(({ id, progressFieldId: _progressFieldId, ...delivery }) => [id, delivery]),
+  );
+}
+
+export async function readDeliveryPlanProgress(projectId: number) {
+  const rows = await readDeliveryPlanRows(projectId);
+  return rows.map(({ id, progressFieldId, progress, problem }) => ({
+    id,
+    progressFieldId,
+    progress,
+    problem,
+  }));
 }
 
 export async function assertDeliveryDeletionAllowed(projectId: number, ids: number[]) {
@@ -139,7 +191,10 @@ export async function readDeliveryItems(
   const settings = await readDeliverySettings(projectId, executor);
   if (!settings) return [];
   return await executor.execute<DeliveryItem>(sql`
-    SELECT d.id, d.module_id AS "moduleId", d.role, d.progress::float8, d.problem,
+    SELECT d.id,
+      CASE WHEN delivery_settings(${projectId})->>'planHierarchy' IS DISTINCT FROM 'true'
+           THEN d.module_id END AS "moduleId",
+      d.role, d.progress::float8, d.problem,
       CASE
         WHEN d.role IN ('module', 'node') THEN ${settings.nodeProgressId}::integer
         WHEN d.role = 'task' THEN ${settings.taskProgressId}::integer

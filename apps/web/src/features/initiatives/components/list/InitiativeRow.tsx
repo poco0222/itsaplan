@@ -15,6 +15,7 @@ import { STATUS_META } from '@/utils/initiativeMeta';
 import { useSetInitiativeFavorite } from '@/services/initiatives.service';
 import HealthBadge from '../shared/HealthBadge';
 import InitiativeFavoriteButton from '../shared/InitiativeFavoriteButton';
+import InitiativeDeliveryProgress from '../shared/InitiativeDeliveryProgress';
 import ProgressBar from '@/components/common/ProgressBar';
 
 // The whole row navigates to the detail page; the title is also a real anchor so
@@ -86,7 +87,11 @@ export default function InitiativeRow({
       </TableCell>
 
       <TableCell className="px-3 py-2.5 align-middle">
-        <ProgressBar progress={initiative.progress} />
+        {initiative.delivery ? (
+          <InitiativeDeliveryProgress delivery={initiative.delivery} />
+        ) : (
+          <ProgressBar progress={initiative.progress} />
+        )}
       </TableCell>
 
       <TableCell className="px-3 py-2.5 align-middle">

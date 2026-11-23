@@ -1,4 +1,5 @@
 import { t } from 'elysia';
+import { DeliveryPlan } from '#modules/delivery-workflow/model';
 import { isoDate } from '#shared/schemas';
 import { pageQueryFields, pageResponse } from '#shared/pagination';
 import { ActivityPayloadResponse } from '#shared/activity';
@@ -44,9 +45,6 @@ export const initiativeFeedQuery = t.Object({
   cursor: t.Optional(t.String({ description: 'nextCursor from the previous page.' })),
 });
 
-// InitiativeRow from the service. progress is derived issue counts; health is
-// computed on the fly (on_track/at_risk/off_track, or null when there is nothing
-// to judge).
 export const InitiativeResponse = t.Object({
   id: t.Number(),
   projectId: t.Number(),
@@ -62,6 +60,7 @@ export const InitiativeResponse = t.Object({
   updatedAt: t.String(),
   labelIds: t.Array(t.Number()),
   progress: t.Object({ completed: t.Number(), canceled: t.Number(), total: t.Number() }),
+  delivery: t.Optional(DeliveryPlan),
   health: t.Nullable(t.String()),
   favorite: t.Boolean(),
 });

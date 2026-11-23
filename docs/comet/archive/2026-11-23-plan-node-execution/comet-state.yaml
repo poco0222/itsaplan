@@ -1,0 +1,2264 @@
+# comet-execution: managed-run
+schema: comet.native.v4
+name: plan-node-execution
+language: en
+phase: archive
+status: done
+state_version: 8
+brief: brief.md
+document_constraints_version: 3
+spec_changes:
+  - capability: plan-node-execution
+    operation: create
+    source: specs/plan-node-execution/spec.md
+workspace:
+  isolation: current
+  change_branch: main
+  target_branch: main
+  finish: null
+loop:
+  stage: done
+  goal_cycle: 1
+  iteration: 1
+  attempt: 1
+  retry_epoch: 0
+  failed_iteration_count: 0
+  no_progress_count: 0
+  execution_failure_count: 0
+  previous_unresolved_ids: []
+  next_action: null
+acceptance:
+  - id: A1
+    source: brief.md
+    text: A user can open a built-in plan, see its nodes, and expand a node to open
+      its execution tasks. Creating a node in a plan and adding an execution
+      task under it use the same hierarchy. An execution task appears with its
+      node when the node changes plans.
+    result: passed
+    reason:
+      text: Chrome showed a node and its nested execution item, and the creation form
+        selected the node type and plan. The API created a node and child, then
+        moved the node to another plan and returned the child under the same
+        node in the destination plan.
+      truncated: false
+  - id: A2
+    source: brief.md
+    text: The plan list and detail report 58 percent for a completed node weighted
+      30 percent and a node at 40 percent weighted 70 percent. Edits and reopens
+      refresh the result. Canceled nodes are excluded. Empty groups and invalid
+      weights or unavailable child progress show an unavailable result and the
+      relevant reason.
+    result: passed
+    reason:
+      text: The list and detail display 58%. Tests exercised edits, reopening,
+        cancellation, empty groups, unallocated weights and an unavailable child
+        percentage. The translated unavailable reason rendered in Web tests.
+      truncated: false
+  - id: A3
+    source: brief.md
+    text: Node and execution progress entry, weighted node rollup, and status
+      changes follow the existing rules. A plan can be marked complete through
+      its standard status action after delivery.
+    result: passed
+    reason:
+      text: An incomplete execution task at 100% did not complete its node. Marking it
+        completed rolled up the node, reopening reopened the node, and the
+        native plan status action completed the plan. Legacy lifecycle tests
+        passed.
+      truncated: false
+  - id: A4
+    source: brief.md
+    text: A migration of the planning snapshot creates four plans, relinks 13 nodes,
+      preserves the 15 execution task parent links, and archives the four source
+      modules. Plan title, description, status and planned date reflect the
+      source. Work item IDs, existing statuses, status history, field values,
+      and attachments remain accessible. Each plan links to its archived source
+      module.
+    result: passed
+    reason:
+      text: The test fixture migrated 4 modules, 13 nodes and 15 execution tasks. It
+        retained issue IDs, statuses, status history, original
+        parent-to-execution links, numeric fields and attachment metadata and
+        URLs. The resulting plans carried over module metadata and linked to
+        their original records. Chrome opened an archived source with its
+        history.
+      truncated: false
+  - id: A5
+    source: brief.md
+    text: Preview leaves project data intact. An unsuccessful apply has no partial
+      effect, and rerunning a successful migration creates no duplicates. Other
+      projects retain their current behavior.
+    result: passed
+    reason:
+      text: Preview preserved the fixture data. A late database constraint error
+        rolled back plan creation, relinking and archive changes. Repeat apply
+        yielded no duplicate plan. The project scope and legacy behavior passed
+        across the API regression checks.
+      truncated: false
+builder_handoff:
+  candidate_id: plan-node-execution:3
+  identity_provider: skill-coordinated
+  builder_execution_ref: 01a20601-c292-7311-81ec-19b2dd740e02
+  iteration: 1
+  summary:
+    text: Implemented the native plan hierarchy, weighted delivery percentages,
+      standard plan completion, and the previewable transactional migration. The
+      verified candidate is ready for acceptance.
+    truncated: false
+  addressed_acceptance_ids:
+    - A1
+    - A2
+    - A3
+    - A4
+    - A5
+  checks:
+    - name:
+        text: Bun schema migration
+        truncated: false
+      result: passed
+      note:
+        text: Applied all Drizzle migrations through 0197 to fresh loopback PostgreSQL
+          test databases using bun --no-env-file packages/db/src/migrate.ts from
+          the repository root.
+        truncated: false
+      acceptance_ids:
+        - A1
+        - A3
+        - A5
+    - name:
+        text: Delivery, initiatives, and work item API tests
+        truncated: false
+      result: passed
+      note:
+        text: 247 tests passed across eight files on isolated PostgreSQL. Final delivery
+          fixture rerun passed all seven tests, including unchanged attachment
+          metadata and URLs, status history and fields, preview, rollback on an
+          injected late database error, repeat apply, plan links and progress.
+          API regression log /tmp/itsaplan-plan-api.rfVxJ4.
+        truncated: false
+      acceptance_ids:
+        - A1
+        - A2
+        - A3
+        - A4
+        - A5
+    - name:
+        text: Web test suite and Chrome extension acceptance
+        truncated: false
+      result: passed
+      note:
+        text: 798 Web tests passed. Chrome task tab 267696806 on the loopback fixture
+          showed 58% in the list and detail, opened the archived ORIGINAL work
+          item with its history, showed the execution task when the node was
+          expanded, and opened creation with the node type and plan preselected.
+        truncated: false
+      acceptance_ids:
+        - A1
+        - A2
+        - A4
+    - name:
+        text: Workspace typecheck, lint and changed-file formatting
+        truncated: false
+      result: passed
+      note:
+        text: bun run typecheck and bun run lint, direct ESLint for the migration
+          script, changed-file Prettier check and git diff --check passed in the
+          repository.
+        truncated: false
+      acceptance_ids:
+        - A1
+        - A2
+        - A3
+        - A4
+        - A5
+    - name:
+        text: Rolling Plan read-only preflight
+        truncated: false
+      result: passed
+      note:
+        text: The migration script's read-only preview against pocoy.ROLL reported four
+          source modules, 12 current nodes, 15 execution tasks and no conflicts.
+          The template fixture preserved the approved 13-node planning snapshot.
+          ROLL-23 is absent from current local data.
+        truncated: false
+      acceptance_ids:
+        - A4
+        - A5
+  checks_truncated: false
+  known_limits:
+    - text: Local deployment and migration wait for the user's acceptance. The
+        required local upgrade tool builds from a clean committed Git HEAD, so
+        the commit needs explicit authorization.
+      truncated: false
+    - text: The current local preview has 12 nodes. ROLL-23 was included in the
+        planning snapshot and is absent from the current project data.
+      truncated: false
+  known_limits_truncated: false
+  review: null
+  submitted_at: 2026-11-23T01:37:56.732Z
+blockers: []
+verification:
+  candidate_id: plan-node-execution:3
+  identity_provider: skill-coordinated
+  verifier_execution_ref: 01a20601-c292-7311-81ec-19b2dd740e02
+  iteration: 1
+  attempt: 1
+  assurance: self-reviewed
+  verdict: pass
+  checks: []
+  reported_checks:
+    - name:
+        text: Bun schema migration
+        truncated: false
+      result: passed
+      note:
+        text: Applied all Drizzle migrations through 0197 to fresh loopback PostgreSQL
+          test databases using bun --no-env-file packages/db/src/migrate.ts from
+          the repository root.
+        truncated: false
+      acceptance_ids:
+        - A1
+        - A3
+        - A5
+    - name:
+        text: Delivery, initiatives, and work item API tests
+        truncated: false
+      result: passed
+      note:
+        text: 247 tests passed across eight files on isolated PostgreSQL. Final delivery
+          fixture rerun passed all seven tests, including unchanged attachment
+          metadata and URLs, status history and fields, preview, rollback on an
+          injected late database error, repeat apply, plan links and progress.
+          API regression log /tmp/itsaplan-plan-api.rfVxJ4.
+        truncated: false
+      acceptance_ids:
+        - A1
+        - A2
+        - A3
+        - A4
+        - A5
+    - name:
+        text: Web test suite and Chrome extension acceptance
+        truncated: false
+      result: passed
+      note:
+        text: 798 Web tests passed. Chrome task tab 267696806 on the loopback fixture
+          showed 58% in the list and detail, opened the archived ORIGINAL work
+          item with its history, showed the execution task when the node was
+          expanded, and opened creation with the node type and plan preselected.
+        truncated: false
+      acceptance_ids:
+        - A1
+        - A2
+        - A4
+    - name:
+        text: Workspace typecheck, lint and changed-file formatting
+        truncated: false
+      result: passed
+      note:
+        text: bun run typecheck and bun run lint, direct ESLint for the migration
+          script, changed-file Prettier check and git diff --check passed in the
+          repository.
+        truncated: false
+      acceptance_ids:
+        - A1
+        - A2
+        - A3
+        - A4
+        - A5
+    - name:
+        text: Rolling Plan read-only preflight
+        truncated: false
+      result: passed
+      note:
+        text: The migration script's read-only preview against pocoy.ROLL reported four
+          source modules, 12 current nodes, 15 execution tasks and no conflicts.
+          The template fixture preserved the approved 13-node planning snapshot.
+          ROLL-23 is absent from current local data.
+        truncated: false
+      acceptance_ids:
+        - A4
+        - A5
+  summary:
+    text: All five acceptance criteria passed on the isolated candidate. The actual
+      local Rolling Plan data was accessed through read-only preview.
+    truncated: false
+  risks:
+    - text: Local preflight currently shows four modules, 12 nodes and 15 execution
+        tasks, with no conflicts. ROLL-23 is absent from current data.
+      truncated: false
+    - text: Deployment and data cutover are pending acceptance. The prescribed local
+        upgrade script requires a clean committed checkout.
+      truncated: false
+    - text: Attachment associations, metadata and URLs were verified. The migration
+        does not touch object storage.
+      truncated: false
+  risks_truncated: false
+  completed_at: 2026-11-23T01:38:07.653Z
+history:
+  - goal_cycle: 1
+    iteration: 1
+    attempt: 1
+    outcome: pass
+    unresolved_ids: []
+    summary:
+      text: All five acceptance criteria passed on the isolated candidate. The actual
+        local Rolling Plan data was accessed through read-only preview.
+      truncated: false
+    completed_at: 2026-11-23T01:38:07.653Z
+history_overflow:
+  dropped_entries: 0
+  first_dropped_at: null
+  last_dropped_at: null
+  outcome_counts:
+    pass: 0
+    fail: 0
+    blocked: 0
+    execution-error: 0
+    recovery: 0
+verification_result: pass
+verification_report: verification.md
+archived: true
+created_at: 2026-11-23T01:25:23.998Z
+archive_receipt:
+  runId: plan-node-execution
+  change: plan-node-execution
+  archiveRef: 2026-11-23-plan-node-execution
+  transactionId: a8f783dd-94dd-4f0c-b526-712272b1204a
+  stateVersion: 8
+  specs:
+    - capability: plan-node-execution
+      operation: create
+run_checkpoint:
+  {
+    'schema': 'comet.workflow-run-checkpoint.v2',
+    'hash': 'e4de62aa7104625b77f59f5c2ec3f8336db6880bbc7a51a7c5ef42d0df1daabb',
+    'run':
+      {
+        'protocolVersion': 1,
+        'schemaVersion': 1,
+        'runId': 'plan-node-execution',
+        'revision': 1,
+        'workflow':
+          {
+            'id': 'comet-native',
+            'version': '4',
+            'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+          },
+        'definitionHashes':
+          {
+            '["comet-native","4"]': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+          },
+        'initialStateHash': '72c2d266036c2443aaf83063e1d6214fecb29aaf66f1ea348d7212243de94b7a',
+        'input':
+          {
+            'artifactRootRef': 'docs',
+            'name': 'plan-node-execution',
+            'task': '我觉得当前的按照一级模块, 二级节点, 三级执行的模式还是不太行, 走计划, 节点, 执行这种还是比较好一些,',
+          },
+        'state':
+          {
+            'acceptance':
+              [
+                {
+                  'id': 'A1',
+                  'reason':
+                    {
+                      'text': 'Chrome showed a node and its nested execution item, and the creation form selected the node type and plan. The API created a node and child, then moved the node to another plan and returned the child under the same node in the destination plan.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'A user can open a built-in plan, see its nodes, and expand a node to open its execution tasks. Creating a node in a plan and adding an execution task under it use the same hierarchy. An execution task appears with its node when the node changes plans.',
+                },
+                {
+                  'id': 'A2',
+                  'reason':
+                    {
+                      'text': 'The list and detail display 58%. Tests exercised edits, reopening, cancellation, empty groups, unallocated weights and an unavailable child percentage. The translated unavailable reason rendered in Web tests.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'The plan list and detail report 58 percent for a completed node weighted 30 percent and a node at 40 percent weighted 70 percent. Edits and reopens refresh the result. Canceled nodes are excluded. Empty groups and invalid weights or unavailable child progress show an unavailable result and the relevant reason.',
+                },
+                {
+                  'id': 'A3',
+                  'reason':
+                    {
+                      'text': 'An incomplete execution task at 100% did not complete its node. Marking it completed rolled up the node, reopening reopened the node, and the native plan status action completed the plan. Legacy lifecycle tests passed.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'Node and execution progress entry, weighted node rollup, and status changes follow the existing rules. A plan can be marked complete through its standard status action after delivery.',
+                },
+                {
+                  'id': 'A4',
+                  'reason':
+                    {
+                      'text': 'The test fixture migrated 4 modules, 13 nodes and 15 execution tasks. It retained issue IDs, statuses, status history, original parent-to-execution links, numeric fields and attachment metadata and URLs. The resulting plans carried over module metadata and linked to their original records. Chrome opened an archived source with its history.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'A migration of the planning snapshot creates four plans, relinks 13 nodes, preserves the 15 execution task parent links, and archives the four source modules. Plan title, description, status and planned date reflect the source. Work item IDs, existing statuses, status history, field values, and attachments remain accessible. Each plan links to its archived source module.',
+                },
+                {
+                  'id': 'A5',
+                  'reason':
+                    {
+                      'text': 'Preview preserved the fixture data. A late database constraint error rolled back plan creation, relinking and archive changes. Repeat apply yielded no duplicate plan. The project scope and legacy behavior passed across the API regression checks.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'Preview leaves project data intact. An unsuccessful apply has no partial effect, and rerunning a successful migration creates no duplicates. Other projects retain their current behavior.',
+                },
+              ],
+            'archived': true,
+            'blockers': [],
+            'brief': 'brief.md',
+            'builder_handoff':
+              {
+                'addressed_acceptance_ids': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                'builder_execution_ref': '01a20601-c292-7311-81ec-19b2dd740e02',
+                'candidate_id': 'plan-node-execution:3',
+                'checks':
+                  [
+                    {
+                      'acceptance_ids': ['A1', 'A3', 'A5'],
+                      'name': { 'text': 'Bun schema migration', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'Applied all Drizzle migrations through 0197 to fresh loopback PostgreSQL test databases using bun --no-env-file packages/db/src/migrate.ts from the repository root.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'acceptance_ids': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                      'name':
+                        {
+                          'text': 'Delivery, initiatives, and work item API tests',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': '247 tests passed across eight files on isolated PostgreSQL. Final delivery fixture rerun passed all seven tests, including unchanged attachment metadata and URLs, status history and fields, preview, rollback on an injected late database error, repeat apply, plan links and progress. API regression log /tmp/itsaplan-plan-api.rfVxJ4.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'acceptance_ids': ['A1', 'A2', 'A4'],
+                      'name':
+                        {
+                          'text': 'Web test suite and Chrome extension acceptance',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': '798 Web tests passed. Chrome task tab 267696806 on the loopback fixture showed 58% in the list and detail, opened the archived ORIGINAL work item with its history, showed the execution task when the node was expanded, and opened creation with the node type and plan preselected.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'acceptance_ids': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                      'name':
+                        {
+                          'text': 'Workspace typecheck, lint and changed-file formatting',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'bun run typecheck and bun run lint, direct ESLint for the migration script, changed-file Prettier check and git diff --check passed in the repository.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'acceptance_ids': ['A4', 'A5'],
+                      'name': { 'text': 'Rolling Plan read-only preflight', 'truncated': false },
+                      'note':
+                        {
+                          'text': "The migration script's read-only preview against pocoy.ROLL reported four source modules, 12 current nodes, 15 execution tasks and no conflicts. The template fixture preserved the approved 13-node planning snapshot. ROLL-23 is absent from current local data.",
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                  ],
+                'checks_truncated': false,
+                'identity_provider': 'skill-coordinated',
+                'iteration': 1,
+                'known_limits':
+                  [
+                    {
+                      'text': "Local deployment and migration wait for the user's acceptance. The required local upgrade tool builds from a clean committed Git HEAD, so the commit needs explicit authorization.",
+                      'truncated': false,
+                    },
+                    {
+                      'text': 'The current local preview has 12 nodes. ROLL-23 was included in the planning snapshot and is absent from the current project data.',
+                      'truncated': false,
+                    },
+                  ],
+                'known_limits_truncated': false,
+                'review': null,
+                'submitted_at': '2026-11-23T01:37:56.732Z',
+                'summary':
+                  {
+                    'text': 'Implemented the native plan hierarchy, weighted delivery percentages, standard plan completion, and the previewable transactional migration. The verified candidate is ready for acceptance.',
+                    'truncated': false,
+                  },
+              },
+            'created_at': '2026-11-23T01:25:23.998Z',
+            'document_constraints_version': 3,
+            'history':
+              [
+                {
+                  'attempt': 1,
+                  'completed_at': '2026-11-23T01:38:07.653Z',
+                  'goal_cycle': 1,
+                  'iteration': 1,
+                  'outcome': 'pass',
+                  'summary':
+                    {
+                      'text': 'All five acceptance criteria passed on the isolated candidate. The actual local Rolling Plan data was accessed through read-only preview.',
+                      'truncated': false,
+                    },
+                  'unresolved_ids': [],
+                },
+              ],
+            'history_overflow':
+              {
+                'dropped_entries': 0,
+                'first_dropped_at': null,
+                'last_dropped_at': null,
+                'outcome_counts':
+                  { 'blocked': 0, 'execution-error': 0, 'fail': 0, 'pass': 0, 'recovery': 0 },
+              },
+            'language': 'en',
+            'loop':
+              {
+                'attempt': 1,
+                'execution_failure_count': 0,
+                'failed_iteration_count': 0,
+                'goal_cycle': 1,
+                'iteration': 1,
+                'next_action': null,
+                'no_progress_count': 0,
+                'previous_unresolved_ids': [],
+                'retry_epoch': 0,
+                'stage': 'done',
+              },
+            'name': 'plan-node-execution',
+            'phase': 'archive',
+            'schema': 'comet.native.v4',
+            'spec_changes':
+              [
+                {
+                  'capability': 'plan-node-execution',
+                  'operation': 'create',
+                  'source': 'specs/plan-node-execution/spec.md',
+                },
+              ],
+            'state_version': 8,
+            'status': 'done',
+            'verification':
+              {
+                'assurance': 'self-reviewed',
+                'attempt': 1,
+                'candidate_id': 'plan-node-execution:3',
+                'checks': [],
+                'completed_at': '2026-11-23T01:38:07.653Z',
+                'identity_provider': 'skill-coordinated',
+                'iteration': 1,
+                'reported_checks':
+                  [
+                    {
+                      'acceptance_ids': ['A1', 'A3', 'A5'],
+                      'name': { 'text': 'Bun schema migration', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'Applied all Drizzle migrations through 0197 to fresh loopback PostgreSQL test databases using bun --no-env-file packages/db/src/migrate.ts from the repository root.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'acceptance_ids': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                      'name':
+                        {
+                          'text': 'Delivery, initiatives, and work item API tests',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': '247 tests passed across eight files on isolated PostgreSQL. Final delivery fixture rerun passed all seven tests, including unchanged attachment metadata and URLs, status history and fields, preview, rollback on an injected late database error, repeat apply, plan links and progress. API regression log /tmp/itsaplan-plan-api.rfVxJ4.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'acceptance_ids': ['A1', 'A2', 'A4'],
+                      'name':
+                        {
+                          'text': 'Web test suite and Chrome extension acceptance',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': '798 Web tests passed. Chrome task tab 267696806 on the loopback fixture showed 58% in the list and detail, opened the archived ORIGINAL work item with its history, showed the execution task when the node was expanded, and opened creation with the node type and plan preselected.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'acceptance_ids': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                      'name':
+                        {
+                          'text': 'Workspace typecheck, lint and changed-file formatting',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'bun run typecheck and bun run lint, direct ESLint for the migration script, changed-file Prettier check and git diff --check passed in the repository.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'acceptance_ids': ['A4', 'A5'],
+                      'name': { 'text': 'Rolling Plan read-only preflight', 'truncated': false },
+                      'note':
+                        {
+                          'text': "The migration script's read-only preview against pocoy.ROLL reported four source modules, 12 current nodes, 15 execution tasks and no conflicts. The template fixture preserved the approved 13-node planning snapshot. ROLL-23 is absent from current local data.",
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                  ],
+                'risks':
+                  [
+                    {
+                      'text': 'Local preflight currently shows four modules, 12 nodes and 15 execution tasks, with no conflicts. ROLL-23 is absent from current data.',
+                      'truncated': false,
+                    },
+                    {
+                      'text': 'Deployment and data cutover are pending acceptance. The prescribed local upgrade script requires a clean committed checkout.',
+                      'truncated': false,
+                    },
+                    {
+                      'text': 'Attachment associations, metadata and URLs were verified. The migration does not touch object storage.',
+                      'truncated': false,
+                    },
+                  ],
+                'risks_truncated': false,
+                'summary':
+                  {
+                    'text': 'All five acceptance criteria passed on the isolated candidate. The actual local Rolling Plan data was accessed through read-only preview.',
+                    'truncated': false,
+                  },
+                'verdict': 'pass',
+                'verifier_execution_ref': '01a20601-c292-7311-81ec-19b2dd740e02',
+              },
+            'verification_report': 'verification.md',
+            'verification_result': 'pass',
+            'workspace':
+              {
+                'change_branch': 'main',
+                'finish': null,
+                'isolation': 'current',
+                'target_branch': 'main',
+              },
+          },
+        'status': 'completed',
+        'sequence': 8,
+        'actions':
+          [
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-cli',
+                  'token': 'portable-eda71ab8ca2f8f70beca8594c30aa093b0f191491090e97ee40da23895f89130',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'plan-node-execution:1',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'plan-node-execution',
+                      'task': '我觉得当前的按照一级模块, 二级节点, 三级执行的模式还是不太行, 走计划, 节点, 执行这种还是比较好一些,',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': 'd27c782821d09c638563eea188780b27f58451dee348df2642858420216682e0',
+              'outcome':
+                {
+                  'actionId': 'plan-node-execution:1',
+                  'attempt': 1,
+                  'claimToken': 'portable-eda71ab8ca2f8f70beca8594c30aa093b0f191491090e97ee40da23895f89130',
+                  'inputHash': 'd27c782821d09c638563eea188780b27f58451dee348df2642858420216682e0',
+                  'outcomeId': 'ae8c24c1-8e84-4596-9834-f61d12bbd7a2',
+                  'output':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'source': 'brief.md',
+                            'text': 'A user can open a built-in plan, see its nodes, and expand a node to open its execution tasks. Creating a node in a plan and adding an execution task under it use the same hierarchy. An execution task appears with its node when the node changes plans.',
+                          },
+                          {
+                            'id': 'A2',
+                            'source': 'brief.md',
+                            'text': 'The plan list and detail report 58 percent for a completed node weighted 30 percent and a node at 40 percent weighted 70 percent. Edits and reopens refresh the result. Canceled nodes are excluded. Empty groups and invalid weights or unavailable child progress show an unavailable result and the relevant reason.',
+                          },
+                          {
+                            'id': 'A3',
+                            'source': 'brief.md',
+                            'text': 'Node and execution progress entry, weighted node rollup, and status changes follow the existing rules. A plan can be marked complete through its standard status action after delivery.',
+                          },
+                          {
+                            'id': 'A4',
+                            'source': 'brief.md',
+                            'text': 'A migration of the planning snapshot creates four plans, relinks 13 nodes, preserves the 15 execution task parent links, and archives the four source modules. Plan title, description, status and planned date reflect the source. Work item IDs, existing statuses, status history, field values, and attachments remain accessible. Each plan links to its archived source module.',
+                          },
+                          {
+                            'id': 'A5',
+                            'source': 'brief.md',
+                            'text': 'Preview leaves project data intact. An unsuccessful apply has no partial effect, and rerunning a successful migration creates no duplicates. Other projects retain their current behavior.',
+                          },
+                        ],
+                      'children': null,
+                      'specChanges':
+                        [
+                          {
+                            'capability': 'plan-node-execution',
+                            'operation': 'create',
+                            'source': 'specs/plan-node-execution/spec.md',
+                          },
+                        ],
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'a878d705c5b546165901df5add97f8e7fb7a3520fe171d06de1750002cfb810d',
+                    'outcomeId': 'ae8c24c1-8e84-4596-9834-f61d12bbd7a2',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-shape-prepare',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'plan-node-execution',
+              'status': 'succeeded',
+              'stepId': 'shape.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a20601-c292-7311-81ec-19b2dd740e02',
+                  'token': 'portable-1e201e11db6c87a18a326e90f4f0926a9ac3d297b47f2136b0bb20a15d5a060f',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'plan-node-execution:3',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'plan-node-execution',
+                      'task': '我觉得当前的按照一级模块, 二级节点, 三级执行的模式还是不太行, 走计划, 节点, 执行这种还是比较好一些,',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': 'ec39635f7db7beca01302aec48a91e71b5a78df56ee525b8826cc61d13cecc80',
+              'outcome':
+                {
+                  'actionId': 'plan-node-execution:3',
+                  'attempt': 1,
+                  'claimToken': 'portable-1e201e11db6c87a18a326e90f4f0926a9ac3d297b47f2136b0bb20a15d5a060f',
+                  'inputHash': 'ec39635f7db7beca01302aec48a91e71b5a78df56ee525b8826cc61d13cecc80',
+                  'outcomeId': 'native-result-bbf9b44b4f1a5bf798486e22f08b812efe9272b0495e383ddb44073d26729520',
+                  'output':
+                    {
+                      'addressedAcceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                      'checks':
+                        [
+                          {
+                            'acceptanceIds': ['A1', 'A3', 'A5'],
+                            'name': 'Bun schema migration',
+                            'note': 'Applied all Drizzle migrations through 0197 to fresh loopback PostgreSQL test databases using bun --no-env-file packages/db/src/migrate.ts from the repository root.',
+                            'result': 'passed',
+                          },
+                          {
+                            'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                            'name': 'Delivery, initiatives, and work item API tests',
+                            'note': '247 tests passed across eight files on isolated PostgreSQL. Final delivery fixture rerun passed all seven tests, including unchanged attachment metadata and URLs, status history and fields, preview, rollback on an injected late database error, repeat apply, plan links and progress. API regression log /tmp/itsaplan-plan-api.rfVxJ4.',
+                            'result': 'passed',
+                          },
+                          {
+                            'acceptanceIds': ['A1', 'A2', 'A4'],
+                            'name': 'Web test suite and Chrome extension acceptance',
+                            'note': '798 Web tests passed. Chrome task tab 267696806 on the loopback fixture showed 58% in the list and detail, opened the archived ORIGINAL work item with its history, showed the execution task when the node was expanded, and opened creation with the node type and plan preselected.',
+                            'result': 'passed',
+                          },
+                          {
+                            'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                            'name': 'Workspace typecheck, lint and changed-file formatting',
+                            'note': 'bun run typecheck and bun run lint, direct ESLint for the migration script, changed-file Prettier check and git diff --check passed in the repository.',
+                            'result': 'passed',
+                          },
+                          {
+                            'acceptanceIds': ['A4', 'A5'],
+                            'name': 'Rolling Plan read-only preflight',
+                            'note': "The migration script's read-only preview against pocoy.ROLL reported four source modules, 12 current nodes, 15 execution tasks and no conflicts. The template fixture preserved the approved 13-node planning snapshot. ROLL-23 is absent from current local data.",
+                            'result': 'passed',
+                          },
+                        ],
+                      'knownLimits':
+                        [
+                          "Local deployment and migration wait for the user's acceptance. The required local upgrade tool builds from a clean committed Git HEAD, so the commit needs explicit authorization.",
+                          'The current local preview has 12 nodes. ROLL-23 was included in the planning snapshot and is absent from the current project data.',
+                        ],
+                      'requireIndependentReview': false,
+                      'summary': 'Implemented the native plan hierarchy, weighted delivery percentages, standard plan completion, and the previewable transactional migration. The verified candidate is ready for acceptance.',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'fd6b6c574f6a23b561e911d47a402901d61b044cb49deaa2732614f8f3bcd5a7',
+                    'outcomeId': 'native-result-bbf9b44b4f1a5bf798486e22f08b812efe9272b0495e383ddb44073d26729520',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-builder',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'plan-node-execution',
+              'status': 'succeeded',
+              'stepId': 'build.builder',
+              'type': 'handoff',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a20601-c292-7311-81ec-19b2dd740e02',
+                  'token': 'portable-3a398c29e4ed87412b38f4dc88609ba2e9b3c1d369918d2b8feb01db2c7bb7e4',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'plan-node-execution:4',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'plan-node-execution',
+                      'task': '我觉得当前的按照一级模块, 二级节点, 三级执行的模式还是不太行, 走计划, 节点, 执行这种还是比较好一些,',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '304c7624bc19d5589b1ed025d8fc39036227c702c082fc297b159a422ef9bbc9',
+              'outcome':
+                {
+                  'actionId': 'plan-node-execution:4',
+                  'attempt': 1,
+                  'claimToken': 'portable-3a398c29e4ed87412b38f4dc88609ba2e9b3c1d369918d2b8feb01db2c7bb7e4',
+                  'inputHash': '304c7624bc19d5589b1ed025d8fc39036227c702c082fc297b159a422ef9bbc9',
+                  'outcomeId': 'native-result-f516a913024920455209765c9ef622618dcc5d83015cd0e62b92fd063b9bc0e5',
+                  'output':
+                    {
+                      'candidateId': 'plan-node-execution:3',
+                      'checks':
+                        [
+                          {
+                            'acceptanceIds': ['A1', 'A3', 'A5'],
+                            'name': 'Bun schema migration',
+                            'note': 'Applied all Drizzle migrations through 0197 to fresh loopback PostgreSQL test databases using bun --no-env-file packages/db/src/migrate.ts from the repository root.',
+                            'result': 'passed',
+                          },
+                          {
+                            'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                            'name': 'Delivery, initiatives, and work item API tests',
+                            'note': '247 tests passed across eight files on isolated PostgreSQL. Final delivery fixture rerun passed all seven tests, including unchanged attachment metadata and URLs, status history and fields, preview, rollback on an injected late database error, repeat apply, plan links and progress. API regression log /tmp/itsaplan-plan-api.rfVxJ4.',
+                            'result': 'passed',
+                          },
+                          {
+                            'acceptanceIds': ['A1', 'A2', 'A4'],
+                            'name': 'Web test suite and Chrome extension acceptance',
+                            'note': '798 Web tests passed. Chrome task tab 267696806 on the loopback fixture showed 58% in the list and detail, opened the archived ORIGINAL work item with its history, showed the execution task when the node was expanded, and opened creation with the node type and plan preselected.',
+                            'result': 'passed',
+                          },
+                          {
+                            'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                            'name': 'Workspace typecheck, lint and changed-file formatting',
+                            'note': 'bun run typecheck and bun run lint, direct ESLint for the migration script, changed-file Prettier check and git diff --check passed in the repository.',
+                            'result': 'passed',
+                          },
+                          {
+                            'acceptanceIds': ['A4', 'A5'],
+                            'name': 'Rolling Plan read-only preflight',
+                            'note': "The migration script's read-only preview against pocoy.ROLL reported four source modules, 12 current nodes, 15 execution tasks and no conflicts. The template fixture preserved the approved 13-node planning snapshot. ROLL-23 is absent from current local data.",
+                            'result': 'passed',
+                          },
+                        ],
+                      'response':
+                        {
+                          'kind': 'final-result',
+                          'result':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'reason': 'Chrome showed a node and its nested execution item, and the creation form selected the node type and plan. The API created a node and child, then moved the node to another plan and returned the child under the same node in the destination plan.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'reason': 'The list and detail display 58%. Tests exercised edits, reopening, cancellation, empty groups, unallocated weights and an unavailable child percentage. The translated unavailable reason rendered in Web tests.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'reason': 'An incomplete execution task at 100% did not complete its node. Marking it completed rolled up the node, reopening reopened the node, and the native plan status action completed the plan. Legacy lifecycle tests passed.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A4',
+                                    'reason': 'The test fixture migrated 4 modules, 13 nodes and 15 execution tasks. It retained issue IDs, statuses, status history, original parent-to-execution links, numeric fields and attachment metadata and URLs. The resulting plans carried over module metadata and linked to their original records. Chrome opened an archived source with its history.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A5',
+                                    'reason': 'Preview preserved the fixture data. A late database constraint error rolled back plan creation, relinking and archive changes. Repeat apply yielded no duplicate plan. The project scope and legacy behavior passed across the API regression checks.',
+                                    'result': 'passed',
+                                  },
+                                ],
+                              'attempt': 1,
+                              'iteration': 1,
+                              'requestReview':
+                                {
+                                  'reason': 'The approved scope uses built-in Plans for the top level with nodes and execution tasks, weighted plan progress, and direct completion through standard plan status. The code and fixtures match the brief and target specification.',
+                                  'result': 'aligned',
+                                },
+                              'risks':
+                                [
+                                  'Local preflight currently shows four modules, 12 nodes and 15 execution tasks, with no conflicts. ROLL-23 is absent from current data.',
+                                  'Deployment and data cutover are pending acceptance. The prescribed local upgrade script requires a clean committed checkout.',
+                                  'Attachment associations, metadata and URLs were verified. The migration does not touch object storage.',
+                                ],
+                              'summary': 'All five acceptance criteria passed on the isolated candidate. The actual local Rolling Plan data was accessed through read-only preview.',
+                              'verdict': 'pass',
+                            },
+                        },
+                      'verifierExecutionRef': '01a20601-c292-7311-81ec-19b2dd740e02',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '80c080e5358315883a915056e913a3917b9070182381e2d2d8d7fea02cd0255c',
+                    'outcomeId': 'native-result-f516a913024920455209765c9ef622618dcc5d83015cd0e62b92fd063b9bc0e5',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-verifier',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'plan-node-execution',
+              'status': 'succeeded',
+              'stepId': 'verify.verifier',
+              'type': 'handoff',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-preflight',
+                  'token': 'portable-a6efc9313fda1d2fd2925d965dcd6ebfd7f4459405f392dc38ec07206aafe5eb',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'plan-node-execution:6',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'plan-node-execution',
+                      'task': '我觉得当前的按照一级模块, 二级节点, 三级执行的模式还是不太行, 走计划, 节点, 执行这种还是比较好一些,',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': 'ae0b64c8623981a2910c5884a4a8a65adab8b028404d31f14d5ce3a3e9a857b0',
+              'outcome':
+                {
+                  'actionId': 'plan-node-execution:6',
+                  'attempt': 1,
+                  'claimToken': 'portable-a6efc9313fda1d2fd2925d965dcd6ebfd7f4459405f392dc38ec07206aafe5eb',
+                  'inputHash': 'ae0b64c8623981a2910c5884a4a8a65adab8b028404d31f14d5ce3a3e9a857b0',
+                  'outcomeId': 'plan-node-execution:6:1:executor-result',
+                  'output':
+                    {
+                      'archiveDirRef': 'docs/comet/archive/2026-11-23-plan-node-execution',
+                      'blockers': [],
+                      'candidateId': 'plan-node-execution:3',
+                      'capabilityPeers': [],
+                      'ready': true,
+                      'reportRef': 'docs/comet/changes/plan-node-execution/verification.md',
+                      'reportStateVersion': 6,
+                      'requiresReverification': false,
+                      'specPreview':
+                        [
+                          {
+                            'capability': 'plan-node-execution',
+                            'operation': 'create',
+                            'source': 'specs/plan-node-execution/spec.md',
+                          },
+                        ],
+                      'stateVersion': 7,
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '5941c2d40f50870c73e26eb803f8ba8397519aadceb6636e2c01d1c98be2ae84',
+                    'outcomeId': 'plan-node-execution:6:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive-preflight',
+              'requiredCapabilities': [],
+              'retry': 'idempotent',
+              'runId': 'plan-node-execution',
+              'status': 'succeeded',
+              'stepId': 'archive.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-apply',
+                  'token': 'portable-df7dc721d9385baed46fd7f6223658bbbcc487ea3fb9d464bfab2cb26fdcfe26',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'plan-node-execution:7',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'plan-node-execution',
+                      'task': '我觉得当前的按照一级模块, 二级节点, 三级执行的模式还是不太行, 走计划, 节点, 执行这种还是比较好一些,',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '33b6f13267eb35fbcbc5b2f9e3fd789685581d9f0a4d2433df7ce8e824e6ae8d',
+              'outcome':
+                {
+                  'actionId': 'plan-node-execution:7',
+                  'attempt': 1,
+                  'claimToken': 'portable-df7dc721d9385baed46fd7f6223658bbbcc487ea3fb9d464bfab2cb26fdcfe26',
+                  'inputHash': '33b6f13267eb35fbcbc5b2f9e3fd789685581d9f0a4d2433df7ce8e824e6ae8d',
+                  'outcomeId': 'plan-node-execution:7:1:executor-result',
+                  'output':
+                    {
+                      'archiveRef': '2026-11-23-plan-node-execution',
+                      'specCount': 1,
+                      'stateVersion': 7,
+                      'transactionId': 'a8f783dd-94dd-4f0c-b526-712272b1204a',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '937a7e1ed269f4b4568e99c3cadc1ea856f81a40c32a3e522e3003c8f6da321f',
+                    'outcomeId': 'plan-node-execution:7:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'plan-node-execution',
+              'status': 'succeeded',
+              'stepId': 'archive.execute',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-finalize',
+                  'token': 'portable-215f9bb66ab138702d508aea4ab90bf28bd9d7036e8cd6f22b75774af35219b3',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'plan-node-execution:8',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'plan-node-execution',
+                      'task': '我觉得当前的按照一级模块, 二级节点, 三级执行的模式还是不太行, 走计划, 节点, 执行这种还是比较好一些,',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '5ffd6fb69d6b1a79c93745e48d1044ba86a99f1e2ed02c83c4c4d08a2302600c',
+              'outcome':
+                {
+                  'actionId': 'plan-node-execution:8',
+                  'attempt': 1,
+                  'claimToken': 'portable-215f9bb66ab138702d508aea4ab90bf28bd9d7036e8cd6f22b75774af35219b3',
+                  'inputHash': '5ffd6fb69d6b1a79c93745e48d1044ba86a99f1e2ed02c83c4c4d08a2302600c',
+                  'outcomeId': 'plan-node-execution:8:1:executor-result',
+                  'output':
+                    {
+                      'archiveRef': '2026-11-23-plan-node-execution',
+                      'change': 'plan-node-execution',
+                      'runId': 'plan-node-execution',
+                      'specs': [{ 'capability': 'plan-node-execution', 'operation': 'create' }],
+                      'stateVersion': 8,
+                      'transactionId': 'a8f783dd-94dd-4f0c-b526-712272b1204a',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '3bae61e8af0f3b4890c364a2656f83972e8b516cc3d523b553d03484a8701edf',
+                    'outcomeId': 'plan-node-execution:8:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive-finalize',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'plan-node-execution',
+              'status': 'succeeded',
+              'stepId': 'archive.finalize',
+              'type': 'call_tool',
+            },
+          ],
+        'actionContexts':
+          {
+            'plan-node-execution:1': { 'results': {}, 'sequence': 1 },
+            'plan-node-execution:3': { 'results': {}, 'sequence': 3 },
+            'plan-node-execution:4': { 'results': {}, 'sequence': 4 },
+            'plan-node-execution:6': { 'results': {}, 'sequence': 6 },
+            'plan-node-execution:7': { 'results': {}, 'sequence': 7 },
+            'plan-node-execution:8': { 'results': {}, 'sequence': 8 },
+          },
+        'waits':
+          [
+            {
+              'id': 'plan-node-execution:2',
+              'stepId': 'shape.confirm',
+              'sequence': 2,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'plan-node-execution',
+                      'task': '我觉得当前的按照一级模块, 二级节点, 三级执行的模式还是不太行, 走计划, 节点, 执行这种还是比较好一些,',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'A user can open a built-in plan, see its nodes, and expand a node to open its execution tasks. Creating a node in a plan and adding an execution task under it use the same hierarchy. An execution task appears with its node when the node changes plans.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'The plan list and detail report 58 percent for a completed node weighted 30 percent and a node at 40 percent weighted 70 percent. Edits and reopens refresh the result. Canceled nodes are excluded. Empty groups and invalid weights or unavailable child progress show an unavailable result and the relevant reason.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'Node and execution progress entry, weighted node rollup, and status changes follow the existing rules. A plan can be marked complete through its standard status action after delivery.',
+                              },
+                              {
+                                'id': 'A4',
+                                'source': 'brief.md',
+                                'text': 'A migration of the planning snapshot creates four plans, relinks 13 nodes, preserves the 15 execution task parent links, and archives the four source modules. Plan title, description, status and planned date reflect the source. Work item IDs, existing statuses, status history, field values, and attachments remain accessible. Each plan links to its archived source module.',
+                              },
+                              {
+                                'id': 'A5',
+                                'source': 'brief.md',
+                                'text': 'Preview leaves project data intact. An unsuccessful apply has no partial effect, and rerunning a successful migration creates no duplicates. Other projects retain their current behavior.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges':
+                            [
+                              {
+                                'capability': 'plan-node-execution',
+                                'operation': 'create',
+                                'source': 'specs/plan-node-execution/spec.md',
+                              },
+                            ],
+                        },
+                    },
+                },
+              'proposalHash': '8169f7a5e094c8e6538dc4277b3f207638ce0ba73daa4efb63b9b856140448d8',
+              'choices': ['approved', 'rejected'],
+              'results': {},
+              'decision':
+                {
+                  'id': '40e8423ae25c2a52fb465806030ac2af135f5f8b901e7d8c629adc91b4b054c5',
+                  'choice': 'approved',
+                  'proposalHash': '8169f7a5e094c8e6538dc4277b3f207638ce0ba73daa4efb63b9b856140448d8',
+                },
+            },
+            {
+              'id': 'plan-node-execution:5',
+              'stepId': 'verify.confirm',
+              'sequence': 5,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'activation':
+                    {
+                      'report':
+                        {
+                          'attempt': 1,
+                          'candidateId': 'plan-node-execution:3',
+                          'iteration': 1,
+                          'reportRef': 'docs/comet/changes/plan-node-execution/verification.md',
+                          'stateVersion': 6,
+                        },
+                    },
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'plan-node-execution',
+                      'task': '我觉得当前的按照一级模块, 二级节点, 三级执行的模式还是不太行, 走计划, 节点, 执行这种还是比较好一些,',
+                    },
+                  'outputs':
+                    {
+                      'verify.verifier':
+                        {
+                          'candidateId': 'plan-node-execution:3',
+                          'checks':
+                            [
+                              {
+                                'acceptanceIds': ['A1', 'A3', 'A5'],
+                                'name': 'Bun schema migration',
+                                'note': 'Applied all Drizzle migrations through 0197 to fresh loopback PostgreSQL test databases using bun --no-env-file packages/db/src/migrate.ts from the repository root.',
+                                'result': 'passed',
+                              },
+                              {
+                                'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                                'name': 'Delivery, initiatives, and work item API tests',
+                                'note': '247 tests passed across eight files on isolated PostgreSQL. Final delivery fixture rerun passed all seven tests, including unchanged attachment metadata and URLs, status history and fields, preview, rollback on an injected late database error, repeat apply, plan links and progress. API regression log /tmp/itsaplan-plan-api.rfVxJ4.',
+                                'result': 'passed',
+                              },
+                              {
+                                'acceptanceIds': ['A1', 'A2', 'A4'],
+                                'name': 'Web test suite and Chrome extension acceptance',
+                                'note': '798 Web tests passed. Chrome task tab 267696806 on the loopback fixture showed 58% in the list and detail, opened the archived ORIGINAL work item with its history, showed the execution task when the node was expanded, and opened creation with the node type and plan preselected.',
+                                'result': 'passed',
+                              },
+                              {
+                                'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                                'name': 'Workspace typecheck, lint and changed-file formatting',
+                                'note': 'bun run typecheck and bun run lint, direct ESLint for the migration script, changed-file Prettier check and git diff --check passed in the repository.',
+                                'result': 'passed',
+                              },
+                              {
+                                'acceptanceIds': ['A4', 'A5'],
+                                'name': 'Rolling Plan read-only preflight',
+                                'note': "The migration script's read-only preview against pocoy.ROLL reported four source modules, 12 current nodes, 15 execution tasks and no conflicts. The template fixture preserved the approved 13-node planning snapshot. ROLL-23 is absent from current local data.",
+                                'result': 'passed',
+                              },
+                            ],
+                          'response':
+                            {
+                              'kind': 'final-result',
+                              'result':
+                                {
+                                  'acceptance':
+                                    [
+                                      {
+                                        'id': 'A1',
+                                        'reason': 'Chrome showed a node and its nested execution item, and the creation form selected the node type and plan. The API created a node and child, then moved the node to another plan and returned the child under the same node in the destination plan.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A2',
+                                        'reason': 'The list and detail display 58%. Tests exercised edits, reopening, cancellation, empty groups, unallocated weights and an unavailable child percentage. The translated unavailable reason rendered in Web tests.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A3',
+                                        'reason': 'An incomplete execution task at 100% did not complete its node. Marking it completed rolled up the node, reopening reopened the node, and the native plan status action completed the plan. Legacy lifecycle tests passed.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A4',
+                                        'reason': 'The test fixture migrated 4 modules, 13 nodes and 15 execution tasks. It retained issue IDs, statuses, status history, original parent-to-execution links, numeric fields and attachment metadata and URLs. The resulting plans carried over module metadata and linked to their original records. Chrome opened an archived source with its history.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A5',
+                                        'reason': 'Preview preserved the fixture data. A late database constraint error rolled back plan creation, relinking and archive changes. Repeat apply yielded no duplicate plan. The project scope and legacy behavior passed across the API regression checks.',
+                                        'result': 'passed',
+                                      },
+                                    ],
+                                  'attempt': 1,
+                                  'iteration': 1,
+                                  'requestReview':
+                                    {
+                                      'reason': 'The approved scope uses built-in Plans for the top level with nodes and execution tasks, weighted plan progress, and direct completion through standard plan status. The code and fixtures match the brief and target specification.',
+                                      'result': 'aligned',
+                                    },
+                                  'risks':
+                                    [
+                                      'Local preflight currently shows four modules, 12 nodes and 15 execution tasks, with no conflicts. ROLL-23 is absent from current data.',
+                                      'Deployment and data cutover are pending acceptance. The prescribed local upgrade script requires a clean committed checkout.',
+                                      'Attachment associations, metadata and URLs were verified. The migration does not touch object storage.',
+                                    ],
+                                  'summary': 'All five acceptance criteria passed on the isolated candidate. The actual local Rolling Plan data was accessed through read-only preview.',
+                                  'verdict': 'pass',
+                                },
+                            },
+                          'verifierExecutionRef': '01a20601-c292-7311-81ec-19b2dd740e02',
+                        },
+                    },
+                },
+              'proposalHash': 'd64e2af65026a6452cece788aa4a2af4da4f90eb36f5d60a165760b120684c0f',
+              'choices': ['approved', 'rejected', 'reverify'],
+              'results': {},
+              'decision':
+                {
+                  'id': '6aea676a73f55e86e7e7fcd5f79a58b907205ba6e6a46c18045bb61dc8ef905e',
+                  'choice': 'approved',
+                  'proposalHash': 'd64e2af65026a6452cece788aa4a2af4da4f90eb36f5d60a165760b120684c0f',
+                  'reason': '用户明确接受已通过的五项验收，并授权归档、本地提交和切换本地 ROLL。',
+                },
+            },
+          ],
+        'ready': [],
+        'joins': {},
+        'outputs': {},
+        'children': [],
+        'lineage': [],
+      },
+    'sourceRevision': 14,
+    'sourceHash': '61ac6c77df7d2aeab29649a455853e79e5678bbf9ffef0961f8224ead3b31a4d',
+    'pool':
+      {
+        'version': 3,
+        'values':
+          [
+            {
+              'choice': 'approved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'plan-node-execution',
+                      'task': '我觉得当前的按照一级模块, 二级节点, 三级执行的模式还是不太行, 走计划, 节点, 执行这种还是比较好一些,',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'A user can open a built-in plan, see its nodes, and expand a node to open its execution tasks. Creating a node in a plan and adding an execution task under it use the same hierarchy. An execution task appears with its node when the node changes plans.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'The plan list and detail report 58 percent for a completed node weighted 30 percent and a node at 40 percent weighted 70 percent. Edits and reopens refresh the result. Canceled nodes are excluded. Empty groups and invalid weights or unavailable child progress show an unavailable result and the relevant reason.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'Node and execution progress entry, weighted node rollup, and status changes follow the existing rules. A plan can be marked complete through its standard status action after delivery.',
+                              },
+                              {
+                                'id': 'A4',
+                                'source': 'brief.md',
+                                'text': 'A migration of the planning snapshot creates four plans, relinks 13 nodes, preserves the 15 execution task parent links, and archives the four source modules. Plan title, description, status and planned date reflect the source. Work item IDs, existing statuses, status history, field values, and attachments remain accessible. Each plan links to its archived source module.',
+                              },
+                              {
+                                'id': 'A5',
+                                'source': 'brief.md',
+                                'text': 'Preview leaves project data intact. An unsuccessful apply has no partial effect, and rerunning a successful migration creates no duplicates. Other projects retain their current behavior.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges':
+                            [
+                              {
+                                'capability': 'plan-node-execution',
+                                'operation': 'create',
+                                'source': 'specs/plan-node-execution/spec.md',
+                              },
+                            ],
+                        },
+                    },
+                },
+            },
+            {
+              'acceptance':
+                [
+                  {
+                    'id': 'A1',
+                    'source': 'brief.md',
+                    'text': 'A user can open a built-in plan, see its nodes, and expand a node to open its execution tasks. Creating a node in a plan and adding an execution task under it use the same hierarchy. An execution task appears with its node when the node changes plans.',
+                  },
+                  {
+                    'id': 'A2',
+                    'source': 'brief.md',
+                    'text': 'The plan list and detail report 58 percent for a completed node weighted 30 percent and a node at 40 percent weighted 70 percent. Edits and reopens refresh the result. Canceled nodes are excluded. Empty groups and invalid weights or unavailable child progress show an unavailable result and the relevant reason.',
+                  },
+                  {
+                    'id': 'A3',
+                    'source': 'brief.md',
+                    'text': 'Node and execution progress entry, weighted node rollup, and status changes follow the existing rules. A plan can be marked complete through its standard status action after delivery.',
+                  },
+                  {
+                    'id': 'A4',
+                    'source': 'brief.md',
+                    'text': 'A migration of the planning snapshot creates four plans, relinks 13 nodes, preserves the 15 execution task parent links, and archives the four source modules. Plan title, description, status and planned date reflect the source. Work item IDs, existing statuses, status history, field values, and attachments remain accessible. Each plan links to its archived source module.',
+                  },
+                  {
+                    'id': 'A5',
+                    'source': 'brief.md',
+                    'text': 'Preview leaves project data intact. An unsuccessful apply has no partial effect, and rerunning a successful migration creates no duplicates. Other projects retain their current behavior.',
+                  },
+                ],
+              'children': null,
+              'specChanges':
+                [
+                  {
+                    'capability': 'plan-node-execution',
+                    'operation': 'create',
+                    'source': 'specs/plan-node-execution/spec.md',
+                  },
+                ],
+            },
+            {
+              'addressedAcceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+              'checks':
+                [
+                  {
+                    'acceptanceIds': ['A1', 'A3', 'A5'],
+                    'name': 'Bun schema migration',
+                    'note': 'Applied all Drizzle migrations through 0197 to fresh loopback PostgreSQL test databases using bun --no-env-file packages/db/src/migrate.ts from the repository root.',
+                    'result': 'passed',
+                  },
+                  {
+                    'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                    'name': 'Delivery, initiatives, and work item API tests',
+                    'note': '247 tests passed across eight files on isolated PostgreSQL. Final delivery fixture rerun passed all seven tests, including unchanged attachment metadata and URLs, status history and fields, preview, rollback on an injected late database error, repeat apply, plan links and progress. API regression log /tmp/itsaplan-plan-api.rfVxJ4.',
+                    'result': 'passed',
+                  },
+                  {
+                    'acceptanceIds': ['A1', 'A2', 'A4'],
+                    'name': 'Web test suite and Chrome extension acceptance',
+                    'note': '798 Web tests passed. Chrome task tab 267696806 on the loopback fixture showed 58% in the list and detail, opened the archived ORIGINAL work item with its history, showed the execution task when the node was expanded, and opened creation with the node type and plan preselected.',
+                    'result': 'passed',
+                  },
+                  {
+                    'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                    'name': 'Workspace typecheck, lint and changed-file formatting',
+                    'note': 'bun run typecheck and bun run lint, direct ESLint for the migration script, changed-file Prettier check and git diff --check passed in the repository.',
+                    'result': 'passed',
+                  },
+                  {
+                    'acceptanceIds': ['A4', 'A5'],
+                    'name': 'Rolling Plan read-only preflight',
+                    'note': "The migration script's read-only preview against pocoy.ROLL reported four source modules, 12 current nodes, 15 execution tasks and no conflicts. The template fixture preserved the approved 13-node planning snapshot. ROLL-23 is absent from current local data.",
+                    'result': 'passed',
+                  },
+                ],
+              'knownLimits':
+                [
+                  "Local deployment and migration wait for the user's acceptance. The required local upgrade tool builds from a clean committed Git HEAD, so the commit needs explicit authorization.",
+                  'The current local preview has 12 nodes. ROLL-23 was included in the planning snapshot and is absent from the current project data.',
+                ],
+              'requireIndependentReview': false,
+              'summary': 'Implemented the native plan hierarchy, weighted delivery percentages, standard plan completion, and the previewable transactional migration. The verified candidate is ready for acceptance.',
+            },
+            {
+              'choice': 'approved',
+              'proposal':
+                {
+                  'activation':
+                    {
+                      'report':
+                        {
+                          'attempt': 1,
+                          'candidateId': 'plan-node-execution:3',
+                          'iteration': 1,
+                          'reportRef': 'docs/comet/changes/plan-node-execution/verification.md',
+                          'stateVersion': 6,
+                        },
+                    },
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'plan-node-execution',
+                      'task': '我觉得当前的按照一级模块, 二级节点, 三级执行的模式还是不太行, 走计划, 节点, 执行这种还是比较好一些,',
+                    },
+                  'outputs':
+                    {
+                      'verify.verifier':
+                        {
+                          'candidateId': 'plan-node-execution:3',
+                          'checks':
+                            [
+                              {
+                                'acceptanceIds': ['A1', 'A3', 'A5'],
+                                'name': 'Bun schema migration',
+                                'note': 'Applied all Drizzle migrations through 0197 to fresh loopback PostgreSQL test databases using bun --no-env-file packages/db/src/migrate.ts from the repository root.',
+                                'result': 'passed',
+                              },
+                              {
+                                'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                                'name': 'Delivery, initiatives, and work item API tests',
+                                'note': '247 tests passed across eight files on isolated PostgreSQL. Final delivery fixture rerun passed all seven tests, including unchanged attachment metadata and URLs, status history and fields, preview, rollback on an injected late database error, repeat apply, plan links and progress. API regression log /tmp/itsaplan-plan-api.rfVxJ4.',
+                                'result': 'passed',
+                              },
+                              {
+                                'acceptanceIds': ['A1', 'A2', 'A4'],
+                                'name': 'Web test suite and Chrome extension acceptance',
+                                'note': '798 Web tests passed. Chrome task tab 267696806 on the loopback fixture showed 58% in the list and detail, opened the archived ORIGINAL work item with its history, showed the execution task when the node was expanded, and opened creation with the node type and plan preselected.',
+                                'result': 'passed',
+                              },
+                              {
+                                'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                                'name': 'Workspace typecheck, lint and changed-file formatting',
+                                'note': 'bun run typecheck and bun run lint, direct ESLint for the migration script, changed-file Prettier check and git diff --check passed in the repository.',
+                                'result': 'passed',
+                              },
+                              {
+                                'acceptanceIds': ['A4', 'A5'],
+                                'name': 'Rolling Plan read-only preflight',
+                                'note': "The migration script's read-only preview against pocoy.ROLL reported four source modules, 12 current nodes, 15 execution tasks and no conflicts. The template fixture preserved the approved 13-node planning snapshot. ROLL-23 is absent from current local data.",
+                                'result': 'passed',
+                              },
+                            ],
+                          'response':
+                            {
+                              'kind': 'final-result',
+                              'result':
+                                {
+                                  'acceptance':
+                                    [
+                                      {
+                                        'id': 'A1',
+                                        'reason': 'Chrome showed a node and its nested execution item, and the creation form selected the node type and plan. The API created a node and child, then moved the node to another plan and returned the child under the same node in the destination plan.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A2',
+                                        'reason': 'The list and detail display 58%. Tests exercised edits, reopening, cancellation, empty groups, unallocated weights and an unavailable child percentage. The translated unavailable reason rendered in Web tests.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A3',
+                                        'reason': 'An incomplete execution task at 100% did not complete its node. Marking it completed rolled up the node, reopening reopened the node, and the native plan status action completed the plan. Legacy lifecycle tests passed.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A4',
+                                        'reason': 'The test fixture migrated 4 modules, 13 nodes and 15 execution tasks. It retained issue IDs, statuses, status history, original parent-to-execution links, numeric fields and attachment metadata and URLs. The resulting plans carried over module metadata and linked to their original records. Chrome opened an archived source with its history.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A5',
+                                        'reason': 'Preview preserved the fixture data. A late database constraint error rolled back plan creation, relinking and archive changes. Repeat apply yielded no duplicate plan. The project scope and legacy behavior passed across the API regression checks.',
+                                        'result': 'passed',
+                                      },
+                                    ],
+                                  'attempt': 1,
+                                  'iteration': 1,
+                                  'requestReview':
+                                    {
+                                      'reason': 'The approved scope uses built-in Plans for the top level with nodes and execution tasks, weighted plan progress, and direct completion through standard plan status. The code and fixtures match the brief and target specification.',
+                                      'result': 'aligned',
+                                    },
+                                  'risks':
+                                    [
+                                      'Local preflight currently shows four modules, 12 nodes and 15 execution tasks, with no conflicts. ROLL-23 is absent from current data.',
+                                      'Deployment and data cutover are pending acceptance. The prescribed local upgrade script requires a clean committed checkout.',
+                                      'Attachment associations, metadata and URLs were verified. The migration does not touch object storage.',
+                                    ],
+                                  'summary': 'All five acceptance criteria passed on the isolated candidate. The actual local Rolling Plan data was accessed through read-only preview.',
+                                  'verdict': 'pass',
+                                },
+                            },
+                          'verifierExecutionRef': '01a20601-c292-7311-81ec-19b2dd740e02',
+                        },
+                    },
+                },
+            },
+            {
+              'candidateId': 'plan-node-execution:3',
+              'checks':
+                [
+                  {
+                    'acceptanceIds': ['A1', 'A3', 'A5'],
+                    'name': 'Bun schema migration',
+                    'note': 'Applied all Drizzle migrations through 0197 to fresh loopback PostgreSQL test databases using bun --no-env-file packages/db/src/migrate.ts from the repository root.',
+                    'result': 'passed',
+                  },
+                  {
+                    'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                    'name': 'Delivery, initiatives, and work item API tests',
+                    'note': '247 tests passed across eight files on isolated PostgreSQL. Final delivery fixture rerun passed all seven tests, including unchanged attachment metadata and URLs, status history and fields, preview, rollback on an injected late database error, repeat apply, plan links and progress. API regression log /tmp/itsaplan-plan-api.rfVxJ4.',
+                    'result': 'passed',
+                  },
+                  {
+                    'acceptanceIds': ['A1', 'A2', 'A4'],
+                    'name': 'Web test suite and Chrome extension acceptance',
+                    'note': '798 Web tests passed. Chrome task tab 267696806 on the loopback fixture showed 58% in the list and detail, opened the archived ORIGINAL work item with its history, showed the execution task when the node was expanded, and opened creation with the node type and plan preselected.',
+                    'result': 'passed',
+                  },
+                  {
+                    'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                    'name': 'Workspace typecheck, lint and changed-file formatting',
+                    'note': 'bun run typecheck and bun run lint, direct ESLint for the migration script, changed-file Prettier check and git diff --check passed in the repository.',
+                    'result': 'passed',
+                  },
+                  {
+                    'acceptanceIds': ['A4', 'A5'],
+                    'name': 'Rolling Plan read-only preflight',
+                    'note': "The migration script's read-only preview against pocoy.ROLL reported four source modules, 12 current nodes, 15 execution tasks and no conflicts. The template fixture preserved the approved 13-node planning snapshot. ROLL-23 is absent from current local data.",
+                    'result': 'passed',
+                  },
+                ],
+              'response':
+                {
+                  'kind': 'final-result',
+                  'result':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'reason': 'Chrome showed a node and its nested execution item, and the creation form selected the node type and plan. The API created a node and child, then moved the node to another plan and returned the child under the same node in the destination plan.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A2',
+                            'reason': 'The list and detail display 58%. Tests exercised edits, reopening, cancellation, empty groups, unallocated weights and an unavailable child percentage. The translated unavailable reason rendered in Web tests.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A3',
+                            'reason': 'An incomplete execution task at 100% did not complete its node. Marking it completed rolled up the node, reopening reopened the node, and the native plan status action completed the plan. Legacy lifecycle tests passed.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A4',
+                            'reason': 'The test fixture migrated 4 modules, 13 nodes and 15 execution tasks. It retained issue IDs, statuses, status history, original parent-to-execution links, numeric fields and attachment metadata and URLs. The resulting plans carried over module metadata and linked to their original records. Chrome opened an archived source with its history.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A5',
+                            'reason': 'Preview preserved the fixture data. A late database constraint error rolled back plan creation, relinking and archive changes. Repeat apply yielded no duplicate plan. The project scope and legacy behavior passed across the API regression checks.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'attempt': 1,
+                      'iteration': 1,
+                      'requestReview':
+                        {
+                          'reason': 'The approved scope uses built-in Plans for the top level with nodes and execution tasks, weighted plan progress, and direct completion through standard plan status. The code and fixtures match the brief and target specification.',
+                          'result': 'aligned',
+                        },
+                      'risks':
+                        [
+                          'Local preflight currently shows four modules, 12 nodes and 15 execution tasks, with no conflicts. ROLL-23 is absent from current data.',
+                          'Deployment and data cutover are pending acceptance. The prescribed local upgrade script requires a clean committed checkout.',
+                          'Attachment associations, metadata and URLs were verified. The migration does not touch object storage.',
+                        ],
+                      'summary': 'All five acceptance criteria passed on the isolated candidate. The actual local Rolling Plan data was accessed through read-only preview.',
+                      'verdict': 'pass',
+                    },
+                },
+              'verifierExecutionRef': '01a20601-c292-7311-81ec-19b2dd740e02',
+            },
+            {
+              'archiveDirRef': 'docs/comet/archive/2026-11-23-plan-node-execution',
+              'blockers': [],
+              'candidateId': 'plan-node-execution:3',
+              'capabilityPeers': [],
+              'ready': true,
+              'reportRef': 'docs/comet/changes/plan-node-execution/verification.md',
+              'reportStateVersion': 6,
+              'requiresReverification': false,
+              'specPreview':
+                [
+                  {
+                    'capability': 'plan-node-execution',
+                    'operation': 'create',
+                    'source': 'specs/plan-node-execution/spec.md',
+                  },
+                ],
+              'stateVersion': 7,
+            },
+            {
+              'archiveRef': '2026-11-23-plan-node-execution',
+              'specCount': 1,
+              'stateVersion': 7,
+              'transactionId': 'a8f783dd-94dd-4f0c-b526-712272b1204a',
+            },
+            {
+              'sequence': 2,
+              'value':
+                {
+                  'choice': 'approved',
+                  'proposal':
+                    {
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'plan-node-execution',
+                          'task': '我觉得当前的按照一级模块, 二级节点, 三级执行的模式还是不太行, 走计划, 节点, 执行这种还是比较好一些,',
+                        },
+                      'outputs':
+                        {
+                          'shape.prepare':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'source': 'brief.md',
+                                    'text': 'A user can open a built-in plan, see its nodes, and expand a node to open its execution tasks. Creating a node in a plan and adding an execution task under it use the same hierarchy. An execution task appears with its node when the node changes plans.',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'source': 'brief.md',
+                                    'text': 'The plan list and detail report 58 percent for a completed node weighted 30 percent and a node at 40 percent weighted 70 percent. Edits and reopens refresh the result. Canceled nodes are excluded. Empty groups and invalid weights or unavailable child progress show an unavailable result and the relevant reason.',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'source': 'brief.md',
+                                    'text': 'Node and execution progress entry, weighted node rollup, and status changes follow the existing rules. A plan can be marked complete through its standard status action after delivery.',
+                                  },
+                                  {
+                                    'id': 'A4',
+                                    'source': 'brief.md',
+                                    'text': 'A migration of the planning snapshot creates four plans, relinks 13 nodes, preserves the 15 execution task parent links, and archives the four source modules. Plan title, description, status and planned date reflect the source. Work item IDs, existing statuses, status history, field values, and attachments remain accessible. Each plan links to its archived source module.',
+                                  },
+                                  {
+                                    'id': 'A5',
+                                    'source': 'brief.md',
+                                    'text': 'Preview leaves project data intact. An unsuccessful apply has no partial effect, and rerunning a successful migration creates no duplicates. Other projects retain their current behavior.',
+                                  },
+                                ],
+                              'children': null,
+                              'specChanges':
+                                [
+                                  {
+                                    'capability': 'plan-node-execution',
+                                    'operation': 'create',
+                                    'source': 'specs/plan-node-execution/spec.md',
+                                  },
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 1,
+              'value':
+                {
+                  'acceptance':
+                    [
+                      {
+                        'id': 'A1',
+                        'source': 'brief.md',
+                        'text': 'A user can open a built-in plan, see its nodes, and expand a node to open its execution tasks. Creating a node in a plan and adding an execution task under it use the same hierarchy. An execution task appears with its node when the node changes plans.',
+                      },
+                      {
+                        'id': 'A2',
+                        'source': 'brief.md',
+                        'text': 'The plan list and detail report 58 percent for a completed node weighted 30 percent and a node at 40 percent weighted 70 percent. Edits and reopens refresh the result. Canceled nodes are excluded. Empty groups and invalid weights or unavailable child progress show an unavailable result and the relevant reason.',
+                      },
+                      {
+                        'id': 'A3',
+                        'source': 'brief.md',
+                        'text': 'Node and execution progress entry, weighted node rollup, and status changes follow the existing rules. A plan can be marked complete through its standard status action after delivery.',
+                      },
+                      {
+                        'id': 'A4',
+                        'source': 'brief.md',
+                        'text': 'A migration of the planning snapshot creates four plans, relinks 13 nodes, preserves the 15 execution task parent links, and archives the four source modules. Plan title, description, status and planned date reflect the source. Work item IDs, existing statuses, status history, field values, and attachments remain accessible. Each plan links to its archived source module.',
+                      },
+                      {
+                        'id': 'A5',
+                        'source': 'brief.md',
+                        'text': 'Preview leaves project data intact. An unsuccessful apply has no partial effect, and rerunning a successful migration creates no duplicates. Other projects retain their current behavior.',
+                      },
+                    ],
+                  'children': null,
+                  'specChanges':
+                    [
+                      {
+                        'capability': 'plan-node-execution',
+                        'operation': 'create',
+                        'source': 'specs/plan-node-execution/spec.md',
+                      },
+                    ],
+                },
+            },
+            {
+              'sequence': 3,
+              'value':
+                {
+                  'addressedAcceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                  'checks':
+                    [
+                      {
+                        'acceptanceIds': ['A1', 'A3', 'A5'],
+                        'name': 'Bun schema migration',
+                        'note': 'Applied all Drizzle migrations through 0197 to fresh loopback PostgreSQL test databases using bun --no-env-file packages/db/src/migrate.ts from the repository root.',
+                        'result': 'passed',
+                      },
+                      {
+                        'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                        'name': 'Delivery, initiatives, and work item API tests',
+                        'note': '247 tests passed across eight files on isolated PostgreSQL. Final delivery fixture rerun passed all seven tests, including unchanged attachment metadata and URLs, status history and fields, preview, rollback on an injected late database error, repeat apply, plan links and progress. API regression log /tmp/itsaplan-plan-api.rfVxJ4.',
+                        'result': 'passed',
+                      },
+                      {
+                        'acceptanceIds': ['A1', 'A2', 'A4'],
+                        'name': 'Web test suite and Chrome extension acceptance',
+                        'note': '798 Web tests passed. Chrome task tab 267696806 on the loopback fixture showed 58% in the list and detail, opened the archived ORIGINAL work item with its history, showed the execution task when the node was expanded, and opened creation with the node type and plan preselected.',
+                        'result': 'passed',
+                      },
+                      {
+                        'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                        'name': 'Workspace typecheck, lint and changed-file formatting',
+                        'note': 'bun run typecheck and bun run lint, direct ESLint for the migration script, changed-file Prettier check and git diff --check passed in the repository.',
+                        'result': 'passed',
+                      },
+                      {
+                        'acceptanceIds': ['A4', 'A5'],
+                        'name': 'Rolling Plan read-only preflight',
+                        'note': "The migration script's read-only preview against pocoy.ROLL reported four source modules, 12 current nodes, 15 execution tasks and no conflicts. The template fixture preserved the approved 13-node planning snapshot. ROLL-23 is absent from current local data.",
+                        'result': 'passed',
+                      },
+                    ],
+                  'knownLimits':
+                    [
+                      "Local deployment and migration wait for the user's acceptance. The required local upgrade tool builds from a clean committed Git HEAD, so the commit needs explicit authorization.",
+                      'The current local preview has 12 nodes. ROLL-23 was included in the planning snapshot and is absent from the current project data.',
+                    ],
+                  'requireIndependentReview': false,
+                  'summary': 'Implemented the native plan hierarchy, weighted delivery percentages, standard plan completion, and the previewable transactional migration. The verified candidate is ready for acceptance.',
+                },
+            },
+            {
+              'sequence': 5,
+              'value':
+                {
+                  'choice': 'approved',
+                  'proposal':
+                    {
+                      'activation':
+                        {
+                          'report':
+                            {
+                              'attempt': 1,
+                              'candidateId': 'plan-node-execution:3',
+                              'iteration': 1,
+                              'reportRef': 'docs/comet/changes/plan-node-execution/verification.md',
+                              'stateVersion': 6,
+                            },
+                        },
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'plan-node-execution',
+                          'task': '我觉得当前的按照一级模块, 二级节点, 三级执行的模式还是不太行, 走计划, 节点, 执行这种还是比较好一些,',
+                        },
+                      'outputs':
+                        {
+                          'verify.verifier':
+                            {
+                              'candidateId': 'plan-node-execution:3',
+                              'checks':
+                                [
+                                  {
+                                    'acceptanceIds': ['A1', 'A3', 'A5'],
+                                    'name': 'Bun schema migration',
+                                    'note': 'Applied all Drizzle migrations through 0197 to fresh loopback PostgreSQL test databases using bun --no-env-file packages/db/src/migrate.ts from the repository root.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                                    'name': 'Delivery, initiatives, and work item API tests',
+                                    'note': '247 tests passed across eight files on isolated PostgreSQL. Final delivery fixture rerun passed all seven tests, including unchanged attachment metadata and URLs, status history and fields, preview, rollback on an injected late database error, repeat apply, plan links and progress. API regression log /tmp/itsaplan-plan-api.rfVxJ4.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'acceptanceIds': ['A1', 'A2', 'A4'],
+                                    'name': 'Web test suite and Chrome extension acceptance',
+                                    'note': '798 Web tests passed. Chrome task tab 267696806 on the loopback fixture showed 58% in the list and detail, opened the archived ORIGINAL work item with its history, showed the execution task when the node was expanded, and opened creation with the node type and plan preselected.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                                    'name': 'Workspace typecheck, lint and changed-file formatting',
+                                    'note': 'bun run typecheck and bun run lint, direct ESLint for the migration script, changed-file Prettier check and git diff --check passed in the repository.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'acceptanceIds': ['A4', 'A5'],
+                                    'name': 'Rolling Plan read-only preflight',
+                                    'note': "The migration script's read-only preview against pocoy.ROLL reported four source modules, 12 current nodes, 15 execution tasks and no conflicts. The template fixture preserved the approved 13-node planning snapshot. ROLL-23 is absent from current local data.",
+                                    'result': 'passed',
+                                  },
+                                ],
+                              'response':
+                                {
+                                  'kind': 'final-result',
+                                  'result':
+                                    {
+                                      'acceptance':
+                                        [
+                                          {
+                                            'id': 'A1',
+                                            'reason': 'Chrome showed a node and its nested execution item, and the creation form selected the node type and plan. The API created a node and child, then moved the node to another plan and returned the child under the same node in the destination plan.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A2',
+                                            'reason': 'The list and detail display 58%. Tests exercised edits, reopening, cancellation, empty groups, unallocated weights and an unavailable child percentage. The translated unavailable reason rendered in Web tests.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A3',
+                                            'reason': 'An incomplete execution task at 100% did not complete its node. Marking it completed rolled up the node, reopening reopened the node, and the native plan status action completed the plan. Legacy lifecycle tests passed.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A4',
+                                            'reason': 'The test fixture migrated 4 modules, 13 nodes and 15 execution tasks. It retained issue IDs, statuses, status history, original parent-to-execution links, numeric fields and attachment metadata and URLs. The resulting plans carried over module metadata and linked to their original records. Chrome opened an archived source with its history.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A5',
+                                            'reason': 'Preview preserved the fixture data. A late database constraint error rolled back plan creation, relinking and archive changes. Repeat apply yielded no duplicate plan. The project scope and legacy behavior passed across the API regression checks.',
+                                            'result': 'passed',
+                                          },
+                                        ],
+                                      'attempt': 1,
+                                      'iteration': 1,
+                                      'requestReview':
+                                        {
+                                          'reason': 'The approved scope uses built-in Plans for the top level with nodes and execution tasks, weighted plan progress, and direct completion through standard plan status. The code and fixtures match the brief and target specification.',
+                                          'result': 'aligned',
+                                        },
+                                      'risks':
+                                        [
+                                          'Local preflight currently shows four modules, 12 nodes and 15 execution tasks, with no conflicts. ROLL-23 is absent from current data.',
+                                          'Deployment and data cutover are pending acceptance. The prescribed local upgrade script requires a clean committed checkout.',
+                                          'Attachment associations, metadata and URLs were verified. The migration does not touch object storage.',
+                                        ],
+                                      'summary': 'All five acceptance criteria passed on the isolated candidate. The actual local Rolling Plan data was accessed through read-only preview.',
+                                      'verdict': 'pass',
+                                    },
+                                },
+                              'verifierExecutionRef': '01a20601-c292-7311-81ec-19b2dd740e02',
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 4,
+              'value':
+                {
+                  'candidateId': 'plan-node-execution:3',
+                  'checks':
+                    [
+                      {
+                        'acceptanceIds': ['A1', 'A3', 'A5'],
+                        'name': 'Bun schema migration',
+                        'note': 'Applied all Drizzle migrations through 0197 to fresh loopback PostgreSQL test databases using bun --no-env-file packages/db/src/migrate.ts from the repository root.',
+                        'result': 'passed',
+                      },
+                      {
+                        'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                        'name': 'Delivery, initiatives, and work item API tests',
+                        'note': '247 tests passed across eight files on isolated PostgreSQL. Final delivery fixture rerun passed all seven tests, including unchanged attachment metadata and URLs, status history and fields, preview, rollback on an injected late database error, repeat apply, plan links and progress. API regression log /tmp/itsaplan-plan-api.rfVxJ4.',
+                        'result': 'passed',
+                      },
+                      {
+                        'acceptanceIds': ['A1', 'A2', 'A4'],
+                        'name': 'Web test suite and Chrome extension acceptance',
+                        'note': '798 Web tests passed. Chrome task tab 267696806 on the loopback fixture showed 58% in the list and detail, opened the archived ORIGINAL work item with its history, showed the execution task when the node was expanded, and opened creation with the node type and plan preselected.',
+                        'result': 'passed',
+                      },
+                      {
+                        'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                        'name': 'Workspace typecheck, lint and changed-file formatting',
+                        'note': 'bun run typecheck and bun run lint, direct ESLint for the migration script, changed-file Prettier check and git diff --check passed in the repository.',
+                        'result': 'passed',
+                      },
+                      {
+                        'acceptanceIds': ['A4', 'A5'],
+                        'name': 'Rolling Plan read-only preflight',
+                        'note': "The migration script's read-only preview against pocoy.ROLL reported four source modules, 12 current nodes, 15 execution tasks and no conflicts. The template fixture preserved the approved 13-node planning snapshot. ROLL-23 is absent from current local data.",
+                        'result': 'passed',
+                      },
+                    ],
+                  'response':
+                    {
+                      'kind': 'final-result',
+                      'result':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'reason': 'Chrome showed a node and its nested execution item, and the creation form selected the node type and plan. The API created a node and child, then moved the node to another plan and returned the child under the same node in the destination plan.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A2',
+                                'reason': 'The list and detail display 58%. Tests exercised edits, reopening, cancellation, empty groups, unallocated weights and an unavailable child percentage. The translated unavailable reason rendered in Web tests.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A3',
+                                'reason': 'An incomplete execution task at 100% did not complete its node. Marking it completed rolled up the node, reopening reopened the node, and the native plan status action completed the plan. Legacy lifecycle tests passed.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A4',
+                                'reason': 'The test fixture migrated 4 modules, 13 nodes and 15 execution tasks. It retained issue IDs, statuses, status history, original parent-to-execution links, numeric fields and attachment metadata and URLs. The resulting plans carried over module metadata and linked to their original records. Chrome opened an archived source with its history.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A5',
+                                'reason': 'Preview preserved the fixture data. A late database constraint error rolled back plan creation, relinking and archive changes. Repeat apply yielded no duplicate plan. The project scope and legacy behavior passed across the API regression checks.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'attempt': 1,
+                          'iteration': 1,
+                          'requestReview':
+                            {
+                              'reason': 'The approved scope uses built-in Plans for the top level with nodes and execution tasks, weighted plan progress, and direct completion through standard plan status. The code and fixtures match the brief and target specification.',
+                              'result': 'aligned',
+                            },
+                          'risks':
+                            [
+                              'Local preflight currently shows four modules, 12 nodes and 15 execution tasks, with no conflicts. ROLL-23 is absent from current data.',
+                              'Deployment and data cutover are pending acceptance. The prescribed local upgrade script requires a clean committed checkout.',
+                              'Attachment associations, metadata and URLs were verified. The migration does not touch object storage.',
+                            ],
+                          'summary': 'All five acceptance criteria passed on the isolated candidate. The actual local Rolling Plan data was accessed through read-only preview.',
+                          'verdict': 'pass',
+                        },
+                    },
+                  'verifierExecutionRef': '01a20601-c292-7311-81ec-19b2dd740e02',
+                },
+            },
+            {
+              'sequence': 6,
+              'value':
+                {
+                  'archiveDirRef': 'docs/comet/archive/2026-11-23-plan-node-execution',
+                  'blockers': [],
+                  'candidateId': 'plan-node-execution:3',
+                  'capabilityPeers': [],
+                  'ready': true,
+                  'reportRef': 'docs/comet/changes/plan-node-execution/verification.md',
+                  'reportStateVersion': 6,
+                  'requiresReverification': false,
+                  'specPreview':
+                    [
+                      {
+                        'capability': 'plan-node-execution',
+                        'operation': 'create',
+                        'source': 'specs/plan-node-execution/spec.md',
+                      },
+                    ],
+                  'stateVersion': 7,
+                },
+            },
+            {
+              'sequence': 7,
+              'value':
+                {
+                  'archiveRef': '2026-11-23-plan-node-execution',
+                  'specCount': 1,
+                  'stateVersion': 7,
+                  'transactionId': 'a8f783dd-94dd-4f0c-b526-712272b1204a',
+                },
+            },
+            {
+              'sequence': 8,
+              'value':
+                {
+                  'archiveRef': '2026-11-23-plan-node-execution',
+                  'change': 'plan-node-execution',
+                  'runId': 'plan-node-execution',
+                  'specs': [{ 'capability': 'plan-node-execution', 'operation': 'create' }],
+                  'stateVersion': 8,
+                  'transactionId': 'a8f783dd-94dd-4f0c-b526-712272b1204a',
+                },
+            },
+          ],
+        'nodes':
+          [
+            { 'key': 'shape.prepare', 'value': 1, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': null, 'right': 0, 'height': 2 },
+            { 'key': 'build.builder', 'value': 2, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 2, 'right': 0, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 1, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 4, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.confirm', 'value': 3, 'left': 4, 'right': 5, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 2, 'right': 6, 'height': 3 },
+            { 'key': 'archive.prepare', 'value': 5, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 2, 'left': 8, 'right': null, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 9, 'right': 6, 'height': 3 },
+            { 'key': 'archive.execute', 'value': 6, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 2, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.prepare', 'value': 5, 'left': 11, 'right': 12, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 13, 'right': 6, 'height': 3 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': null, 'right': 15, 'height': 2 },
+            { 'key': 'build.builder', 'value': 9, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 17, 'right': 15, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 11, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.confirm', 'value': 10, 'left': 19, 'right': 20, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 17, 'right': 21, 'height': 3 },
+            { 'key': 'archive.prepare', 'value': 12, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 9, 'left': 23, 'right': null, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 24, 'right': 21, 'height': 3 },
+            { 'key': 'archive.execute', 'value': 13, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 9, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.prepare', 'value': 12, 'left': 26, 'right': 27, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 28, 'right': 21, 'height': 3 },
+            { 'key': 'archive.finalize', 'value': 14, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.execute', 'value': 13, 'left': null, 'right': 30, 'height': 2 },
+            { 'key': 'archive.prepare', 'value': 12, 'left': 31, 'right': 27, 'height': 3 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 32, 'right': 21, 'height': 4 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 9, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 11, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': 36, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 35, 'right': 37, 'height': 3 },
+          ],
+        'maps': [null, 1, 3, 7, 10, 14, 16, 18, 22, 25, 29, 33, 34, 38],
+        'bindings':
+          [
+            { 'path': ['actions', '0', 'input', 'outputs'], 'map': 0 },
+            { 'path': ['actions', '1', 'input', 'outputs'], 'map': 1 },
+            { 'path': ['actions', '2', 'input', 'outputs'], 'map': 2 },
+            { 'path': ['actions', '3', 'input', 'outputs'], 'map': 3 },
+            { 'path': ['actions', '4', 'input', 'outputs'], 'map': 4 },
+            { 'path': ['actions', '5', 'input', 'outputs'], 'map': 5 },
+            { 'path': ['actionContexts', 'plan-node-execution:1', 'results'], 'map': 0 },
+            { 'path': ['actionContexts', 'plan-node-execution:3', 'results'], 'map': 6 },
+            { 'path': ['actionContexts', 'plan-node-execution:4', 'results'], 'map': 7 },
+            { 'path': ['actionContexts', 'plan-node-execution:6', 'results'], 'map': 8 },
+            { 'path': ['actionContexts', 'plan-node-execution:7', 'results'], 'map': 9 },
+            { 'path': ['actionContexts', 'plan-node-execution:8', 'results'], 'map': 10 },
+            { 'path': ['outputs'], 'map': 11 },
+            { 'path': ['waits', '0', 'results'], 'map': 12 },
+            { 'path': ['waits', '1', 'results'], 'map': 13 },
+          ],
+      },
+    'storageHash': '99baa4a571d19c6e92ff0e6a8a6a0bfbf30241b569a52370bae0473dcb31a534',
+  }

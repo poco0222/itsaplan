@@ -1,8 +1,10 @@
 import { beforeEach, expect, test } from 'bun:test';
+import { SQL } from 'bun';
 import { authedApi, createProject } from '#tests/helpers/app';
 import { signUpTestUser } from '#tests/helpers/auth';
 import { resetDb } from '#tests/helpers/db';
 import { createRole } from '#tests/helpers/roles';
+import { migrateDeliveryPlans } from '../../../../../../../scripts/migrate-delivery-plans';
 
 beforeEach(resetDb);
 
@@ -55,6 +57,7 @@ async function setup() {
     user,
     api,
     project,
+    projectRef: view.project.ref,
     settings,
     scope,
     started,
@@ -70,6 +73,239 @@ async function setup() {
     enable,
   };
 }
+
+test('migrates existing work and rolls up native plans as delivery changes', async () => {
+  const {
+    api,
+    project,
+    projectRef,
+    settings,
+    add,
+    set,
+    item,
+    enable,
+    get,
+    started,
+    done,
+    canceled,
+  } = await setup();
+  await enable();
+  const summaries = project.initiatives['delivery-progress'];
+  expect((await summaries.get()).data).toEqual([]);
+  const modules = await Promise.all(
+    Array.from({ length: 4 }, (_, i) => add(`Module ${i + 1}`, settings.moduleTypeId)),
+  );
+  const nodes = await Promise.all(
+    Array.from({ length: 13 }, (_, i) =>
+      add(
+        `Node ${i + 1}`,
+        settings.nodeTypeId,
+        modules[i < 2 ? 0 : 1 + (i % 3)],
+        i === 0 ? done : started,
+      ),
+    ),
+  );
+  const tasks = await Promise.all(
+    Array.from({ length: 15 }, (_, i) =>
+      add(
+        `Task ${i + 1}`,
+        settings.taskTypeId,
+        nodes[i < 2 ? 1 : 2 + (i % 11)],
+        i === 0 ? done : started,
+      ),
+    ),
+  );
+  await item(modules[0]).patch({ description: 'Original module description' });
+  await set(nodes[0], settings.nodeWeightId, 30);
+  await set(nodes[1], settings.nodeWeightId, 70);
+  await set(tasks[0], settings.taskWeightId, 20);
+  await set(tasks[1], settings.taskWeightId, 80);
+  await set(tasks[1], settings.taskProgressId, 25);
+  expect(await get(nodes[1])).toMatchObject({ progress: 40 });
+
+  const db = new SQL(process.env.DATABASE_URL!);
+  try {
+    await db`
+      INSERT INTO issue_attachment (issue_id, s3_key, filename, content_type, size_bytes)
+      VALUES (${modules[0]}, 'test/module', 'original-module.txt', 'text/plain', 12),
+             (${tasks[0]}, 'test/execution', 'execution-output.txt', 'text/plain', 12)
+    `;
+    const attachments = async () => [
+      (await item(modules[0]).attachments.get()).data,
+      (await item(tasks[0]).attachments.get()).data,
+    ];
+    const originalAttachments = await attachments();
+    expect(originalAttachments.map((items) => items?.length)).toEqual([1, 1]);
+    const snapshot = async () => {
+      const rows = await db<
+        {
+          id: number;
+          parent_id: number | null;
+          type_id: number | null;
+          column_id: number;
+          initiative_id: number | null;
+          archived_at: Date | null;
+        }[]
+      >`SELECT id, parent_id, type_id, column_id, initiative_id, archived_at FROM issue ORDER BY id`;
+      const history = await db`SELECT * FROM issue_status ORDER BY id`;
+      const fields = await db`SELECT * FROM issue_field_value ORDER BY issue_id, field_id`;
+      return { rows, history, fields };
+    };
+    const before = await snapshot();
+    expect(await migrateDeliveryPlans(db, projectRef, false)).toMatchObject({
+      status: 'preview',
+      nodes: 13,
+      tasks: 15,
+      conflicts: [],
+    });
+    expect(await snapshot()).toEqual(before);
+    expect((await project.initiatives.get()).data?.total).toBe(0);
+    const [source] = await db`SELECT sequence_number FROM issue WHERE id = ${modules[0]}`;
+    expect(await migrateDeliveryPlans(db, projectRef, true)).toMatchObject({
+      status: 'applied',
+      nodes: 13,
+      tasks: 15,
+    });
+    expect(await migrateDeliveryPlans(db, projectRef, true)).toMatchObject({
+      status: 'already-applied',
+    });
+    const after = await snapshot();
+    expect(await attachments()).toEqual(originalAttachments);
+    expect(after.history).toEqual(before.history);
+    expect(after.fields).toEqual(before.fields);
+    expect(after.rows.map((row) => [row.id, row.column_id, row.type_id])).toEqual(
+      before.rows.map((row) => [row.id, row.column_id, row.type_id]),
+    );
+    expect(
+      after.rows
+        .filter((row) => row.archived_at)
+        .map((row) => row.id)
+        .sort(),
+    ).toEqual([...modules].sort());
+    expect(
+      after.rows.filter((row) => tasks.includes(row.id)).map((row) => [row.id, row.parent_id]),
+    ).toEqual(
+      before.rows.filter((row) => tasks.includes(row.id)).map((row) => [row.id, row.parent_id]),
+    );
+
+    const list = await project.initiatives.get();
+    expect(list.status).toBe(200);
+    expect(list.data?.total).toBe(4);
+    const plan = list.data!.items.find((p) => p.title === 'Module 1')!;
+    expect(plan).toMatchObject({
+      status: 'active',
+      description: 'Original module description',
+      delivery: {
+        nodeTypeId: settings.nodeTypeId,
+        sourceNumber: source.sequence_number,
+        progress: 58,
+        problem: null,
+      },
+    });
+    expect(new Date(plan.targetDate!).toISOString()).toStartWith('2020-12-10');
+    const detail = api.initiatives({ initiativeId: plan.id });
+    const planDelivery = async () => (await detail.get()).data!.delivery;
+    expect((await planDelivery())?.progress).toBe(58);
+    const planSummary = async () => {
+      const response = await summaries.get();
+      expect(response.status).toBe(200);
+      return response.data!.find((summary) => summary.id === plan.id);
+    };
+    expect(await planSummary()).toEqual({
+      id: plan.id,
+      progressFieldId: settings.nodeProgressId,
+      progress: 58,
+      problem: null,
+    });
+    const outsider = authedApi((await signUpTestUser()).cookie);
+    expect(
+      (await outsider.projects({ projectKey: projectRef }).initiatives['delivery-progress'].get())
+        .status,
+    ).toBe(403);
+
+    expect((await item(tasks[0]).get()).data).toMatchObject({
+      parentId: nodes[1],
+      initiative: { id: plan.id },
+    });
+    await set(tasks[1], settings.taskProgressId, 80);
+    expect(await planSummary()).toMatchObject({ progress: 88.8, problem: null });
+    expect((await planDelivery())?.progress).toBe(88.8);
+    await set(tasks[1], settings.taskProgressId, 100);
+    expect((await planDelivery())?.progress).toBe(100);
+    expect(await get(nodes[1])).toMatchObject({ completed: false });
+    expect((await item(tasks[1]).patch({ columnId: done })).status).toBe(200);
+    expect(await get(nodes[1])).toMatchObject({ completed: true });
+    expect((await detail.patch({ status: 'completed' })).data?.status).toBe('completed');
+    expect((await item(tasks[1]).patch({ columnId: started })).status).toBe(200);
+    expect(await get(nodes[1])).toMatchObject({ completed: false });
+    await set(tasks[1], settings.taskProgressId, 0);
+    expect((await planDelivery())?.progress).toBe(44);
+
+    expect((await item(nodes[0]).patch({ columnId: canceled })).status).toBe(200);
+    expect(await planDelivery()).toMatchObject({ progress: null, problem: 'weights' });
+    await set(nodes[1], settings.nodeWeightId, 100);
+    expect((await planDelivery())?.progress).toBe(20);
+    await set(tasks[0], settings.taskWeightId, 10);
+    expect(await planDelivery()).toMatchObject({ progress: null, problem: 'child' });
+    expect(await planSummary()).toMatchObject({ progress: null, problem: 'child' });
+
+    const next = (await project.initiatives.post({ title: 'Next plan' })).data!;
+    expect(next.delivery).toMatchObject({ progress: null, problem: 'children' });
+    const newNode = await project.issues.post({
+      title: 'New node',
+      columnId: started,
+      typeId: settings.nodeTypeId,
+      initiativeId: plan.id,
+    });
+    expect(newNode.status).toBe(201);
+    const newTask = await add('New task', settings.taskTypeId, newNode.data!.id);
+    expect((await item(newTask).get()).data).toMatchObject({ initiative: { id: plan.id } });
+    expect((await item(newNode.data!.id).patch({ initiativeId: next.id })).status).toBe(200);
+    expect((await item(newTask).get()).data).toMatchObject({
+      parentId: newNode.data!.id,
+      initiative: { id: next.id },
+    });
+    expect((await api.initiatives({ initiativeId: next.id }).delete()).status).toBe(204);
+    expect((await item(newTask).get()).data).toMatchObject({
+      parentId: newNode.data!.id,
+      initiative: null,
+    });
+  } finally {
+    await db.close();
+  }
+});
+
+test('rolls the migration back if applying fails after plans are inserted', async () => {
+  const { project, projectRef, settings, add, enable } = await setup();
+  await enable();
+  const module = await add('Module to roll back', settings.moduleTypeId);
+  const node = await add('Original node', settings.nodeTypeId, module);
+  const task = await add('Original task', settings.taskTypeId, node);
+  const db = new SQL(process.env.DATABASE_URL!);
+  try {
+    const rows = () => db`SELECT id, parent_id, initiative_id, archived_at FROM issue ORDER BY id`;
+    const before = await rows();
+    await db`ALTER TABLE issue_type ADD CONSTRAINT test_plan_migration_failure CHECK (name <> '节点')`;
+    try {
+      await expect(migrateDeliveryPlans(db, projectRef, true)).rejects.toThrow(
+        'test_plan_migration_failure',
+      );
+      expect(await rows()).toEqual(before);
+      expect((await project.initiatives.get()).data?.total).toBe(0);
+    } finally {
+      await db`ALTER TABLE issue_type DROP CONSTRAINT test_plan_migration_failure`;
+    }
+    expect(await migrateDeliveryPlans(db, projectRef, true)).toMatchObject({
+      status: 'applied',
+      nodes: 1,
+      tasks: 1,
+    });
+    const [kept] = await db`SELECT parent_id FROM issue WHERE id = ${task}`;
+    expect(kept.parent_id).toBe(node);
+  } finally {
+    await db.close();
+  }
+});
 
 test('enrolls existing issues and applies the hierarchy with exact weighted progress', async () => {
   const {

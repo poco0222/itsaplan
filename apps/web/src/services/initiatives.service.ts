@@ -6,12 +6,14 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import type { FeedCursor } from '@/lib/api/endpoints/activity';
+import { useLiveRefresh } from '@/hooks/useLiveRefresh';
 import {
   type InitiativeListParams,
   type InitiativePatch,
   type NewInitiativeInput,
   listInitiatives,
   listFavoriteInitiatives,
+  listInitiativeDeliveryProgress,
   listInitiativeOptions,
   initiativeCounts,
   getInitiative,
@@ -22,6 +24,7 @@ import {
   listInitiativeFeed,
 } from '@/lib/api/endpoints/initiatives';
 import { qk } from '@/services/queryKeys';
+import { revScope } from '@/utils/revScopes';
 
 // A page of the project's initiatives. params filter (status/search), sort and
 // page it server-side; keepPreviousData holds the current page on screen while the
@@ -33,6 +36,16 @@ export function useInitiativesQuery(projectKey: string | null, params: Initiativ
     enabled: projectKey != null,
     placeholderData: keepPreviousData,
   });
+}
+
+export function useInitiativeDeliveryProgress(
+  project: string,
+  projectId: number,
+  enabled: boolean,
+) {
+  const queryKey = qk.initiativeDeliveryProgress(project);
+  useLiveRefresh({ scope: revScope.board(projectId), targets: [queryKey], enabled });
+  return useQuery({ queryKey, queryFn: () => listInitiativeDeliveryProgress(project), enabled });
 }
 
 // The initiatives an issue can be linked to. Read under work items, so the picker

@@ -18,7 +18,13 @@ const INITIATIVE_BOARD_STORE_KEY = 'planner_initiative_board_settings';
 // calendar) with filters and display settings, but no saved views. The board is
 // fed a project whose issues are just this initiative's, so drag/edit still hit the
 // real issues and the live board refresh keeps it current.
-export default function InitiativeIssuesBoard({ initiativeId }: { initiativeId: number }) {
+export default function InitiativeIssuesBoard({
+  initiativeId,
+  nodeTypeId,
+}: {
+  initiativeId: number;
+  nodeTypeId?: number;
+}) {
   const { project, customFields, onOpenIssue, onAddIssue } = useShell();
   const board = useLocalBoardSettings(INITIATIVE_BOARD_STORE_KEY, initiativeId);
   const initiativeOptions = useInitiativeOptionsQuery(project?.project.ref ?? null).data ?? [];
@@ -37,6 +43,7 @@ export default function InitiativeIssuesBoard({ initiativeId }: { initiativeId: 
       initiatives: initiativeOptions,
     }),
     initiativeId,
+    ...(nodeTypeId && { typeId: nodeTypeId }),
   };
   const viewProps = {
     project: viewProject,

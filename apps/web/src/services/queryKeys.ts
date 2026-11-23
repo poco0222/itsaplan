@@ -299,6 +299,8 @@ export const qk = {
   initiatives: (projectKey: string, params: unknown) =>
     ['initiatives', projectKey, params] as const,
   initiativesForProject: (projectKey: string) => ['initiatives', projectKey] as const,
+  initiativeDeliveryProgress: (projectKey: string) =>
+    ['initiatives', projectKey, 'delivery-progress'] as const,
   // The linkable initiatives behind the issue picker, narrowed by the typed search.
   initiativeOptions: (projectKey: string, params: Record<string, unknown>) =>
     ['initiatives', projectKey, 'options', params] as const,
