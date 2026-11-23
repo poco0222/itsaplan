@@ -27,6 +27,7 @@ export const DeliveryItem = t.Object({
   ]),
   progress: t.Nullable(t.Number()),
   progressFieldId: t.Nullable(id),
+  weightFieldId: t.Nullable(id),
   progressReadOnly: t.Boolean(),
   problem: t.Nullable(
     t.Union([

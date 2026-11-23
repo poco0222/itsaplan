@@ -1,0 +1,2071 @@
+# comet-execution: managed-run
+schema: comet.native.v4
+name: table-delivery-percentage-editing
+language: en
+phase: archive
+status: done
+state_version: 8
+brief: brief.md
+document_constraints_version: 3
+spec_changes:
+  - capability: table-inline-delivery-progress
+    operation: modify
+    source: specs/table-inline-delivery-progress/spec.md
+workspace:
+  isolation: current
+  change_branch: main
+  target_branch: main
+  finish: null
+loop:
+  stage: done
+  goal_cycle: 1
+  iteration: 1
+  attempt: 1
+  retry_epoch: 0
+  failed_iteration_count: 0
+  no_progress_count: 0
+  execution_failure_count: 0
+  previous_unresolved_ids: []
+  next_action: null
+acceptance:
+  - id: A1
+    source: brief.md
+    text: Applicable progress and weight cells show a percent sign for manual
+      values, including zero and decimals, and calculated progress uses the
+      percentage display. Empty values and unavailable calculated results keep
+      the existing marker or workflow message.
+    result: passed
+    reason:
+      text: TableRowSubtasks.test.tsx verifies raw zero and decimal percentages,
+        manual progress, computed completion, an empty marker and the workflow
+        reason. The API fixture uses different weight bindings for nodes and
+        tasks, demonstrating that table formatting can follow the configured
+        roles without depending on labels.
+      truncated: false
+  - id: A2
+    source: brief.md
+    text: An edited progress or weight value saves once on Enter, blur or clicking
+      Save. Saving an empty value clears it, Escape cancels, and invalid input
+      or an unchanged value causes no write. The write targets the edited work
+      item on root and nested rows.
+    result: passed
+    reason:
+      text: The table interaction test verifies root and nested row mutations, one
+        save on Enter plus blur, blur and click save, cancel, and no writes for
+        unchanged and outside-range inputs. The Chrome preview additionally
+        verified native incomplete numeric drafts, clearing on blur and one
+        write per save.
+      truncated: false
+  - id: A3
+    source: brief.md
+    text: Read-only and calculated progress cells cannot be edited. Unrelated
+      numeric fields and the time estimate editor retain their existing display
+      and save behavior.
+    result: passed
+    reason:
+      text: The calculated-progress branch takes precedence, and read-only cells
+        display percentages without buttons. The general number fixture still
+        renders without a percent unit and cancels on blur. The existing
+        estimate and delivery API tests still pass, including workflow locks.
+      truncated: false
+builder_handoff:
+  candidate_id: table-delivery-percentage-editing:3
+  identity_provider: skill-coordinated
+  builder_execution_ref: 01a205e8-0a23-7442-b3e0-aab10853bc30
+  iteration: 1
+  summary:
+    text: Show a percent unit in the configured progress and weight cells. The
+      opted-in numeric editor commits on Enter, leaving the input, or clicking
+      Save, and preserves the saved value on no change, Escape or invalid input.
+    truncated: false
+  addressed_acceptance_ids:
+    - A1
+    - A2
+    - A3
+  checks:
+    - name:
+        text: bun --filter=web run test
+        truncated: false
+      result: passed
+      note:
+        text: "Repository root /Users/poco/Projects/itsaplan. 797 passed, 0 failed
+          across 160 files. TableRowSubtasks.test.tsx covered zero and decimal
+          percentage rendering, read-only rendering, opt-in blur, Enter+blur
+          once, click save and clearing, Escape, unchanged edits, out-of-range
+          input and ordinary number behavior. Log:
+          /var/folders/v9/b4f7l74x1b7gm_7zw9t6ncm80000gp/T/itsaplan-delivery-pe\
+          rcent-web.63axMM4S1J."
+        truncated: false
+    - name:
+        text: bun test delivery-workflow integration suite
+        truncated: false
+      result: passed
+      note:
+        text: From /Users/poco/Projects/itsaplan/apps/api, bun test
+          --env-file=<temporary test env>
+          src/modules/delivery-workflow/__tests__/integration/delivery.test.ts
+          against an isolated, migrated tmpfs Postgres. 5 passed, 0 failed. Used
+          distinct node/task weight bindings, retained effective progress,
+          validation and workflow lock coverage. Test container was stopped and
+          removed.
+        truncated: false
+    - name:
+        text: bun --filter=web --filter=api run typecheck
+        truncated: false
+      result: passed
+      note:
+        text: Repository root. Web and API TypeScript checks exited 0.
+        truncated: false
+    - name:
+        text: Prettier, ESLint and git diff --check
+        truncated: false
+      result: passed
+      note:
+        text: Repository root. Prettier check and ESLint --flag
+          v10_config_lookup_from_file on the eight changed code files, and git
+          diff --check exited 0.
+        truncated: false
+    - name:
+        text: Chrome extension component preview
+        truncated: false
+      result: passed
+      note:
+        text: The current InlineTextField in a synthetic loopback preview. Editing 20%
+          to 30 and clicking outside incremented Writes once. Unchanged blur,
+          Escape, 101 and the incomplete number 1e did not increment Writes; 1e
+          had an empty DOM value with validity.badInput=true, and 40% was
+          preserved. Enter saved once.
+        truncated: false
+    - name:
+        text: Project tidy, code-review and focused security-audit
+        truncated: false
+      result: passed
+      note:
+        text: Reviewed the final diff and callers. The read API provides configured
+          field IDs to the existing work item read route. The edit permissions,
+          server range check, numeric storage and calculation are retained. No
+          actionable findings.
+        truncated: false
+  checks_truncated: false
+  known_limits:
+    - text: Browser checks used a desktop Chrome preview with synthetic data. The
+        deployed ROLL table was left untouched.
+      truncated: false
+  known_limits_truncated: false
+  review: null
+  submitted_at: 2026-11-23T01:16:56.223Z
+blockers: []
+verification:
+  candidate_id: table-delivery-percentage-editing:3
+  identity_provider: skill-coordinated
+  verifier_execution_ref: 01a205e8-0a23-7442-b3e0-aab10853bc30
+  iteration: 1
+  attempt: 1
+  assurance: self-reviewed
+  verdict: pass
+  checks: []
+  reported_checks:
+    - name:
+        text: bun --filter=web run test
+        truncated: false
+      result: passed
+      note:
+        text: "Repository root /Users/poco/Projects/itsaplan. 797 passed, 0 failed
+          across 160 files. TableRowSubtasks.test.tsx covered zero and decimal
+          percentage rendering, read-only rendering, opt-in blur, Enter+blur
+          once, click save and clearing, Escape, unchanged edits, out-of-range
+          input and ordinary number behavior. Log:
+          /var/folders/v9/b4f7l74x1b7gm_7zw9t6ncm80000gp/T/itsaplan-delivery-pe\
+          rcent-web.63axMM4S1J."
+        truncated: false
+    - name:
+        text: bun test delivery-workflow integration suite
+        truncated: false
+      result: passed
+      note:
+        text: From /Users/poco/Projects/itsaplan/apps/api, bun test
+          --env-file=<temporary test env>
+          src/modules/delivery-workflow/__tests__/integration/delivery.test.ts
+          against an isolated, migrated tmpfs Postgres. 5 passed, 0 failed. Used
+          distinct node/task weight bindings, retained effective progress,
+          validation and workflow lock coverage. Test container was stopped and
+          removed.
+        truncated: false
+    - name:
+        text: bun --filter=web --filter=api run typecheck
+        truncated: false
+      result: passed
+      note:
+        text: Repository root. Web and API TypeScript checks exited 0.
+        truncated: false
+    - name:
+        text: Prettier, ESLint and git diff --check
+        truncated: false
+      result: passed
+      note:
+        text: Repository root. Prettier check and ESLint --flag
+          v10_config_lookup_from_file on the eight changed code files, and git
+          diff --check exited 0.
+        truncated: false
+    - name:
+        text: Chrome extension component preview
+        truncated: false
+      result: passed
+      note:
+        text: The current InlineTextField in a synthetic loopback preview. Editing 20%
+          to 30 and clicking outside incremented Writes once. Unchanged blur,
+          Escape, 101 and the incomplete number 1e did not increment Writes; 1e
+          had an empty DOM value with validity.badInput=true, and 40% was
+          preserved. Enter saved once. A standalone minus also had badInput=true
+          and preserved 40%; explicitly deleting the value and blurring saved
+          one clear; editing Weight and clicking Save saved once.
+        truncated: false
+    - name:
+        text: Project tidy, code-review and focused security-audit
+        truncated: false
+      result: passed
+      note:
+        text: Reviewed the final diff and callers. The read API provides configured
+          field IDs to the existing work item read route. The edit permissions,
+          server range check, numeric storage and calculation are retained. No
+          actionable findings.
+        truncated: false
+  summary:
+    text: The table consistently displays configured delivery percentages and saves
+      valid edits on Enter, blur or Save.
+    truncated: false
+  risks:
+    - text: Browser verification used a desktop preview with synthetic values. The
+        running ROLL instance was not changed or retested with the candidate.
+      truncated: false
+  risks_truncated: false
+  completed_at: 2026-11-23T01:17:11.095Z
+history:
+  - goal_cycle: 1
+    iteration: 1
+    attempt: 1
+    outcome: pass
+    unresolved_ids: []
+    summary:
+      text: The table consistently displays configured delivery percentages and saves
+        valid edits on Enter, blur or Save.
+      truncated: false
+    completed_at: 2026-11-23T01:17:11.095Z
+history_overflow:
+  dropped_entries: 0
+  first_dropped_at: null
+  last_dropped_at: null
+  outcome_counts:
+    pass: 0
+    fail: 0
+    blocked: 0
+    execution-error: 0
+    recovery: 0
+verification_result: pass
+verification_report: verification.md
+archived: true
+created_at: 2026-11-23T01:12:22.777Z
+archive_receipt:
+  runId: table-delivery-percentage-editing
+  change: table-delivery-percentage-editing
+  archiveRef: 2026-11-23-table-delivery-percentage-editing
+  transactionId: 6421be91-9a15-4a81-8e1c-a292c90772fe
+  stateVersion: 8
+  specs:
+    - capability: table-inline-delivery-progress
+      operation: modify
+run_checkpoint:
+  {
+    'schema': 'comet.workflow-run-checkpoint.v2',
+    'hash': '111e7634b0b04120ff3a4e265f9e3f83f6bbfc4896e7ca6a9e08f75a82cdfc6a',
+    'run':
+      {
+        'protocolVersion': 1,
+        'schemaVersion': 1,
+        'runId': 'table-delivery-percentage-editing',
+        'revision': 1,
+        'workflow':
+          {
+            'id': 'comet-native',
+            'version': '4',
+            'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+          },
+        'definitionHashes':
+          {
+            '["comet-native","4"]': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+          },
+        'initialStateHash': '66baac3c0b094119a2cc9412a1e988ba2adb560dbe5eb48091bc82b3f4592346',
+        'input':
+          {
+            'artifactRootRef': 'docs',
+            'name': 'table-delivery-percentage-editing',
+            'task': "两个事情\n\n1. 完成进度和占比为啥有些不显示单位?\n2. 占比和完成进度的填写, 不一定要点击✓才能生效, 我看工时输入完直接回车或者失焦也可以保存",
+          },
+        'state':
+          {
+            'acceptance':
+              [
+                {
+                  'id': 'A1',
+                  'reason':
+                    {
+                      'text': 'TableRowSubtasks.test.tsx verifies raw zero and decimal percentages, manual progress, computed completion, an empty marker and the workflow reason. The API fixture uses different weight bindings for nodes and tasks, demonstrating that table formatting can follow the configured roles without depending on labels.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'Applicable progress and weight cells show a percent sign for manual values, including zero and decimals, and calculated progress uses the percentage display. Empty values and unavailable calculated results keep the existing marker or workflow message.',
+                },
+                {
+                  'id': 'A2',
+                  'reason':
+                    {
+                      'text': 'The table interaction test verifies root and nested row mutations, one save on Enter plus blur, blur and click save, cancel, and no writes for unchanged and outside-range inputs. The Chrome preview additionally verified native incomplete numeric drafts, clearing on blur and one write per save.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'An edited progress or weight value saves once on Enter, blur or clicking Save. Saving an empty value clears it, Escape cancels, and invalid input or an unchanged value causes no write. The write targets the edited work item on root and nested rows.',
+                },
+                {
+                  'id': 'A3',
+                  'reason':
+                    {
+                      'text': 'The calculated-progress branch takes precedence, and read-only cells display percentages without buttons. The general number fixture still renders without a percent unit and cancels on blur. The existing estimate and delivery API tests still pass, including workflow locks.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'Read-only and calculated progress cells cannot be edited. Unrelated numeric fields and the time estimate editor retain their existing display and save behavior.',
+                },
+              ],
+            'archived': true,
+            'blockers': [],
+            'brief': 'brief.md',
+            'builder_handoff':
+              {
+                'addressed_acceptance_ids': ['A1', 'A2', 'A3'],
+                'builder_execution_ref': '01a205e8-0a23-7442-b3e0-aab10853bc30',
+                'candidate_id': 'table-delivery-percentage-editing:3',
+                'checks':
+                  [
+                    {
+                      'name': { 'text': 'bun --filter=web run test', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'Repository root /Users/poco/Projects/itsaplan. 797 passed, 0 failed across 160 files. TableRowSubtasks.test.tsx covered zero and decimal percentage rendering, read-only rendering, opt-in blur, Enter+blur once, click save and clearing, Escape, unchanged edits, out-of-range input and ordinary number behavior. Log: /var/folders/v9/b4f7l74x1b7gm_7zw9t6ncm80000gp/T/itsaplan-delivery-percent-web.63axMM4S1J.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'bun test delivery-workflow integration suite',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'From /Users/poco/Projects/itsaplan/apps/api, bun test --env-file=<temporary test env> src/modules/delivery-workflow/__tests__/integration/delivery.test.ts against an isolated, migrated tmpfs Postgres. 5 passed, 0 failed. Used distinct node/task weight bindings, retained effective progress, validation and workflow lock coverage. Test container was stopped and removed.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'bun --filter=web --filter=api run typecheck',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'Repository root. Web and API TypeScript checks exited 0.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        { 'text': 'Prettier, ESLint and git diff --check', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'Repository root. Prettier check and ESLint --flag v10_config_lookup_from_file on the eight changed code files, and git diff --check exited 0.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name': { 'text': 'Chrome extension component preview', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'The current InlineTextField in a synthetic loopback preview. Editing 20% to 30 and clicking outside incremented Writes once. Unchanged blur, Escape, 101 and the incomplete number 1e did not increment Writes; 1e had an empty DOM value with validity.badInput=true, and 40% was preserved. Enter saved once.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Project tidy, code-review and focused security-audit',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'Reviewed the final diff and callers. The read API provides configured field IDs to the existing work item read route. The edit permissions, server range check, numeric storage and calculation are retained. No actionable findings.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                  ],
+                'checks_truncated': false,
+                'identity_provider': 'skill-coordinated',
+                'iteration': 1,
+                'known_limits':
+                  [
+                    {
+                      'text': 'Browser checks used a desktop Chrome preview with synthetic data. The deployed ROLL table was left untouched.',
+                      'truncated': false,
+                    },
+                  ],
+                'known_limits_truncated': false,
+                'review': null,
+                'submitted_at': '2026-11-23T01:16:56.223Z',
+                'summary':
+                  {
+                    'text': 'Show a percent unit in the configured progress and weight cells. The opted-in numeric editor commits on Enter, leaving the input, or clicking Save, and preserves the saved value on no change, Escape or invalid input.',
+                    'truncated': false,
+                  },
+              },
+            'created_at': '2026-11-23T01:12:22.777Z',
+            'document_constraints_version': 3,
+            'history':
+              [
+                {
+                  'attempt': 1,
+                  'completed_at': '2026-11-23T01:17:11.095Z',
+                  'goal_cycle': 1,
+                  'iteration': 1,
+                  'outcome': 'pass',
+                  'summary':
+                    {
+                      'text': 'The table consistently displays configured delivery percentages and saves valid edits on Enter, blur or Save.',
+                      'truncated': false,
+                    },
+                  'unresolved_ids': [],
+                },
+              ],
+            'history_overflow':
+              {
+                'dropped_entries': 0,
+                'first_dropped_at': null,
+                'last_dropped_at': null,
+                'outcome_counts':
+                  { 'blocked': 0, 'execution-error': 0, 'fail': 0, 'pass': 0, 'recovery': 0 },
+              },
+            'language': 'en',
+            'loop':
+              {
+                'attempt': 1,
+                'execution_failure_count': 0,
+                'failed_iteration_count': 0,
+                'goal_cycle': 1,
+                'iteration': 1,
+                'next_action': null,
+                'no_progress_count': 0,
+                'previous_unresolved_ids': [],
+                'retry_epoch': 0,
+                'stage': 'done',
+              },
+            'name': 'table-delivery-percentage-editing',
+            'phase': 'archive',
+            'schema': 'comet.native.v4',
+            'spec_changes':
+              [
+                {
+                  'capability': 'table-inline-delivery-progress',
+                  'operation': 'modify',
+                  'source': 'specs/table-inline-delivery-progress/spec.md',
+                },
+              ],
+            'state_version': 8,
+            'status': 'done',
+            'verification':
+              {
+                'assurance': 'self-reviewed',
+                'attempt': 1,
+                'candidate_id': 'table-delivery-percentage-editing:3',
+                'checks': [],
+                'completed_at': '2026-11-23T01:17:11.095Z',
+                'identity_provider': 'skill-coordinated',
+                'iteration': 1,
+                'reported_checks':
+                  [
+                    {
+                      'name': { 'text': 'bun --filter=web run test', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'Repository root /Users/poco/Projects/itsaplan. 797 passed, 0 failed across 160 files. TableRowSubtasks.test.tsx covered zero and decimal percentage rendering, read-only rendering, opt-in blur, Enter+blur once, click save and clearing, Escape, unchanged edits, out-of-range input and ordinary number behavior. Log: /var/folders/v9/b4f7l74x1b7gm_7zw9t6ncm80000gp/T/itsaplan-delivery-percent-web.63axMM4S1J.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'bun test delivery-workflow integration suite',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'From /Users/poco/Projects/itsaplan/apps/api, bun test --env-file=<temporary test env> src/modules/delivery-workflow/__tests__/integration/delivery.test.ts against an isolated, migrated tmpfs Postgres. 5 passed, 0 failed. Used distinct node/task weight bindings, retained effective progress, validation and workflow lock coverage. Test container was stopped and removed.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'bun --filter=web --filter=api run typecheck',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'Repository root. Web and API TypeScript checks exited 0.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        { 'text': 'Prettier, ESLint and git diff --check', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'Repository root. Prettier check and ESLint --flag v10_config_lookup_from_file on the eight changed code files, and git diff --check exited 0.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name': { 'text': 'Chrome extension component preview', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'The current InlineTextField in a synthetic loopback preview. Editing 20% to 30 and clicking outside incremented Writes once. Unchanged blur, Escape, 101 and the incomplete number 1e did not increment Writes; 1e had an empty DOM value with validity.badInput=true, and 40% was preserved. Enter saved once. A standalone minus also had badInput=true and preserved 40%; explicitly deleting the value and blurring saved one clear; editing Weight and clicking Save saved once.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Project tidy, code-review and focused security-audit',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'Reviewed the final diff and callers. The read API provides configured field IDs to the existing work item read route. The edit permissions, server range check, numeric storage and calculation are retained. No actionable findings.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                  ],
+                'risks':
+                  [
+                    {
+                      'text': 'Browser verification used a desktop preview with synthetic values. The running ROLL instance was not changed or retested with the candidate.',
+                      'truncated': false,
+                    },
+                  ],
+                'risks_truncated': false,
+                'summary':
+                  {
+                    'text': 'The table consistently displays configured delivery percentages and saves valid edits on Enter, blur or Save.',
+                    'truncated': false,
+                  },
+                'verdict': 'pass',
+                'verifier_execution_ref': '01a205e8-0a23-7442-b3e0-aab10853bc30',
+              },
+            'verification_report': 'verification.md',
+            'verification_result': 'pass',
+            'workspace':
+              {
+                'change_branch': 'main',
+                'finish': null,
+                'isolation': 'current',
+                'target_branch': 'main',
+              },
+          },
+        'status': 'completed',
+        'sequence': 8,
+        'actions':
+          [
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a205e8-0a23-7442-b3e0-aab10853bc30',
+                  'token': 'portable-fc801842394785c072242504c2ca9300f0e77236d38943b22203014b2124fa91',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'table-delivery-percentage-editing:1',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-delivery-percentage-editing',
+                      'task': "两个事情\n\n1. 完成进度和占比为啥有些不显示单位?\n2. 占比和完成进度的填写, 不一定要点击✓才能生效, 我看工时输入完直接回车或者失焦也可以保存",
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '3fe2d4d90aca44afa5d0cf4d3c862e3fc131f48eb0bd65177e933d2f9358d3e1',
+              'outcome':
+                {
+                  'actionId': 'table-delivery-percentage-editing:1',
+                  'attempt': 1,
+                  'claimToken': 'portable-fc801842394785c072242504c2ca9300f0e77236d38943b22203014b2124fa91',
+                  'inputHash': '3fe2d4d90aca44afa5d0cf4d3c862e3fc131f48eb0bd65177e933d2f9358d3e1',
+                  'outcomeId': 'native-result-a719ea598807a3c703dddaffd40c8862dd0d9aa95aef357863ebf66893fa4a9b',
+                  'output':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'source': 'brief.md',
+                            'text': 'Applicable progress and weight cells show a percent sign for manual values, including zero and decimals, and calculated progress uses the percentage display. Empty values and unavailable calculated results keep the existing marker or workflow message.',
+                          },
+                          {
+                            'id': 'A2',
+                            'source': 'brief.md',
+                            'text': 'An edited progress or weight value saves once on Enter, blur or clicking Save. Saving an empty value clears it, Escape cancels, and invalid input or an unchanged value causes no write. The write targets the edited work item on root and nested rows.',
+                          },
+                          {
+                            'id': 'A3',
+                            'source': 'brief.md',
+                            'text': 'Read-only and calculated progress cells cannot be edited. Unrelated numeric fields and the time estimate editor retain their existing display and save behavior.',
+                          },
+                        ],
+                      'children': null,
+                      'specChanges':
+                        [
+                          {
+                            'capability': 'table-inline-delivery-progress',
+                            'operation': 'modify',
+                            'source': 'specs/table-inline-delivery-progress/spec.md',
+                          },
+                        ],
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'b3bf1e49ad226f995eec410aee1337b02cc293381877a5588b5958ecd65a1bc7',
+                    'outcomeId': 'native-result-a719ea598807a3c703dddaffd40c8862dd0d9aa95aef357863ebf66893fa4a9b',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-shape-prepare',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'table-delivery-percentage-editing',
+              'status': 'succeeded',
+              'stepId': 'shape.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a205e8-0a23-7442-b3e0-aab10853bc30',
+                  'token': 'portable-d5f039282528fcd0530231777d03309637afc50424f57b04d64f23b5a5b18050',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'table-delivery-percentage-editing:3',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-delivery-percentage-editing',
+                      'task': "两个事情\n\n1. 完成进度和占比为啥有些不显示单位?\n2. 占比和完成进度的填写, 不一定要点击✓才能生效, 我看工时输入完直接回车或者失焦也可以保存",
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '50ae2f3f151bf97f21d3ec13af4a4ddeb2e3db62ad8b6cc279fa9bfc7b827dd2',
+              'outcome':
+                {
+                  'actionId': 'table-delivery-percentage-editing:3',
+                  'attempt': 1,
+                  'claimToken': 'portable-d5f039282528fcd0530231777d03309637afc50424f57b04d64f23b5a5b18050',
+                  'inputHash': '50ae2f3f151bf97f21d3ec13af4a4ddeb2e3db62ad8b6cc279fa9bfc7b827dd2',
+                  'outcomeId': 'native-result-a0a7ceac98f2025a00a055e5807384ba53f16a8ae75f0601b540d31869581a47',
+                  'output':
+                    {
+                      'addressedAcceptanceIds': ['A1', 'A2', 'A3'],
+                      'checks':
+                        [
+                          {
+                            'name': 'bun --filter=web run test',
+                            'note': 'Repository root /Users/poco/Projects/itsaplan. 797 passed, 0 failed across 160 files. TableRowSubtasks.test.tsx covered zero and decimal percentage rendering, read-only rendering, opt-in blur, Enter+blur once, click save and clearing, Escape, unchanged edits, out-of-range input and ordinary number behavior. Log: /var/folders/v9/b4f7l74x1b7gm_7zw9t6ncm80000gp/T/itsaplan-delivery-percent-web.63axMM4S1J.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun test delivery-workflow integration suite',
+                            'note': 'From /Users/poco/Projects/itsaplan/apps/api, bun test --env-file=<temporary test env> src/modules/delivery-workflow/__tests__/integration/delivery.test.ts against an isolated, migrated tmpfs Postgres. 5 passed, 0 failed. Used distinct node/task weight bindings, retained effective progress, validation and workflow lock coverage. Test container was stopped and removed.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun --filter=web --filter=api run typecheck',
+                            'note': 'Repository root. Web and API TypeScript checks exited 0.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Prettier, ESLint and git diff --check',
+                            'note': 'Repository root. Prettier check and ESLint --flag v10_config_lookup_from_file on the eight changed code files, and git diff --check exited 0.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Chrome extension component preview',
+                            'note': 'The current InlineTextField in a synthetic loopback preview. Editing 20% to 30 and clicking outside incremented Writes once. Unchanged blur, Escape, 101 and the incomplete number 1e did not increment Writes; 1e had an empty DOM value with validity.badInput=true, and 40% was preserved. Enter saved once.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Project tidy, code-review and focused security-audit',
+                            'note': 'Reviewed the final diff and callers. The read API provides configured field IDs to the existing work item read route. The edit permissions, server range check, numeric storage and calculation are retained. No actionable findings.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'knownLimits':
+                        [
+                          'Browser checks used a desktop Chrome preview with synthetic data. The deployed ROLL table was left untouched.',
+                        ],
+                      'requireIndependentReview': false,
+                      'summary': 'Show a percent unit in the configured progress and weight cells. The opted-in numeric editor commits on Enter, leaving the input, or clicking Save, and preserves the saved value on no change, Escape or invalid input.',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '8cbbd8d6de072a99386a4ff8a1b7a5eda89df2a0efed61db3862c5e0d7e2381f',
+                    'outcomeId': 'native-result-a0a7ceac98f2025a00a055e5807384ba53f16a8ae75f0601b540d31869581a47',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-builder',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'table-delivery-percentage-editing',
+              'status': 'succeeded',
+              'stepId': 'build.builder',
+              'type': 'handoff',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a205e8-0a23-7442-b3e0-aab10853bc30',
+                  'token': 'portable-b5dbb920b2ff4d00b45176f190056b2888eda972111a58d9fbd5b7239f395bb5',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'table-delivery-percentage-editing:4',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-delivery-percentage-editing',
+                      'task': "两个事情\n\n1. 完成进度和占比为啥有些不显示单位?\n2. 占比和完成进度的填写, 不一定要点击✓才能生效, 我看工时输入完直接回车或者失焦也可以保存",
+                    },
+                  'outputs': {},
+                },
+              'inputHash': 'd9024367c401dd2c999920d5dac02cbc5e2f562ad8eb44b91eee1c8dccfcfb8d',
+              'outcome':
+                {
+                  'actionId': 'table-delivery-percentage-editing:4',
+                  'attempt': 1,
+                  'claimToken': 'portable-b5dbb920b2ff4d00b45176f190056b2888eda972111a58d9fbd5b7239f395bb5',
+                  'inputHash': 'd9024367c401dd2c999920d5dac02cbc5e2f562ad8eb44b91eee1c8dccfcfb8d',
+                  'outcomeId': 'native-result-fe71f278d79cb97d1b4d36a82e930e399561146cd89a9391dc14a2f3249c0fd1',
+                  'output':
+                    {
+                      'candidateId': 'table-delivery-percentage-editing:3',
+                      'checks':
+                        [
+                          {
+                            'name': 'bun --filter=web run test',
+                            'note': 'Repository root /Users/poco/Projects/itsaplan. 797 passed, 0 failed across 160 files. TableRowSubtasks.test.tsx covered zero and decimal percentage rendering, read-only rendering, opt-in blur, Enter+blur once, click save and clearing, Escape, unchanged edits, out-of-range input and ordinary number behavior. Log: /var/folders/v9/b4f7l74x1b7gm_7zw9t6ncm80000gp/T/itsaplan-delivery-percent-web.63axMM4S1J.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun test delivery-workflow integration suite',
+                            'note': 'From /Users/poco/Projects/itsaplan/apps/api, bun test --env-file=<temporary test env> src/modules/delivery-workflow/__tests__/integration/delivery.test.ts against an isolated, migrated tmpfs Postgres. 5 passed, 0 failed. Used distinct node/task weight bindings, retained effective progress, validation and workflow lock coverage. Test container was stopped and removed.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun --filter=web --filter=api run typecheck',
+                            'note': 'Repository root. Web and API TypeScript checks exited 0.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Prettier, ESLint and git diff --check',
+                            'note': 'Repository root. Prettier check and ESLint --flag v10_config_lookup_from_file on the eight changed code files, and git diff --check exited 0.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Chrome extension component preview',
+                            'note': 'The current InlineTextField in a synthetic loopback preview. Editing 20% to 30 and clicking outside incremented Writes once. Unchanged blur, Escape, 101 and the incomplete number 1e did not increment Writes; 1e had an empty DOM value with validity.badInput=true, and 40% was preserved. Enter saved once. A standalone minus also had badInput=true and preserved 40%; explicitly deleting the value and blurring saved one clear; editing Weight and clicking Save saved once.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Project tidy, code-review and focused security-audit',
+                            'note': 'Reviewed the final diff and callers. The read API provides configured field IDs to the existing work item read route. The edit permissions, server range check, numeric storage and calculation are retained. No actionable findings.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'response':
+                        {
+                          'kind': 'final-result',
+                          'result':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'reason': 'TableRowSubtasks.test.tsx verifies raw zero and decimal percentages, manual progress, computed completion, an empty marker and the workflow reason. The API fixture uses different weight bindings for nodes and tasks, demonstrating that table formatting can follow the configured roles without depending on labels.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'reason': 'The table interaction test verifies root and nested row mutations, one save on Enter plus blur, blur and click save, cancel, and no writes for unchanged and outside-range inputs. The Chrome preview additionally verified native incomplete numeric drafts, clearing on blur and one write per save.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'reason': 'The calculated-progress branch takes precedence, and read-only cells display percentages without buttons. The general number fixture still renders without a percent unit and cancels on blur. The existing estimate and delivery API tests still pass, including workflow locks.',
+                                    'result': 'passed',
+                                  },
+                                ],
+                              'attempt': 1,
+                              'iteration': 1,
+                              'requestReview':
+                                {
+                                  'reason': 'The original request shows mixed percent and raw numbers for delivery columns and asks for time-estimate-style saving. The confirmed brief and target spec scope the behavior to bound fields, which the candidate implements using delivery metadata and the existing editor and mutations.',
+                                  'result': 'aligned',
+                                },
+                              'risks':
+                                [
+                                  'Browser verification used a desktop preview with synthetic values. The running ROLL instance was not changed or retested with the candidate.',
+                                ],
+                              'summary': 'The table consistently displays configured delivery percentages and saves valid edits on Enter, blur or Save.',
+                              'verdict': 'pass',
+                            },
+                        },
+                      'verifierExecutionRef': '01a205e8-0a23-7442-b3e0-aab10853bc30',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'a37024a45fd9f3e504025f43eca7ae050a3d96a4d415859867be60f123fe09e5',
+                    'outcomeId': 'native-result-fe71f278d79cb97d1b4d36a82e930e399561146cd89a9391dc14a2f3249c0fd1',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-verifier',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'table-delivery-percentage-editing',
+              'status': 'succeeded',
+              'stepId': 'verify.verifier',
+              'type': 'handoff',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-preflight',
+                  'token': 'portable-bbcac3269a6850cab3c1a1694e8cc78ce8e124e447da4863c7fe3a812e6b7fcc',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'table-delivery-percentage-editing:6',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-delivery-percentage-editing',
+                      'task': "两个事情\n\n1. 完成进度和占比为啥有些不显示单位?\n2. 占比和完成进度的填写, 不一定要点击✓才能生效, 我看工时输入完直接回车或者失焦也可以保存",
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '192a232b1fc31baa8d42949d3922c46a718e798c2564ebd0292dfc970a652e1d',
+              'outcome':
+                {
+                  'actionId': 'table-delivery-percentage-editing:6',
+                  'attempt': 1,
+                  'claimToken': 'portable-bbcac3269a6850cab3c1a1694e8cc78ce8e124e447da4863c7fe3a812e6b7fcc',
+                  'inputHash': '192a232b1fc31baa8d42949d3922c46a718e798c2564ebd0292dfc970a652e1d',
+                  'outcomeId': 'table-delivery-percentage-editing:6:1:executor-result',
+                  'output':
+                    {
+                      'archiveDirRef': 'docs/comet/archive/2026-11-23-table-delivery-percentage-editing',
+                      'blockers': [],
+                      'candidateId': 'table-delivery-percentage-editing:3',
+                      'capabilityPeers': [],
+                      'ready': true,
+                      'reportRef': 'docs/comet/changes/table-delivery-percentage-editing/verification.md',
+                      'reportStateVersion': 6,
+                      'requiresReverification': false,
+                      'specPreview':
+                        [
+                          {
+                            'capability': 'table-inline-delivery-progress',
+                            'operation': 'modify',
+                            'source': 'specs/table-inline-delivery-progress/spec.md',
+                          },
+                        ],
+                      'stateVersion': 7,
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'e931c228d5c9cd7d648421260b8828c15d61cb9a41fc4a26ce2332d531a600a7',
+                    'outcomeId': 'table-delivery-percentage-editing:6:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive-preflight',
+              'requiredCapabilities': [],
+              'retry': 'idempotent',
+              'runId': 'table-delivery-percentage-editing',
+              'status': 'succeeded',
+              'stepId': 'archive.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-apply',
+                  'token': 'portable-de381bddafb4f8b7569b1639d543168e28ccbde102dfda7bb590d867b1127e10',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'table-delivery-percentage-editing:7',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-delivery-percentage-editing',
+                      'task': "两个事情\n\n1. 完成进度和占比为啥有些不显示单位?\n2. 占比和完成进度的填写, 不一定要点击✓才能生效, 我看工时输入完直接回车或者失焦也可以保存",
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '01189ad94b3090aad3af2466ba9460b3aa38006dfc6762ecc214ccb2b7efffd8',
+              'outcome':
+                {
+                  'actionId': 'table-delivery-percentage-editing:7',
+                  'attempt': 1,
+                  'claimToken': 'portable-de381bddafb4f8b7569b1639d543168e28ccbde102dfda7bb590d867b1127e10',
+                  'inputHash': '01189ad94b3090aad3af2466ba9460b3aa38006dfc6762ecc214ccb2b7efffd8',
+                  'outcomeId': 'table-delivery-percentage-editing:7:1:executor-result',
+                  'output':
+                    {
+                      'archiveRef': '2026-11-23-table-delivery-percentage-editing',
+                      'specCount': 1,
+                      'stateVersion': 7,
+                      'transactionId': '6421be91-9a15-4a81-8e1c-a292c90772fe',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'ec14d11011797678d5f8edb7da4ae0ed8fb542800c81f597c3f8f0cc16efa778',
+                    'outcomeId': 'table-delivery-percentage-editing:7:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'table-delivery-percentage-editing',
+              'status': 'succeeded',
+              'stepId': 'archive.execute',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-finalize',
+                  'token': 'portable-96b9ff220c338623886905d36f967da9251e51a58a40ba3570f1710e30c65356',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'table-delivery-percentage-editing:8',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-delivery-percentage-editing',
+                      'task': "两个事情\n\n1. 完成进度和占比为啥有些不显示单位?\n2. 占比和完成进度的填写, 不一定要点击✓才能生效, 我看工时输入完直接回车或者失焦也可以保存",
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '6545de041229ca987c39ad1a978e57d97e4c4cbef73c76179794ab9b2a4cbfd1',
+              'outcome':
+                {
+                  'actionId': 'table-delivery-percentage-editing:8',
+                  'attempt': 1,
+                  'claimToken': 'portable-96b9ff220c338623886905d36f967da9251e51a58a40ba3570f1710e30c65356',
+                  'inputHash': '6545de041229ca987c39ad1a978e57d97e4c4cbef73c76179794ab9b2a4cbfd1',
+                  'outcomeId': 'table-delivery-percentage-editing:8:1:executor-result',
+                  'output':
+                    {
+                      'archiveRef': '2026-11-23-table-delivery-percentage-editing',
+                      'change': 'table-delivery-percentage-editing',
+                      'runId': 'table-delivery-percentage-editing',
+                      'specs':
+                        [{ 'capability': 'table-inline-delivery-progress', 'operation': 'modify' }],
+                      'stateVersion': 8,
+                      'transactionId': '6421be91-9a15-4a81-8e1c-a292c90772fe',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'bc9cdf15fcf73877d4a4f9879bb5238af7e5cd4f9509440e98ee3e533722162c',
+                    'outcomeId': 'table-delivery-percentage-editing:8:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive-finalize',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'table-delivery-percentage-editing',
+              'status': 'succeeded',
+              'stepId': 'archive.finalize',
+              'type': 'call_tool',
+            },
+          ],
+        'actionContexts':
+          {
+            'table-delivery-percentage-editing:1': { 'results': {}, 'sequence': 1 },
+            'table-delivery-percentage-editing:3': { 'results': {}, 'sequence': 3 },
+            'table-delivery-percentage-editing:4': { 'results': {}, 'sequence': 4 },
+            'table-delivery-percentage-editing:6': { 'results': {}, 'sequence': 6 },
+            'table-delivery-percentage-editing:7': { 'results': {}, 'sequence': 7 },
+            'table-delivery-percentage-editing:8': { 'results': {}, 'sequence': 8 },
+          },
+        'waits':
+          [
+            {
+              'id': 'table-delivery-percentage-editing:2',
+              'stepId': 'shape.confirm',
+              'sequence': 2,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-delivery-percentage-editing',
+                      'task': "两个事情\n\n1. 完成进度和占比为啥有些不显示单位?\n2. 占比和完成进度的填写, 不一定要点击✓才能生效, 我看工时输入完直接回车或者失焦也可以保存",
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'Applicable progress and weight cells show a percent sign for manual values, including zero and decimals, and calculated progress uses the percentage display. Empty values and unavailable calculated results keep the existing marker or workflow message.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'An edited progress or weight value saves once on Enter, blur or clicking Save. Saving an empty value clears it, Escape cancels, and invalid input or an unchanged value causes no write. The write targets the edited work item on root and nested rows.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'Read-only and calculated progress cells cannot be edited. Unrelated numeric fields and the time estimate editor retain their existing display and save behavior.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges':
+                            [
+                              {
+                                'capability': 'table-inline-delivery-progress',
+                                'operation': 'modify',
+                                'source': 'specs/table-inline-delivery-progress/spec.md',
+                              },
+                            ],
+                        },
+                    },
+                },
+              'proposalHash': '28ceed7181348c917bfee52776367945084ef8c3891d36a5feb0fa78c473f8da',
+              'choices': ['approved', 'rejected'],
+              'results': {},
+              'decision':
+                {
+                  'id': 'fbc9f930da9bdfbf49dde9c7a62f09bf14276ab066ca348d7acebf967d28a048',
+                  'choice': 'approved',
+                  'proposalHash': '28ceed7181348c917bfee52776367945084ef8c3891d36a5feb0fa78c473f8da',
+                },
+            },
+            {
+              'id': 'table-delivery-percentage-editing:5',
+              'stepId': 'verify.confirm',
+              'sequence': 5,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'activation':
+                    {
+                      'report':
+                        {
+                          'attempt': 1,
+                          'candidateId': 'table-delivery-percentage-editing:3',
+                          'iteration': 1,
+                          'reportRef': 'docs/comet/changes/table-delivery-percentage-editing/verification.md',
+                          'stateVersion': 6,
+                        },
+                    },
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-delivery-percentage-editing',
+                      'task': "两个事情\n\n1. 完成进度和占比为啥有些不显示单位?\n2. 占比和完成进度的填写, 不一定要点击✓才能生效, 我看工时输入完直接回车或者失焦也可以保存",
+                    },
+                  'outputs':
+                    {
+                      'verify.verifier':
+                        {
+                          'candidateId': 'table-delivery-percentage-editing:3',
+                          'checks':
+                            [
+                              {
+                                'name': 'bun --filter=web run test',
+                                'note': 'Repository root /Users/poco/Projects/itsaplan. 797 passed, 0 failed across 160 files. TableRowSubtasks.test.tsx covered zero and decimal percentage rendering, read-only rendering, opt-in blur, Enter+blur once, click save and clearing, Escape, unchanged edits, out-of-range input and ordinary number behavior. Log: /var/folders/v9/b4f7l74x1b7gm_7zw9t6ncm80000gp/T/itsaplan-delivery-percent-web.63axMM4S1J.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun test delivery-workflow integration suite',
+                                'note': 'From /Users/poco/Projects/itsaplan/apps/api, bun test --env-file=<temporary test env> src/modules/delivery-workflow/__tests__/integration/delivery.test.ts against an isolated, migrated tmpfs Postgres. 5 passed, 0 failed. Used distinct node/task weight bindings, retained effective progress, validation and workflow lock coverage. Test container was stopped and removed.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun --filter=web --filter=api run typecheck',
+                                'note': 'Repository root. Web and API TypeScript checks exited 0.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Prettier, ESLint and git diff --check',
+                                'note': 'Repository root. Prettier check and ESLint --flag v10_config_lookup_from_file on the eight changed code files, and git diff --check exited 0.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Chrome extension component preview',
+                                'note': 'The current InlineTextField in a synthetic loopback preview. Editing 20% to 30 and clicking outside incremented Writes once. Unchanged blur, Escape, 101 and the incomplete number 1e did not increment Writes; 1e had an empty DOM value with validity.badInput=true, and 40% was preserved. Enter saved once. A standalone minus also had badInput=true and preserved 40%; explicitly deleting the value and blurring saved one clear; editing Weight and clicking Save saved once.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Project tidy, code-review and focused security-audit',
+                                'note': 'Reviewed the final diff and callers. The read API provides configured field IDs to the existing work item read route. The edit permissions, server range check, numeric storage and calculation are retained. No actionable findings.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'response':
+                            {
+                              'kind': 'final-result',
+                              'result':
+                                {
+                                  'acceptance':
+                                    [
+                                      {
+                                        'id': 'A1',
+                                        'reason': 'TableRowSubtasks.test.tsx verifies raw zero and decimal percentages, manual progress, computed completion, an empty marker and the workflow reason. The API fixture uses different weight bindings for nodes and tasks, demonstrating that table formatting can follow the configured roles without depending on labels.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A2',
+                                        'reason': 'The table interaction test verifies root and nested row mutations, one save on Enter plus blur, blur and click save, cancel, and no writes for unchanged and outside-range inputs. The Chrome preview additionally verified native incomplete numeric drafts, clearing on blur and one write per save.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A3',
+                                        'reason': 'The calculated-progress branch takes precedence, and read-only cells display percentages without buttons. The general number fixture still renders without a percent unit and cancels on blur. The existing estimate and delivery API tests still pass, including workflow locks.',
+                                        'result': 'passed',
+                                      },
+                                    ],
+                                  'attempt': 1,
+                                  'iteration': 1,
+                                  'requestReview':
+                                    {
+                                      'reason': 'The original request shows mixed percent and raw numbers for delivery columns and asks for time-estimate-style saving. The confirmed brief and target spec scope the behavior to bound fields, which the candidate implements using delivery metadata and the existing editor and mutations.',
+                                      'result': 'aligned',
+                                    },
+                                  'risks':
+                                    [
+                                      'Browser verification used a desktop preview with synthetic values. The running ROLL instance was not changed or retested with the candidate.',
+                                    ],
+                                  'summary': 'The table consistently displays configured delivery percentages and saves valid edits on Enter, blur or Save.',
+                                  'verdict': 'pass',
+                                },
+                            },
+                          'verifierExecutionRef': '01a205e8-0a23-7442-b3e0-aab10853bc30',
+                        },
+                    },
+                },
+              'proposalHash': 'e7ad720911b533c6a6f5af927d93afc1cca469c86092d009b1638eb8c3a99e28',
+              'choices': ['approved', 'rejected', 'reverify'],
+              'results': {},
+              'decision':
+                {
+                  'id': '60c08a42a4b4c86ba5012489db10dc5d5810f76d2add7780d103e7b70c8fa8a5',
+                  'choice': 'approved',
+                  'proposalHash': 'e7ad720911b533c6a6f5af927d93afc1cca469c86092d009b1638eb8c3a99e28',
+                  'reason': '用户明确接受当前验收结果并授权归档、PR、合并和本地部署。',
+                },
+            },
+          ],
+        'ready': [],
+        'joins': {},
+        'outputs': {},
+        'children': [],
+        'lineage': [],
+      },
+    'sourceRevision': 15,
+    'sourceHash': '23a7b3e144625e50f4834f090ee25ddaa044bb1544704afc305b587484719287',
+    'pool':
+      {
+        'version': 3,
+        'values':
+          [
+            {
+              'choice': 'approved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-delivery-percentage-editing',
+                      'task': "两个事情\n\n1. 完成进度和占比为啥有些不显示单位?\n2. 占比和完成进度的填写, 不一定要点击✓才能生效, 我看工时输入完直接回车或者失焦也可以保存",
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'Applicable progress and weight cells show a percent sign for manual values, including zero and decimals, and calculated progress uses the percentage display. Empty values and unavailable calculated results keep the existing marker or workflow message.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'An edited progress or weight value saves once on Enter, blur or clicking Save. Saving an empty value clears it, Escape cancels, and invalid input or an unchanged value causes no write. The write targets the edited work item on root and nested rows.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'Read-only and calculated progress cells cannot be edited. Unrelated numeric fields and the time estimate editor retain their existing display and save behavior.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges':
+                            [
+                              {
+                                'capability': 'table-inline-delivery-progress',
+                                'operation': 'modify',
+                                'source': 'specs/table-inline-delivery-progress/spec.md',
+                              },
+                            ],
+                        },
+                    },
+                },
+            },
+            {
+              'acceptance':
+                [
+                  {
+                    'id': 'A1',
+                    'source': 'brief.md',
+                    'text': 'Applicable progress and weight cells show a percent sign for manual values, including zero and decimals, and calculated progress uses the percentage display. Empty values and unavailable calculated results keep the existing marker or workflow message.',
+                  },
+                  {
+                    'id': 'A2',
+                    'source': 'brief.md',
+                    'text': 'An edited progress or weight value saves once on Enter, blur or clicking Save. Saving an empty value clears it, Escape cancels, and invalid input or an unchanged value causes no write. The write targets the edited work item on root and nested rows.',
+                  },
+                  {
+                    'id': 'A3',
+                    'source': 'brief.md',
+                    'text': 'Read-only and calculated progress cells cannot be edited. Unrelated numeric fields and the time estimate editor retain their existing display and save behavior.',
+                  },
+                ],
+              'children': null,
+              'specChanges':
+                [
+                  {
+                    'capability': 'table-inline-delivery-progress',
+                    'operation': 'modify',
+                    'source': 'specs/table-inline-delivery-progress/spec.md',
+                  },
+                ],
+            },
+            {
+              'addressedAcceptanceIds': ['A1', 'A2', 'A3'],
+              'checks':
+                [
+                  {
+                    'name': 'bun --filter=web run test',
+                    'note': 'Repository root /Users/poco/Projects/itsaplan. 797 passed, 0 failed across 160 files. TableRowSubtasks.test.tsx covered zero and decimal percentage rendering, read-only rendering, opt-in blur, Enter+blur once, click save and clearing, Escape, unchanged edits, out-of-range input and ordinary number behavior. Log: /var/folders/v9/b4f7l74x1b7gm_7zw9t6ncm80000gp/T/itsaplan-delivery-percent-web.63axMM4S1J.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun test delivery-workflow integration suite',
+                    'note': 'From /Users/poco/Projects/itsaplan/apps/api, bun test --env-file=<temporary test env> src/modules/delivery-workflow/__tests__/integration/delivery.test.ts against an isolated, migrated tmpfs Postgres. 5 passed, 0 failed. Used distinct node/task weight bindings, retained effective progress, validation and workflow lock coverage. Test container was stopped and removed.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun --filter=web --filter=api run typecheck',
+                    'note': 'Repository root. Web and API TypeScript checks exited 0.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Prettier, ESLint and git diff --check',
+                    'note': 'Repository root. Prettier check and ESLint --flag v10_config_lookup_from_file on the eight changed code files, and git diff --check exited 0.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Chrome extension component preview',
+                    'note': 'The current InlineTextField in a synthetic loopback preview. Editing 20% to 30 and clicking outside incremented Writes once. Unchanged blur, Escape, 101 and the incomplete number 1e did not increment Writes; 1e had an empty DOM value with validity.badInput=true, and 40% was preserved. Enter saved once.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Project tidy, code-review and focused security-audit',
+                    'note': 'Reviewed the final diff and callers. The read API provides configured field IDs to the existing work item read route. The edit permissions, server range check, numeric storage and calculation are retained. No actionable findings.',
+                    'result': 'passed',
+                  },
+                ],
+              'knownLimits':
+                [
+                  'Browser checks used a desktop Chrome preview with synthetic data. The deployed ROLL table was left untouched.',
+                ],
+              'requireIndependentReview': false,
+              'summary': 'Show a percent unit in the configured progress and weight cells. The opted-in numeric editor commits on Enter, leaving the input, or clicking Save, and preserves the saved value on no change, Escape or invalid input.',
+            },
+            {
+              'choice': 'approved',
+              'proposal':
+                {
+                  'activation':
+                    {
+                      'report':
+                        {
+                          'attempt': 1,
+                          'candidateId': 'table-delivery-percentage-editing:3',
+                          'iteration': 1,
+                          'reportRef': 'docs/comet/changes/table-delivery-percentage-editing/verification.md',
+                          'stateVersion': 6,
+                        },
+                    },
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'table-delivery-percentage-editing',
+                      'task': "两个事情\n\n1. 完成进度和占比为啥有些不显示单位?\n2. 占比和完成进度的填写, 不一定要点击✓才能生效, 我看工时输入完直接回车或者失焦也可以保存",
+                    },
+                  'outputs':
+                    {
+                      'verify.verifier':
+                        {
+                          'candidateId': 'table-delivery-percentage-editing:3',
+                          'checks':
+                            [
+                              {
+                                'name': 'bun --filter=web run test',
+                                'note': 'Repository root /Users/poco/Projects/itsaplan. 797 passed, 0 failed across 160 files. TableRowSubtasks.test.tsx covered zero and decimal percentage rendering, read-only rendering, opt-in blur, Enter+blur once, click save and clearing, Escape, unchanged edits, out-of-range input and ordinary number behavior. Log: /var/folders/v9/b4f7l74x1b7gm_7zw9t6ncm80000gp/T/itsaplan-delivery-percent-web.63axMM4S1J.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun test delivery-workflow integration suite',
+                                'note': 'From /Users/poco/Projects/itsaplan/apps/api, bun test --env-file=<temporary test env> src/modules/delivery-workflow/__tests__/integration/delivery.test.ts against an isolated, migrated tmpfs Postgres. 5 passed, 0 failed. Used distinct node/task weight bindings, retained effective progress, validation and workflow lock coverage. Test container was stopped and removed.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun --filter=web --filter=api run typecheck',
+                                'note': 'Repository root. Web and API TypeScript checks exited 0.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Prettier, ESLint and git diff --check',
+                                'note': 'Repository root. Prettier check and ESLint --flag v10_config_lookup_from_file on the eight changed code files, and git diff --check exited 0.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Chrome extension component preview',
+                                'note': 'The current InlineTextField in a synthetic loopback preview. Editing 20% to 30 and clicking outside incremented Writes once. Unchanged blur, Escape, 101 and the incomplete number 1e did not increment Writes; 1e had an empty DOM value with validity.badInput=true, and 40% was preserved. Enter saved once. A standalone minus also had badInput=true and preserved 40%; explicitly deleting the value and blurring saved one clear; editing Weight and clicking Save saved once.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Project tidy, code-review and focused security-audit',
+                                'note': 'Reviewed the final diff and callers. The read API provides configured field IDs to the existing work item read route. The edit permissions, server range check, numeric storage and calculation are retained. No actionable findings.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'response':
+                            {
+                              'kind': 'final-result',
+                              'result':
+                                {
+                                  'acceptance':
+                                    [
+                                      {
+                                        'id': 'A1',
+                                        'reason': 'TableRowSubtasks.test.tsx verifies raw zero and decimal percentages, manual progress, computed completion, an empty marker and the workflow reason. The API fixture uses different weight bindings for nodes and tasks, demonstrating that table formatting can follow the configured roles without depending on labels.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A2',
+                                        'reason': 'The table interaction test verifies root and nested row mutations, one save on Enter plus blur, blur and click save, cancel, and no writes for unchanged and outside-range inputs. The Chrome preview additionally verified native incomplete numeric drafts, clearing on blur and one write per save.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A3',
+                                        'reason': 'The calculated-progress branch takes precedence, and read-only cells display percentages without buttons. The general number fixture still renders without a percent unit and cancels on blur. The existing estimate and delivery API tests still pass, including workflow locks.',
+                                        'result': 'passed',
+                                      },
+                                    ],
+                                  'attempt': 1,
+                                  'iteration': 1,
+                                  'requestReview':
+                                    {
+                                      'reason': 'The original request shows mixed percent and raw numbers for delivery columns and asks for time-estimate-style saving. The confirmed brief and target spec scope the behavior to bound fields, which the candidate implements using delivery metadata and the existing editor and mutations.',
+                                      'result': 'aligned',
+                                    },
+                                  'risks':
+                                    [
+                                      'Browser verification used a desktop preview with synthetic values. The running ROLL instance was not changed or retested with the candidate.',
+                                    ],
+                                  'summary': 'The table consistently displays configured delivery percentages and saves valid edits on Enter, blur or Save.',
+                                  'verdict': 'pass',
+                                },
+                            },
+                          'verifierExecutionRef': '01a205e8-0a23-7442-b3e0-aab10853bc30',
+                        },
+                    },
+                },
+            },
+            {
+              'candidateId': 'table-delivery-percentage-editing:3',
+              'checks':
+                [
+                  {
+                    'name': 'bun --filter=web run test',
+                    'note': 'Repository root /Users/poco/Projects/itsaplan. 797 passed, 0 failed across 160 files. TableRowSubtasks.test.tsx covered zero and decimal percentage rendering, read-only rendering, opt-in blur, Enter+blur once, click save and clearing, Escape, unchanged edits, out-of-range input and ordinary number behavior. Log: /var/folders/v9/b4f7l74x1b7gm_7zw9t6ncm80000gp/T/itsaplan-delivery-percent-web.63axMM4S1J.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun test delivery-workflow integration suite',
+                    'note': 'From /Users/poco/Projects/itsaplan/apps/api, bun test --env-file=<temporary test env> src/modules/delivery-workflow/__tests__/integration/delivery.test.ts against an isolated, migrated tmpfs Postgres. 5 passed, 0 failed. Used distinct node/task weight bindings, retained effective progress, validation and workflow lock coverage. Test container was stopped and removed.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun --filter=web --filter=api run typecheck',
+                    'note': 'Repository root. Web and API TypeScript checks exited 0.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Prettier, ESLint and git diff --check',
+                    'note': 'Repository root. Prettier check and ESLint --flag v10_config_lookup_from_file on the eight changed code files, and git diff --check exited 0.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Chrome extension component preview',
+                    'note': 'The current InlineTextField in a synthetic loopback preview. Editing 20% to 30 and clicking outside incremented Writes once. Unchanged blur, Escape, 101 and the incomplete number 1e did not increment Writes; 1e had an empty DOM value with validity.badInput=true, and 40% was preserved. Enter saved once. A standalone minus also had badInput=true and preserved 40%; explicitly deleting the value and blurring saved one clear; editing Weight and clicking Save saved once.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Project tidy, code-review and focused security-audit',
+                    'note': 'Reviewed the final diff and callers. The read API provides configured field IDs to the existing work item read route. The edit permissions, server range check, numeric storage and calculation are retained. No actionable findings.',
+                    'result': 'passed',
+                  },
+                ],
+              'response':
+                {
+                  'kind': 'final-result',
+                  'result':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'reason': 'TableRowSubtasks.test.tsx verifies raw zero and decimal percentages, manual progress, computed completion, an empty marker and the workflow reason. The API fixture uses different weight bindings for nodes and tasks, demonstrating that table formatting can follow the configured roles without depending on labels.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A2',
+                            'reason': 'The table interaction test verifies root and nested row mutations, one save on Enter plus blur, blur and click save, cancel, and no writes for unchanged and outside-range inputs. The Chrome preview additionally verified native incomplete numeric drafts, clearing on blur and one write per save.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A3',
+                            'reason': 'The calculated-progress branch takes precedence, and read-only cells display percentages without buttons. The general number fixture still renders without a percent unit and cancels on blur. The existing estimate and delivery API tests still pass, including workflow locks.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'attempt': 1,
+                      'iteration': 1,
+                      'requestReview':
+                        {
+                          'reason': 'The original request shows mixed percent and raw numbers for delivery columns and asks for time-estimate-style saving. The confirmed brief and target spec scope the behavior to bound fields, which the candidate implements using delivery metadata and the existing editor and mutations.',
+                          'result': 'aligned',
+                        },
+                      'risks':
+                        [
+                          'Browser verification used a desktop preview with synthetic values. The running ROLL instance was not changed or retested with the candidate.',
+                        ],
+                      'summary': 'The table consistently displays configured delivery percentages and saves valid edits on Enter, blur or Save.',
+                      'verdict': 'pass',
+                    },
+                },
+              'verifierExecutionRef': '01a205e8-0a23-7442-b3e0-aab10853bc30',
+            },
+            {
+              'archiveDirRef': 'docs/comet/archive/2026-11-23-table-delivery-percentage-editing',
+              'blockers': [],
+              'candidateId': 'table-delivery-percentage-editing:3',
+              'capabilityPeers': [],
+              'ready': true,
+              'reportRef': 'docs/comet/changes/table-delivery-percentage-editing/verification.md',
+              'reportStateVersion': 6,
+              'requiresReverification': false,
+              'specPreview':
+                [
+                  {
+                    'capability': 'table-inline-delivery-progress',
+                    'operation': 'modify',
+                    'source': 'specs/table-inline-delivery-progress/spec.md',
+                  },
+                ],
+              'stateVersion': 7,
+            },
+            {
+              'archiveRef': '2026-11-23-table-delivery-percentage-editing',
+              'specCount': 1,
+              'stateVersion': 7,
+              'transactionId': '6421be91-9a15-4a81-8e1c-a292c90772fe',
+            },
+            {
+              'sequence': 2,
+              'value':
+                {
+                  'choice': 'approved',
+                  'proposal':
+                    {
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'table-delivery-percentage-editing',
+                          'task': "两个事情\n\n1. 完成进度和占比为啥有些不显示单位?\n2. 占比和完成进度的填写, 不一定要点击✓才能生效, 我看工时输入完直接回车或者失焦也可以保存",
+                        },
+                      'outputs':
+                        {
+                          'shape.prepare':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'source': 'brief.md',
+                                    'text': 'Applicable progress and weight cells show a percent sign for manual values, including zero and decimals, and calculated progress uses the percentage display. Empty values and unavailable calculated results keep the existing marker or workflow message.',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'source': 'brief.md',
+                                    'text': 'An edited progress or weight value saves once on Enter, blur or clicking Save. Saving an empty value clears it, Escape cancels, and invalid input or an unchanged value causes no write. The write targets the edited work item on root and nested rows.',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'source': 'brief.md',
+                                    'text': 'Read-only and calculated progress cells cannot be edited. Unrelated numeric fields and the time estimate editor retain their existing display and save behavior.',
+                                  },
+                                ],
+                              'children': null,
+                              'specChanges':
+                                [
+                                  {
+                                    'capability': 'table-inline-delivery-progress',
+                                    'operation': 'modify',
+                                    'source': 'specs/table-inline-delivery-progress/spec.md',
+                                  },
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 1,
+              'value':
+                {
+                  'acceptance':
+                    [
+                      {
+                        'id': 'A1',
+                        'source': 'brief.md',
+                        'text': 'Applicable progress and weight cells show a percent sign for manual values, including zero and decimals, and calculated progress uses the percentage display. Empty values and unavailable calculated results keep the existing marker or workflow message.',
+                      },
+                      {
+                        'id': 'A2',
+                        'source': 'brief.md',
+                        'text': 'An edited progress or weight value saves once on Enter, blur or clicking Save. Saving an empty value clears it, Escape cancels, and invalid input or an unchanged value causes no write. The write targets the edited work item on root and nested rows.',
+                      },
+                      {
+                        'id': 'A3',
+                        'source': 'brief.md',
+                        'text': 'Read-only and calculated progress cells cannot be edited. Unrelated numeric fields and the time estimate editor retain their existing display and save behavior.',
+                      },
+                    ],
+                  'children': null,
+                  'specChanges':
+                    [
+                      {
+                        'capability': 'table-inline-delivery-progress',
+                        'operation': 'modify',
+                        'source': 'specs/table-inline-delivery-progress/spec.md',
+                      },
+                    ],
+                },
+            },
+            {
+              'sequence': 3,
+              'value':
+                {
+                  'addressedAcceptanceIds': ['A1', 'A2', 'A3'],
+                  'checks':
+                    [
+                      {
+                        'name': 'bun --filter=web run test',
+                        'note': 'Repository root /Users/poco/Projects/itsaplan. 797 passed, 0 failed across 160 files. TableRowSubtasks.test.tsx covered zero and decimal percentage rendering, read-only rendering, opt-in blur, Enter+blur once, click save and clearing, Escape, unchanged edits, out-of-range input and ordinary number behavior. Log: /var/folders/v9/b4f7l74x1b7gm_7zw9t6ncm80000gp/T/itsaplan-delivery-percent-web.63axMM4S1J.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun test delivery-workflow integration suite',
+                        'note': 'From /Users/poco/Projects/itsaplan/apps/api, bun test --env-file=<temporary test env> src/modules/delivery-workflow/__tests__/integration/delivery.test.ts against an isolated, migrated tmpfs Postgres. 5 passed, 0 failed. Used distinct node/task weight bindings, retained effective progress, validation and workflow lock coverage. Test container was stopped and removed.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun --filter=web --filter=api run typecheck',
+                        'note': 'Repository root. Web and API TypeScript checks exited 0.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Prettier, ESLint and git diff --check',
+                        'note': 'Repository root. Prettier check and ESLint --flag v10_config_lookup_from_file on the eight changed code files, and git diff --check exited 0.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Chrome extension component preview',
+                        'note': 'The current InlineTextField in a synthetic loopback preview. Editing 20% to 30 and clicking outside incremented Writes once. Unchanged blur, Escape, 101 and the incomplete number 1e did not increment Writes; 1e had an empty DOM value with validity.badInput=true, and 40% was preserved. Enter saved once.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Project tidy, code-review and focused security-audit',
+                        'note': 'Reviewed the final diff and callers. The read API provides configured field IDs to the existing work item read route. The edit permissions, server range check, numeric storage and calculation are retained. No actionable findings.',
+                        'result': 'passed',
+                      },
+                    ],
+                  'knownLimits':
+                    [
+                      'Browser checks used a desktop Chrome preview with synthetic data. The deployed ROLL table was left untouched.',
+                    ],
+                  'requireIndependentReview': false,
+                  'summary': 'Show a percent unit in the configured progress and weight cells. The opted-in numeric editor commits on Enter, leaving the input, or clicking Save, and preserves the saved value on no change, Escape or invalid input.',
+                },
+            },
+            {
+              'sequence': 5,
+              'value':
+                {
+                  'choice': 'approved',
+                  'proposal':
+                    {
+                      'activation':
+                        {
+                          'report':
+                            {
+                              'attempt': 1,
+                              'candidateId': 'table-delivery-percentage-editing:3',
+                              'iteration': 1,
+                              'reportRef': 'docs/comet/changes/table-delivery-percentage-editing/verification.md',
+                              'stateVersion': 6,
+                            },
+                        },
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'table-delivery-percentage-editing',
+                          'task': "两个事情\n\n1. 完成进度和占比为啥有些不显示单位?\n2. 占比和完成进度的填写, 不一定要点击✓才能生效, 我看工时输入完直接回车或者失焦也可以保存",
+                        },
+                      'outputs':
+                        {
+                          'verify.verifier':
+                            {
+                              'candidateId': 'table-delivery-percentage-editing:3',
+                              'checks':
+                                [
+                                  {
+                                    'name': 'bun --filter=web run test',
+                                    'note': 'Repository root /Users/poco/Projects/itsaplan. 797 passed, 0 failed across 160 files. TableRowSubtasks.test.tsx covered zero and decimal percentage rendering, read-only rendering, opt-in blur, Enter+blur once, click save and clearing, Escape, unchanged edits, out-of-range input and ordinary number behavior. Log: /var/folders/v9/b4f7l74x1b7gm_7zw9t6ncm80000gp/T/itsaplan-delivery-percent-web.63axMM4S1J.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'bun test delivery-workflow integration suite',
+                                    'note': 'From /Users/poco/Projects/itsaplan/apps/api, bun test --env-file=<temporary test env> src/modules/delivery-workflow/__tests__/integration/delivery.test.ts against an isolated, migrated tmpfs Postgres. 5 passed, 0 failed. Used distinct node/task weight bindings, retained effective progress, validation and workflow lock coverage. Test container was stopped and removed.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'bun --filter=web --filter=api run typecheck',
+                                    'note': 'Repository root. Web and API TypeScript checks exited 0.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Prettier, ESLint and git diff --check',
+                                    'note': 'Repository root. Prettier check and ESLint --flag v10_config_lookup_from_file on the eight changed code files, and git diff --check exited 0.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Chrome extension component preview',
+                                    'note': 'The current InlineTextField in a synthetic loopback preview. Editing 20% to 30 and clicking outside incremented Writes once. Unchanged blur, Escape, 101 and the incomplete number 1e did not increment Writes; 1e had an empty DOM value with validity.badInput=true, and 40% was preserved. Enter saved once. A standalone minus also had badInput=true and preserved 40%; explicitly deleting the value and blurring saved one clear; editing Weight and clicking Save saved once.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Project tidy, code-review and focused security-audit',
+                                    'note': 'Reviewed the final diff and callers. The read API provides configured field IDs to the existing work item read route. The edit permissions, server range check, numeric storage and calculation are retained. No actionable findings.',
+                                    'result': 'passed',
+                                  },
+                                ],
+                              'response':
+                                {
+                                  'kind': 'final-result',
+                                  'result':
+                                    {
+                                      'acceptance':
+                                        [
+                                          {
+                                            'id': 'A1',
+                                            'reason': 'TableRowSubtasks.test.tsx verifies raw zero and decimal percentages, manual progress, computed completion, an empty marker and the workflow reason. The API fixture uses different weight bindings for nodes and tasks, demonstrating that table formatting can follow the configured roles without depending on labels.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A2',
+                                            'reason': 'The table interaction test verifies root and nested row mutations, one save on Enter plus blur, blur and click save, cancel, and no writes for unchanged and outside-range inputs. The Chrome preview additionally verified native incomplete numeric drafts, clearing on blur and one write per save.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A3',
+                                            'reason': 'The calculated-progress branch takes precedence, and read-only cells display percentages without buttons. The general number fixture still renders without a percent unit and cancels on blur. The existing estimate and delivery API tests still pass, including workflow locks.',
+                                            'result': 'passed',
+                                          },
+                                        ],
+                                      'attempt': 1,
+                                      'iteration': 1,
+                                      'requestReview':
+                                        {
+                                          'reason': 'The original request shows mixed percent and raw numbers for delivery columns and asks for time-estimate-style saving. The confirmed brief and target spec scope the behavior to bound fields, which the candidate implements using delivery metadata and the existing editor and mutations.',
+                                          'result': 'aligned',
+                                        },
+                                      'risks':
+                                        [
+                                          'Browser verification used a desktop preview with synthetic values. The running ROLL instance was not changed or retested with the candidate.',
+                                        ],
+                                      'summary': 'The table consistently displays configured delivery percentages and saves valid edits on Enter, blur or Save.',
+                                      'verdict': 'pass',
+                                    },
+                                },
+                              'verifierExecutionRef': '01a205e8-0a23-7442-b3e0-aab10853bc30',
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 4,
+              'value':
+                {
+                  'candidateId': 'table-delivery-percentage-editing:3',
+                  'checks':
+                    [
+                      {
+                        'name': 'bun --filter=web run test',
+                        'note': 'Repository root /Users/poco/Projects/itsaplan. 797 passed, 0 failed across 160 files. TableRowSubtasks.test.tsx covered zero and decimal percentage rendering, read-only rendering, opt-in blur, Enter+blur once, click save and clearing, Escape, unchanged edits, out-of-range input and ordinary number behavior. Log: /var/folders/v9/b4f7l74x1b7gm_7zw9t6ncm80000gp/T/itsaplan-delivery-percent-web.63axMM4S1J.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun test delivery-workflow integration suite',
+                        'note': 'From /Users/poco/Projects/itsaplan/apps/api, bun test --env-file=<temporary test env> src/modules/delivery-workflow/__tests__/integration/delivery.test.ts against an isolated, migrated tmpfs Postgres. 5 passed, 0 failed. Used distinct node/task weight bindings, retained effective progress, validation and workflow lock coverage. Test container was stopped and removed.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun --filter=web --filter=api run typecheck',
+                        'note': 'Repository root. Web and API TypeScript checks exited 0.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Prettier, ESLint and git diff --check',
+                        'note': 'Repository root. Prettier check and ESLint --flag v10_config_lookup_from_file on the eight changed code files, and git diff --check exited 0.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Chrome extension component preview',
+                        'note': 'The current InlineTextField in a synthetic loopback preview. Editing 20% to 30 and clicking outside incremented Writes once. Unchanged blur, Escape, 101 and the incomplete number 1e did not increment Writes; 1e had an empty DOM value with validity.badInput=true, and 40% was preserved. Enter saved once. A standalone minus also had badInput=true and preserved 40%; explicitly deleting the value and blurring saved one clear; editing Weight and clicking Save saved once.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Project tidy, code-review and focused security-audit',
+                        'note': 'Reviewed the final diff and callers. The read API provides configured field IDs to the existing work item read route. The edit permissions, server range check, numeric storage and calculation are retained. No actionable findings.',
+                        'result': 'passed',
+                      },
+                    ],
+                  'response':
+                    {
+                      'kind': 'final-result',
+                      'result':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'reason': 'TableRowSubtasks.test.tsx verifies raw zero and decimal percentages, manual progress, computed completion, an empty marker and the workflow reason. The API fixture uses different weight bindings for nodes and tasks, demonstrating that table formatting can follow the configured roles without depending on labels.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A2',
+                                'reason': 'The table interaction test verifies root and nested row mutations, one save on Enter plus blur, blur and click save, cancel, and no writes for unchanged and outside-range inputs. The Chrome preview additionally verified native incomplete numeric drafts, clearing on blur and one write per save.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A3',
+                                'reason': 'The calculated-progress branch takes precedence, and read-only cells display percentages without buttons. The general number fixture still renders without a percent unit and cancels on blur. The existing estimate and delivery API tests still pass, including workflow locks.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'attempt': 1,
+                          'iteration': 1,
+                          'requestReview':
+                            {
+                              'reason': 'The original request shows mixed percent and raw numbers for delivery columns and asks for time-estimate-style saving. The confirmed brief and target spec scope the behavior to bound fields, which the candidate implements using delivery metadata and the existing editor and mutations.',
+                              'result': 'aligned',
+                            },
+                          'risks':
+                            [
+                              'Browser verification used a desktop preview with synthetic values. The running ROLL instance was not changed or retested with the candidate.',
+                            ],
+                          'summary': 'The table consistently displays configured delivery percentages and saves valid edits on Enter, blur or Save.',
+                          'verdict': 'pass',
+                        },
+                    },
+                  'verifierExecutionRef': '01a205e8-0a23-7442-b3e0-aab10853bc30',
+                },
+            },
+            {
+              'sequence': 6,
+              'value':
+                {
+                  'archiveDirRef': 'docs/comet/archive/2026-11-23-table-delivery-percentage-editing',
+                  'blockers': [],
+                  'candidateId': 'table-delivery-percentage-editing:3',
+                  'capabilityPeers': [],
+                  'ready': true,
+                  'reportRef': 'docs/comet/changes/table-delivery-percentage-editing/verification.md',
+                  'reportStateVersion': 6,
+                  'requiresReverification': false,
+                  'specPreview':
+                    [
+                      {
+                        'capability': 'table-inline-delivery-progress',
+                        'operation': 'modify',
+                        'source': 'specs/table-inline-delivery-progress/spec.md',
+                      },
+                    ],
+                  'stateVersion': 7,
+                },
+            },
+            {
+              'sequence': 7,
+              'value':
+                {
+                  'archiveRef': '2026-11-23-table-delivery-percentage-editing',
+                  'specCount': 1,
+                  'stateVersion': 7,
+                  'transactionId': '6421be91-9a15-4a81-8e1c-a292c90772fe',
+                },
+            },
+            {
+              'sequence': 8,
+              'value':
+                {
+                  'archiveRef': '2026-11-23-table-delivery-percentage-editing',
+                  'change': 'table-delivery-percentage-editing',
+                  'runId': 'table-delivery-percentage-editing',
+                  'specs':
+                    [{ 'capability': 'table-inline-delivery-progress', 'operation': 'modify' }],
+                  'stateVersion': 8,
+                  'transactionId': '6421be91-9a15-4a81-8e1c-a292c90772fe',
+                },
+            },
+          ],
+        'nodes':
+          [
+            { 'key': 'shape.prepare', 'value': 1, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': null, 'right': 0, 'height': 2 },
+            { 'key': 'build.builder', 'value': 2, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 2, 'right': 0, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 1, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 4, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.confirm', 'value': 3, 'left': 4, 'right': 5, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 2, 'right': 6, 'height': 3 },
+            { 'key': 'archive.prepare', 'value': 5, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 2, 'left': 8, 'right': null, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 9, 'right': 6, 'height': 3 },
+            { 'key': 'archive.execute', 'value': 6, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 2, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.prepare', 'value': 5, 'left': 11, 'right': 12, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 13, 'right': 6, 'height': 3 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': null, 'right': 15, 'height': 2 },
+            { 'key': 'build.builder', 'value': 9, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 17, 'right': 15, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 11, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.confirm', 'value': 10, 'left': 19, 'right': 20, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 17, 'right': 21, 'height': 3 },
+            { 'key': 'archive.prepare', 'value': 12, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 9, 'left': 23, 'right': null, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 24, 'right': 21, 'height': 3 },
+            { 'key': 'archive.execute', 'value': 13, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 9, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.prepare', 'value': 12, 'left': 26, 'right': 27, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 28, 'right': 21, 'height': 3 },
+            { 'key': 'archive.finalize', 'value': 14, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.execute', 'value': 13, 'left': null, 'right': 30, 'height': 2 },
+            { 'key': 'archive.prepare', 'value': 12, 'left': 31, 'right': 27, 'height': 3 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 32, 'right': 21, 'height': 4 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 9, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 11, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': 36, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 35, 'right': 37, 'height': 3 },
+          ],
+        'maps': [null, 1, 3, 7, 10, 14, 16, 18, 22, 25, 29, 33, 34, 38],
+        'bindings':
+          [
+            { 'path': ['actions', '0', 'input', 'outputs'], 'map': 0 },
+            { 'path': ['actions', '1', 'input', 'outputs'], 'map': 1 },
+            { 'path': ['actions', '2', 'input', 'outputs'], 'map': 2 },
+            { 'path': ['actions', '3', 'input', 'outputs'], 'map': 3 },
+            { 'path': ['actions', '4', 'input', 'outputs'], 'map': 4 },
+            { 'path': ['actions', '5', 'input', 'outputs'], 'map': 5 },
+            {
+              'path': ['actionContexts', 'table-delivery-percentage-editing:1', 'results'],
+              'map': 0,
+            },
+            {
+              'path': ['actionContexts', 'table-delivery-percentage-editing:3', 'results'],
+              'map': 6,
+            },
+            {
+              'path': ['actionContexts', 'table-delivery-percentage-editing:4', 'results'],
+              'map': 7,
+            },
+            {
+              'path': ['actionContexts', 'table-delivery-percentage-editing:6', 'results'],
+              'map': 8,
+            },
+            {
+              'path': ['actionContexts', 'table-delivery-percentage-editing:7', 'results'],
+              'map': 9,
+            },
+            {
+              'path': ['actionContexts', 'table-delivery-percentage-editing:8', 'results'],
+              'map': 10,
+            },
+            { 'path': ['outputs'], 'map': 11 },
+            { 'path': ['waits', '0', 'results'], 'map': 12 },
+            { 'path': ['waits', '1', 'results'], 'map': 13 },
+          ],
+      },
+    'storageHash': '1d6dc6600275dcd6a2339f251b40346ee0cbf1d29421587546a68dc9b890c58d',
+  }

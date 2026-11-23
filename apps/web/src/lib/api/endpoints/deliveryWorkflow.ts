@@ -19,6 +19,7 @@ export interface DeliveryItem {
   phase: 'delivery' | 'maintenance';
   progress: number | null;
   progressFieldId: number | null;
+  weightFieldId?: number | null;
   progressReadOnly: boolean;
   problem: 'hierarchy' | 'children' | 'weights' | 'child' | 'progress' | null;
   canConfirm: boolean;

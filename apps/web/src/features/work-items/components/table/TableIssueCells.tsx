@@ -54,19 +54,32 @@ export function TableIssueCells({
     }
     const onChange = (value: IssueFieldValueInput) =>
       setFieldValue.mutate({ issueId: issue.id, fieldId: field.id, value });
-    if (!readOnly && applies && field.fieldType === 'number') {
+    if (applies && field.fieldType === 'number') {
+      const weight = field.id === delivery?.weightFieldId;
+      const percentage = weight || field.id === delivery?.progressFieldId;
+      const cell = (
+        <TableCustomCell
+          key={key}
+          field={field}
+          issue={issue}
+          maps={maps}
+          percentage={percentage}
+        />
+      );
+      if (readOnly || (weight && delivery?.phase === 'maintenance')) return cell;
       const value = issue.fieldValues.find((entry) => entry.fieldId === field.id)?.value;
       return (
         <CellEditor key={key}>
           <InlineTextField
             fieldType="number"
             compact
+            percentage={percentage}
             value={typeof value === 'number' ? value : null}
             saveKey={`${field.id}-${issue.updatedAt}`}
             label={field.name}
             renderTrigger={(onClick) => (
               <CellButton onClick={onClick} title={field.name}>
-                <TableCustomCell field={field} issue={issue} maps={maps} />
+                {cell}
               </CellButton>
             )}
             onSave={(value) => onChange({ value })}
