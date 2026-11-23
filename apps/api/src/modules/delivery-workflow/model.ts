@@ -23,6 +23,13 @@ export const DeliveryPlan = t.Object({
 });
 export type DeliveryPlan = Static<typeof DeliveryPlan>;
 
+export const DeliveryPlanProgressList = t.Array(
+  t.Composite([
+    t.Pick(DeliveryPlan, ['progress', 'problem']),
+    t.Object({ id, progressFieldId: id }),
+  ]),
+);
+
 export const DeliveryItem = t.Object({
   id,
   moduleId: t.Nullable(id),

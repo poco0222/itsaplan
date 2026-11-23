@@ -8,6 +8,8 @@ import { HttpError } from '#shared/lib';
 import { accessErrors, commonErrors, errors } from '#shared/responses';
 import { paginate } from '#shared/pagination';
 import { deleteObjects } from '@repo/storage';
+import { DeliveryPlanProgressList } from '#modules/delivery-workflow/model';
+import { readDeliveryPlanProgress } from '#modules/delivery-workflow/service';
 import {
   AttachmentResponse,
   AttachmentListResponse,
@@ -134,6 +136,17 @@ export const initiativeRoutes = new Elysia({
         description: "List a project's initiatives.",
         ...mcpTool('list_initiatives'),
       },
+    },
+  )
+
+  .get(
+    '/projects/:projectKey/initiatives/delivery-progress',
+    ({ project }) => readDeliveryPlanProgress(project.id),
+    {
+      permission: ['initiatives', 'read'],
+      feature: 'initiatives',
+      response: { 200: DeliveryPlanProgressList, ...accessErrors },
+      detail: { summary: 'List weighted delivery progress for project initiatives' },
     },
   )
 

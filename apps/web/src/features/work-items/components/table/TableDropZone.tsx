@@ -8,17 +8,23 @@ export function TableDropZone({
   onDrop,
   disabled,
   className,
+  style,
   children,
 }: {
   id: string;
   onDrop: (issueId: number) => void;
   disabled?: boolean;
   className?: string;
+  style?: React.CSSProperties;
   children: React.ReactNode;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id, data: { onDrop }, disabled });
   return (
-    <div ref={setNodeRef} className={cn(className, isOver && !disabled && 'bg-accent/30')}>
+    <div
+      ref={setNodeRef}
+      className={cn(className, isOver && !disabled && 'bg-accent/30')}
+      style={style}
+    >
       {children}
     </div>
   );

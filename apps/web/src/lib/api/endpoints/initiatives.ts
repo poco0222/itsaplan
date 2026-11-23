@@ -12,6 +12,16 @@ export interface InitiativeProgress {
   total: number;
 }
 
+export interface PlanDeliveryProgress {
+  progress: number | null;
+  problem: 'children' | 'weights' | 'child' | null;
+}
+
+export interface InitiativeDeliverySummary extends PlanDeliveryProgress {
+  id: number;
+  progressFieldId: number;
+}
+
 export interface Initiative {
   id: number;
   projectId: number;
@@ -27,11 +37,9 @@ export interface Initiative {
   updatedAt: string;
   labelIds: number[];
   progress: InitiativeProgress;
-  delivery?: {
+  delivery?: PlanDeliveryProgress & {
     nodeTypeId: number;
     sourceNumber: number | null;
-    progress: number | null;
-    problem: 'children' | 'weights' | 'child' | null;
   };
   health: InitiativeHealth | null;
   favorite: boolean;
@@ -138,6 +146,11 @@ export const listInitiativeOptions = (
 
 export const listFavoriteInitiatives = (projectKey: string) =>
   request<InitiativeOption[]>(`/projects/${encodeURIComponent(projectKey)}/initiatives/favorites`);
+
+export const listInitiativeDeliveryProgress = (projectKey: string) =>
+  request<InitiativeDeliverySummary[]>(
+    `/projects/${encodeURIComponent(projectKey)}/initiatives/delivery-progress`,
+  );
 
 export const initiativeCounts = (projectKey: string) =>
   request<InitiativeCounts>(`/projects/${projectKey}/initiatives/counts`);

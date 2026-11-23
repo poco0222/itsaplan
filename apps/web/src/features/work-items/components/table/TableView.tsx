@@ -11,6 +11,7 @@ import {
 } from '@/utils/project';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useDeliveryItems } from '@/services/deliveryWorkflow.service';
+import { useInitiativeDeliveryProgress } from '@/services/initiatives.service';
 import { usePersistedSet } from '@/hooks/usePersistedSet';
 import { useTableColumnWidths } from '../../hooks/useTableColumnWidths';
 import { useIssueReorder } from '../../hooks/useIssueReorder';
@@ -82,6 +83,25 @@ export default function TableView({
     customFields,
     widths,
   );
+  const canShowPlanProgress =
+    !readOnly &&
+    settings.group === 'initiative' &&
+    project.project.initiativesEnabled &&
+    can('initiatives', 'read') &&
+    columns.some((c) => c.kind === 'custom' && c.field.fieldType === 'number');
+  const planProgress = useInitiativeDeliveryProgress(
+    project.project.ref,
+    project.project.id,
+    canShowPlanProgress,
+  );
+  const planProgressById = useMemo(
+    () => new Map(canShowPlanProgress ? planProgress.data?.map((plan) => [plan.id, plan]) : []),
+    [canShowPlanProgress, planProgress.data],
+  );
+  const progressFieldId = planProgress.data?.[0]?.progressFieldId;
+  const progressColumn = columns.findIndex(
+    (c) => c.kind === 'custom' && c.field.id === progressFieldId,
+  );
 
   const items = buildTableItems({
     groups,
@@ -116,6 +136,8 @@ export default function TableView({
         // When sub-grouped, issues live under the sub-headers, so the group header
         // is only a drop target while the group is collapsed and they are hidden.
         const isCollapsed = collapsed.values.has(item.group.key);
+        const planId = item.group.assign?.patch.initiativeId;
+        const delivery = planId == null ? undefined : planProgressById.get(planId);
         return (
           <TableSectionHeader
             group={item.group}
@@ -127,6 +149,16 @@ export default function TableView({
             onToggle={() => collapsed.toggle(item.group.key)}
             onAddIssue={() => onAddIssue(groupDefaults(item.group.assign))}
             canAdd={item.group.assign != null && canAddTo(item.group.assign)}
+            planProgress={
+              delivery && progressColumn >= 0
+                ? {
+                    delivery,
+                    gridTemplate,
+                    column: progressColumn + 2,
+                    lastColumn: progressColumn === columns.length - 1,
+                  }
+                : undefined
+            }
           />
         );
       }

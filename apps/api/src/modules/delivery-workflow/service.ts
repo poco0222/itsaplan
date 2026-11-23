@@ -20,9 +20,14 @@ export function readDeliverySettings(projectId: number, executor: DbExecutor = d
   return getProjectSetting<DeliverySettings>(projectId, key, executor);
 }
 
-export async function readDeliveryPlans(projectId: number, ids: number[]) {
-  if (!ids.length) return new Map<number, DeliveryPlan>();
-  const rows = await db.execute<DeliveryPlan & { id: number }>(sql`
+function readDeliveryPlanRows(projectId: number, ids?: number[]) {
+  const where = ids
+    ? sql`WHERE n.id IN (${sql.join(
+        ids.map((id) => sql`${id}`),
+        sql`, `,
+      )})`
+    : sql``;
+  return db.execute<DeliveryPlan & { id: number; progressFieldId: number }>(sql`
     WITH config AS MATERIALIZED (
       SELECT m.project_id, m.value AS sources, w.value AS bindings
       FROM project_setting m JOIN project_setting w ON w.project_id = m.project_id
@@ -38,18 +43,33 @@ export async function readDeliveryPlans(projectId: number, ids: number[]) {
       GROUP BY i.initiative_id
     )
     SELECT n.id, (c.bindings->>'nodeTypeId')::integer AS "nodeTypeId",
+      (c.bindings->>'nodeProgressId')::integer AS "progressFieldId",
       (c.sources->>n.id::text)::integer AS "sourceNumber",
       CASE WHEN g.allocated AND g.rates_known THEN g.rate::float8 END AS progress,
       CASE WHEN g.initiative_id IS NULL THEN 'children'
         WHEN NOT g.allocated THEN 'weights' WHEN NOT g.rates_known THEN 'child' END AS problem
     FROM config c JOIN initiative n ON n.project_id = c.project_id
     LEFT JOIN groups g ON g.initiative_id = n.id
-    WHERE n.id IN (${sql.join(
-      ids.map((id) => sql`${id}`),
-      sql`, `,
-    )})
+    ${where}
   `);
-  return new Map(rows.map(({ id, ...delivery }) => [id, delivery]));
+}
+
+export async function readDeliveryPlans(projectId: number, ids: number[]) {
+  if (!ids.length) return new Map<number, DeliveryPlan>();
+  const rows = await readDeliveryPlanRows(projectId, ids);
+  return new Map(
+    rows.map(({ id, progressFieldId: _progressFieldId, ...delivery }) => [id, delivery]),
+  );
+}
+
+export async function readDeliveryPlanProgress(projectId: number) {
+  const rows = await readDeliveryPlanRows(projectId);
+  return rows.map(({ id, progressFieldId, progress, problem }) => ({
+    id,
+    progressFieldId,
+    progress,
+    problem,
+  }));
 }
 
 export async function assertDeliveryDeletionAllowed(projectId: number, ids: number[]) {

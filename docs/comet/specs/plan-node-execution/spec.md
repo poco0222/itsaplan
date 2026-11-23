@@ -10,6 +10,14 @@ The plan list and detail display the sum of each contributing node's effective p
 
 Nodes retain weighted execution progress and automatic status changes under the delivery workflow. A node without contributing execution tasks retains direct progress entry and status control. Completed nodes and execution tasks contribute 100 percent. Reopening restores the calculation from current inputs. Work item edits and status changes refresh the plan's weighted progress. Users mark a plan complete directly using the standard plan status. Completion has no separate maintenance handoff or reversal step.
 
+## Table plan progress
+
+In the signed-in Work Items table with Plan as its primary grouping, a visible plan group header shows the plan's weighted progress in the visible column bound to delivery-node progress. The value is read-only and stays aligned with that column when it moves or resizes. It is visible when the group is collapsed or expanded. Hiding the bound column hides the value.
+
+Use the same whole-plan result, display precision, and unavailable reason as the Plans list. The value includes eligible nodes even when a table filter hides them, and refreshes after work item changes. For example, a 100-percent node weighted 30 and an 84-percent node weighted 70 yield 88.8 percent.
+
+The No plan group, projects without weighted plan progress, and other primary groupings do not show a plan summary. The summary is only available to users permitted to read the plan progress in the signed-in project.
+
 ## Existing work
 
 For the selected project, map each active delivery module to one built-in plan with its title, description, equivalent current status, and planned due date. Link that module's delivery nodes to the plan. Retain each execution task's existing parent node. Archive the superseded modules and link to their original records from the new plans. Retain work item IDs, statuses, history, attachments, and field values. Leave existing weight allocations as entered.

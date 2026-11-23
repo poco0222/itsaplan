@@ -90,6 +90,8 @@ test('migrates existing work and rolls up native plans as delivery changes', asy
     canceled,
   } = await setup();
   await enable();
+  const summaries = project.initiatives['delivery-progress'];
+  expect((await summaries.get()).data).toEqual([]);
   const modules = await Promise.all(
     Array.from({ length: 4 }, (_, i) => add(`Module ${i + 1}`, settings.moduleTypeId)),
   );
@@ -204,11 +206,30 @@ test('migrates existing work and rolls up native plans as delivery changes', asy
     const detail = api.initiatives({ initiativeId: plan.id });
     const planDelivery = async () => (await detail.get()).data!.delivery;
     expect((await planDelivery())?.progress).toBe(58);
+    const planSummary = async () => {
+      const response = await summaries.get();
+      expect(response.status).toBe(200);
+      return response.data!.find((summary) => summary.id === plan.id);
+    };
+    expect(await planSummary()).toEqual({
+      id: plan.id,
+      progressFieldId: settings.nodeProgressId,
+      progress: 58,
+      problem: null,
+    });
+    const outsider = authedApi((await signUpTestUser()).cookie);
+    expect(
+      (await outsider.projects({ projectKey: projectRef }).initiatives['delivery-progress'].get())
+        .status,
+    ).toBe(403);
 
     expect((await item(tasks[0]).get()).data).toMatchObject({
       parentId: nodes[1],
       initiative: { id: plan.id },
     });
+    await set(tasks[1], settings.taskProgressId, 80);
+    expect(await planSummary()).toMatchObject({ progress: 88.8, problem: null });
+    expect((await planDelivery())?.progress).toBe(88.8);
     await set(tasks[1], settings.taskProgressId, 100);
     expect((await planDelivery())?.progress).toBe(100);
     expect(await get(nodes[1])).toMatchObject({ completed: false });
@@ -226,6 +247,7 @@ test('migrates existing work and rolls up native plans as delivery changes', asy
     expect((await planDelivery())?.progress).toBe(20);
     await set(tasks[0], settings.taskWeightId, 10);
     expect(await planDelivery()).toMatchObject({ progress: null, problem: 'child' });
+    expect(await planSummary()).toMatchObject({ progress: null, problem: 'child' });
 
     const next = (await project.initiatives.post({ title: 'Next plan' })).data!;
     expect(next.delivery).toMatchObject({ progress: null, problem: 'children' });

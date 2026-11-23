@@ -405,7 +405,10 @@ export function useSetFieldValue(projectKey: string | null) {
     onSettled: (_data, _err, { issueId }) => {
       void qc.invalidateQueries({ queryKey: qk.issue(issueId) });
       void qc.invalidateQueries({ queryKey: qk.feed(issueId) });
-      if (projectKey) void qc.invalidateQueries({ queryKey: qk.boardIssues(projectKey) });
+      if (projectKey) {
+        void qc.invalidateQueries({ queryKey: qk.boardIssues(projectKey) });
+        void qc.invalidateQueries({ queryKey: qk.initiativeDeliveryProgress(projectKey) });
+      }
     },
   });
 }
