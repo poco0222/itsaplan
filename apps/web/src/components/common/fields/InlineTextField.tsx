@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { Check } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,7 @@ export default function InlineTextField({
   saveKey,
   label,
   compact = false,
+  percentage = false,
   renderTrigger,
   onSave,
 }: {
@@ -21,6 +22,7 @@ export default function InlineTextField({
   saveKey: string;
   label: string;
   compact?: boolean;
+  percentage?: boolean;
   renderTrigger?: (onClick: () => void) => ReactNode;
   onSave: (v: string | number | null) => void;
 }) {
@@ -29,34 +31,36 @@ export default function InlineTextField({
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
   const [invalid, setInvalid] = useState(false);
+  const input = useRef<HTMLInputElement>(null);
+  const closed = useRef(false);
   const display = value === '' || value == null ? null : String(value);
 
   function start() {
     setDraft(display ?? '');
     setInvalid(false);
+    closed.current = false;
     setEditing(true);
   }
 
-  function commit() {
-    if (draft === '') {
-      onSave(null);
-      setEditing(false);
-      return;
-    }
-    if (fieldType === 'number') {
-      const n = Number(draft);
-      // Reject anything that is not a finite number (NaN from pasted text,
-      // Infinity) — the value column is numeric and the API would reject it.
-      if (!Number.isFinite(n)) {
-        setInvalid(true);
-        return;
-      }
-      onSave(n);
-      setEditing(false);
-      return;
-    }
-    onSave(draft);
+  function close() {
+    closed.current = true;
     setEditing(false);
+  }
+
+  function commit(blur = false) {
+    if (closed.current) return;
+    let next: string | number | null = draft || null;
+    if (fieldType === 'number' && next !== null) next = Number(next);
+    if (
+      (typeof next === 'number' && !Number.isFinite(next)) ||
+      (percentage && input.current?.validity.valid === false)
+    ) {
+      if (blur) close();
+      else setInvalid(true);
+      return;
+    }
+    close();
+    if (!percentage || next !== value) onSave(next);
   }
 
   if (!editing) {
@@ -78,7 +82,9 @@ export default function InlineTextField({
       )}
     >
       <Input
+        ref={input}
         type={fieldType}
+        {...(percentage && { min: 0, max: 100, step: 'any' })}
         autoFocus
         value={draft}
         key={saveKey}
@@ -95,12 +101,9 @@ export default function InlineTextField({
         }}
         onKeyDown={(e) => {
           if (e.key === 'Enter') commit();
-          if (e.key === 'Escape') setEditing(false);
+          if (e.key === 'Escape') close();
         }}
-        // Clicking outside cancels the edit (discards the draft). The Save
-        // button suppresses this via onMouseDown preventDefault, so the input
-        // keeps focus and commit() still runs when it is clicked.
-        onBlur={() => setEditing(false)}
+        onBlur={() => (percentage ? commit(true) : close())}
       />
       <Button
         type="button"
@@ -109,7 +112,7 @@ export default function InlineTextField({
         className={cn('text-muted-foreground hover:text-foreground', compact && 'size-6')}
         title={tCommon('save')}
         onMouseDown={(e) => e.preventDefault()}
-        onClick={commit}
+        onClick={() => commit()}
       >
         <Check className="size-4" />
       </Button>

@@ -268,10 +268,13 @@ it('folds branches and edits time and numbers without activating the parent row'
   const { createRoot } = await import('react-dom/client');
   const root = createRoot(document.querySelector('#root')!);
   const client = new QueryClient();
-  const topLevel = issue(1, null, 'Parent');
+  const topLevel = issue(1, null, 'Parent', [
+    { fieldId: 6, value: 0, valueEnd: null, optionIds: [] },
+    { fieldId: 7, value: 12, valueEnd: null, optionIds: [] },
+  ]);
   const issues = [
     issue(2, 1, 'Verify interface', [{ fieldId: 5, value: 75, valueEnd: null, optionIds: [] }]),
-    issue(3, 1, 'Review handoff'),
+    issue(3, 1, 'Review handoff', [{ fieldId: 6, value: 12.5, valueEnd: null, optionIds: [] }]),
     issue(4, 2, 'Record findings'),
     issue(5, 3, 'Send summary'),
   ];
@@ -284,10 +287,34 @@ it('folds branches and edits time and numbers without activating the parent row'
   const opened: number[] = [];
   const parentEvents: string[] = [];
   const numericColumns = orderedColumns(
-    ['cf:5', 'cf:6'],
-    [progressField, { ...progressField, id: 6, name: 'Weight' }],
+    ['cf:5', 'cf:6', 'cf:7'],
+    [
+      progressField,
+      { ...progressField, id: 6, name: 'Weight' },
+      { ...progressField, id: 7, name: 'Other number' },
+    ],
   );
-  const render = (collapsed: boolean, enabled = true) =>
+  const deliveryById = new Map(
+    [topLevel, ...issues].map(({ id }): [number, DeliveryItem] => [
+      id,
+      {
+        id,
+        moduleId: 1,
+        childTypeId: null,
+        role: 'node',
+        phase: 'delivery',
+        progress: 0,
+        progressFieldId: 5,
+        weightFieldId: 6,
+        progressReadOnly: false,
+        problem: null,
+        canConfirm: false,
+        completed: false,
+        completedAt: null,
+      },
+    ]),
+  );
+  const render = (collapsed: boolean, enabled = true, readOnly = false) =>
     act(() =>
       root.render(
         <QueryClientProvider client={client}>
@@ -303,17 +330,19 @@ it('folds branches and edits time and numbers without activating the parent row'
               <div id="parent-cells">
                 <TableIssueCells
                   project={project}
-                  readOnly={false}
+                  readOnly={readOnly}
                   issue={topLevel}
                   maps={maps}
                   orderedColumns={numericColumns}
+                  delivery={deliveryById.get(topLevel.id)}
                 />
               </div>
               <SubtasksProvider issues={issues} enabled={enabled} collapsed={collapsed}>
                 <TableRowSubtasks
                   project={project}
-                  readOnly={false}
+                  readOnly={readOnly}
                   issueId={1}
+                  deliveryById={deliveryById}
                   maps={maps}
                   orderedColumns={[...orderedColumns(['estimateTime'], []), ...numericColumns]}
                   showId={false}
@@ -327,7 +356,9 @@ it('folds branches and edits time and numbers without activating the parent row'
       ),
     );
   const button = (title: string) =>
-    [...document.querySelectorAll('button')].find((element) => element.textContent === title);
+    [...document.querySelectorAll('button')].find((element) =>
+      element.textContent?.startsWith(title),
+    );
   const editCells = (title: string) =>
     button(title)
       ?.closest('.grid-cols-subgrid')
@@ -398,29 +429,54 @@ it('folds branches and edits time and numbers without activating the parent row'
       { path: '/issues/4', method: 'PATCH', body: { estimateMinutes: 90 } },
     ]);
 
-    const parentNumber = editNumber(document.querySelector('#parent-cells button')!, '');
-    typeValue(parentNumber, '12');
-    act(() => parentNumber.blur());
+    const parentCells = document.querySelectorAll<HTMLButtonElement>('#parent-cells button');
+    assert.equal(parentCells[0].textContent, '—');
+    assert.equal(parentCells[1].textContent, '0%');
+    assert.equal(editCells('Verify interface')![1].textContent, '75%');
+    assert.equal(editCells('Review handoff')![2].textContent, '12.5%');
+    assert.equal(parentCells[2].textContent, '12');
+    const unrelated = editNumber(parentCells[2], '12');
+    typeValue(unrelated, '23');
+    act(() => unrelated.blur());
+    const parentWeight = editNumber(parentCells[1], '0');
+    typeValue(parentWeight, '12');
+    await act(async () => parentWeight.blur());
     let progress = editNumber(editCells('Verify interface')![1], '75');
     typeValue(progress, '20');
-    act(() => press(progress, 'Escape'));
-    assert.equal(editCells('Verify interface')![1].textContent, '75');
-    assert.equal(requests.length, 1);
+    act(() => {
+      press(progress, 'Escape');
+      progress.blur();
+    });
+    assert.equal(editCells('Verify interface')![1].textContent, '75%');
+    progress = editNumber(editCells('Verify interface')![1], '75');
+    act(() => progress.blur());
+    progress = editNumber(editCells('Verify interface')![1], '75');
+    typeValue(progress, '101');
+    act(() => progress.blur());
+    assert.equal(editCells('Verify interface')![1].textContent, '75%');
+    assert.equal(requests.length, 2);
 
     const weight = editNumber(editCells('Record findings')![2], '');
     typeValue(weight, '32.5');
-    await act(async () => press(weight, 'Enter'));
+    await act(async () => {
+      press(weight, 'Enter');
+      weight.blur();
+    });
     progress = editNumber(editCells('Verify interface')![1], '75');
     typeValue(progress, '');
     const save = progress.parentElement?.querySelector('button');
     assert.ok(save);
     await act(async () => save.click());
     assert.deepEqual(requests.slice(1), [
+      { path: '/issues/1/fields/6', method: 'PUT', body: { value: 12 } },
       { path: '/issues/4/fields/6', method: 'PUT', body: { value: 32.5 } },
       { path: '/issues/2/fields/5', method: 'PUT', body: { value: null } },
     ]);
     assert.deepEqual(parentEvents, []);
 
+    render(false, true, true);
+    assert.equal(document.querySelector('#parent-cells button'), null);
+    assert.equal(document.querySelector('#parent-cells')?.textContent, '—0%12');
     render(false);
     assert.ok(button('Send summary'));
     act(() => toggle.click());

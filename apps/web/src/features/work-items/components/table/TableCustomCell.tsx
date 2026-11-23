@@ -21,10 +21,12 @@ export function TableCustomCell({
   field,
   issue,
   maps,
+  percentage = false,
 }: {
   field: CustomField;
   issue: Issue;
   maps: Maps;
+  percentage?: boolean;
 }) {
   const entry = issue.fieldValues.find((v) => v.fieldId === field.id);
 
@@ -94,5 +96,6 @@ export function TableCustomCell({
   if (field.fieldType === 'markdown') {
     return <MarkdownCell value={String(raw)} />;
   }
-  return <div className="truncate text-xs text-muted-foreground">{preview(raw)}</div>;
+  const value = percentage && typeof raw === 'number' ? `${raw}%` : preview(raw);
+  return <div className="truncate text-xs text-muted-foreground">{value}</div>;
 }

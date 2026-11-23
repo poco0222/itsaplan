@@ -79,7 +79,6 @@ test('enrolls existing issues and applies the hierarchy with exact weighted prog
     get,
     set,
     item,
-    enable,
     project,
     weight,
     progress,
@@ -90,28 +89,33 @@ test('enrolls existing issues and applies the hierarchy with exact weighted prog
   const node = await add('Node', s.nodeTypeId, module);
   const completed = await add('Done', s.taskTypeId, node, done);
   const open = await add('Open', s.taskTypeId, node);
+  const taskWeight = (
+    await project['custom-fields'].post({ name: 'Task weight', fieldType: 'number' })
+  ).data!.id;
   expect((await project['delivery-workflow'].get()).data).toEqual([]);
   expect((await scope.put({ ...s, taskTypeId: s.nodeTypeId })).status).toBe(400);
-  await enable();
+  expect((await scope.put({ ...s, taskWeightId: taskWeight })).status).toBe(200);
   expect(
     (await project.issues.post({ title: 'Orphan', columnId: started, typeId: s.taskTypeId }))
       .status,
   ).toBe(409);
   expect((await item(node).patch({ columnId: done })).status).toBe(409);
-  expect((await item(open).fields({ fieldId: weight }).put({ value: 101 })).status).toBe(400);
+  expect((await item(open).fields({ fieldId: taskWeight }).put({ value: 101 })).status).toBe(400);
   await set(node, weight, 100);
-  await set(completed, weight, 30);
-  await set(open, weight, 50);
+  await set(completed, taskWeight, 30);
+  await set(open, taskWeight, 50);
   expect(await get(node)).toMatchObject({
     progress: null,
     problem: 'weights',
     progressFieldId: progress,
+    weightFieldId: weight,
     progressReadOnly: true,
   });
   expect(await get(module)).toMatchObject({
     progress: null,
     problem: 'child',
     progressFieldId: progress,
+    weightFieldId: null,
     progressReadOnly: true,
   });
   expect(await get(completed)).toMatchObject({
@@ -122,9 +126,10 @@ test('enrolls existing issues and applies the hierarchy with exact weighted prog
   expect(await get(open)).toMatchObject({
     progress: 0,
     progressFieldId: progress,
+    weightFieldId: taskWeight,
     progressReadOnly: false,
   });
-  await set(open, weight, 70);
+  await set(open, taskWeight, 70);
   expect((await get(node)).progress).toBe(30);
   await set(open, progress, 40);
   expect((await get(module)).progress).toBe(58);
