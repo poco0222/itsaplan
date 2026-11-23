@@ -60,6 +60,7 @@ export function TableIssueCells({
         <CellEditor key={key}>
           <InlineTextField
             fieldType="number"
+            compact
             value={typeof value === 'number' ? value : null}
             saveKey={`${field.id}-${issue.updatedAt}`}
             label={field.name}

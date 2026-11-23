@@ -1,8 +1,9 @@
 import { useState, type ReactNode } from 'react';
 import { Check } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
 import { Pill } from './Pill';
 
 // The default trigger keeps unset fields compact in issue details.
@@ -11,6 +12,7 @@ export default function InlineTextField({
   fieldType,
   saveKey,
   label,
+  compact = false,
   renderTrigger,
   onSave,
 }: {
@@ -18,6 +20,7 @@ export default function InlineTextField({
   fieldType: 'text' | 'number';
   saveKey: string;
   label: string;
+  compact?: boolean;
   renderTrigger?: (onClick: () => void) => ReactNode;
   onSave: (v: string | number | null) => void;
 }) {
@@ -66,7 +69,14 @@ export default function InlineTextField({
   }
 
   return (
-    <div className="flex items-center gap-1.5">
+    <div
+      className={cn(
+        'flex items-center',
+        compact
+          ? 'max-w-32 min-w-0 rounded-md border border-input bg-background focus-within:border-ring focus-within:ring-1 focus-within:ring-ring has-aria-invalid:border-destructive has-aria-invalid:ring-destructive'
+          : 'gap-1.5',
+      )}
+    >
       <Input
         type={fieldType}
         autoFocus
@@ -74,7 +84,11 @@ export default function InlineTextField({
         key={saveKey}
         aria-label={label}
         aria-invalid={invalid || undefined}
-        className="h-8 max-w-[220px]"
+        className={
+          compact
+            ? 'h-6 flex-1 [appearance:textfield] rounded-none border-0 ps-0.5 pe-0 tabular-nums shadow-none focus-visible:ring-0 md:text-xs [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none'
+            : 'h-8 max-w-[220px]'
+        }
         onChange={(e) => {
           setDraft(e.target.value);
           setInvalid(false);
@@ -91,8 +105,8 @@ export default function InlineTextField({
       <Button
         type="button"
         variant="ghost"
-        size="icon"
-        className="size-8 shrink-0 text-muted-foreground hover:text-foreground"
+        size="icon-sm"
+        className={cn('text-muted-foreground hover:text-foreground', compact && 'size-6')}
         title={tCommon('save')}
         onMouseDown={(e) => e.preventDefault()}
         onClick={commit}
