@@ -1,0 +1,2170 @@
+# comet-execution: managed-run
+schema: comet.native.v4
+name: sync-upstream-main
+language: en
+phase: archive
+status: done
+state_version: 8
+brief: brief.md
+document_constraints_version: 3
+spec_changes: []
+workspace:
+  isolation: current
+  change_branch: main
+  target_branch: main
+  finish: null
+loop:
+  stage: done
+  goal_cycle: 1
+  iteration: 1
+  attempt: 1
+  retry_epoch: 0
+  failed_iteration_count: 0
+  no_progress_count: 0
+  execution_failure_count: 0
+  previous_unresolved_ids: []
+  next_action: null
+acceptance:
+  - id: A1
+    source: brief.md
+    text: The candidate includes both Git histories. No conflict remains, and
+      relevant type, lint, and format checks pass.
+    result: passed
+    reason:
+      text: Verified the staged candidate with fork ec5556ad and upstream cc396276 as
+        merge parents, no unmerged entries, and no diff errors. Typecheck, lint,
+        and formatting checks passed on the relevant candidate files.
+      truncated: false
+  - id: A2
+    source: brief.md
+    text: Targeted tests cover private document sharing and inherited access, weekly
+      report snapshots, delivery progress and handoff, nested task display, and
+      inline numeric editing.
+    result: passed
+    reason:
+      text: 127 API integration and unit checks passed. Document access tests exercise
+        selected members and inherited access, alongside weekly snapshots and
+        delivery handoff. The 797-test Web suite includes nested rows, number
+        edits and Docs behavior.
+      truncated: false
+  - id: A3
+    source: brief.md
+    text: Migrations complete on an empty PostgreSQL database and on an isolated
+      copy of the local database that has applied the fork's
+      `0187_delivery_workflow`. Both paths produce the expected schema, the
+      upgrade preserves existing project data, and a second migration run has no
+      pending work.
+    result: passed
+    reason:
+      text: The empty database and the isolated restored fork database migrated twice.
+        Observed identical public schema, all 197 current journal entries once,
+        the expected legacy ledger row only on the restored path, and unchanged
+        data fingerprints for issues, documents, project settings, and handoffs.
+        Drizzle detects no further schema change.
+      truncated: false
+builder_handoff:
+  candidate_id: sync-upstream-main:3
+  identity_provider: skill-coordinated
+  builder_execution_ref: 01a205aa-ca7e-7d31-ba7b-b0b10807dd60
+  iteration: 1
+  summary:
+    text: Resolved the upstream merge against ec5556ad, with cc396276 as the pending
+      second parent. Document creation combines the weekly snapshot transaction
+      helper with private-child sharing. The thirteen locale files keep both
+      groups of strings. The upstream Drizzle chain is intact through 0195 and
+      the generated 0196 migration recognizes the exact legacy fork entry. Two
+      imported Web tests now drain pending React Query notifications before
+      JSDOM teardown.
+    truncated: false
+  addressed_acceptance_ids:
+    - A1
+    - A2
+    - A3
+  checks:
+    - name:
+        text: Git merge ancestry and staged diff check, repository root
+        truncated: false
+      result: passed
+      note:
+        text: HEAD ec5556ad, MERGE_HEAD cc396276, no unmerged entries, git diff --cached
+          --check clean.
+        truncated: false
+    - name:
+        text: bun run typecheck and bun run lint, repository root
+        truncated: false
+      result: passed
+      note:
+        text: Both workspace runs passed 13/13. After editing the two Web test files,
+          Web typecheck and ESLint on those files passed. Logs typecheck.log,
+          lint.log, web-final-typecheck.log, web-final-lint.log.
+        truncated: false
+    - name:
+        text: Prettier check on staged files and final Web test edits, repository root
+        truncated: false
+      result: passed
+      note:
+        text: All staged code passes. format-staged.log records the staged-file check.
+          The active Comet YAML is generated and formatted by the commit hook
+          after archive.
+        truncated: false
+    - name:
+        text: Bun API integration tests against throwaway PostgreSQL, apps/api
+        truncated: false
+      result: passed
+      note:
+        text: 56 passed for documents, pins, weekly reports and delivery. 71 more passed
+          for run initiators, initiatives and saved actions. Logs api-tests.log
+          and api-upstream-tests.log.
+        truncated: false
+    - name:
+        text: Bun Web tests with ./test/setup.ts and two parallel workers, apps/web
+        truncated: false
+      result: passed
+      note:
+        text: 797 passed in 160 files. The dedicated table and Docs run also passed 62
+          tests. Logs web-tests-final-limited.log and web-targeted.log.
+        truncated: false
+    - name:
+        text: Programmatic Postgres migration rehearsal, repository root
+        truncated: false
+      result: passed
+      note:
+        text: Clean database and restored local fork data migrated twice. All 197
+          journal entries appear once in both databases and the restored copy
+          retains its one legacy row. Public schema and selected project data
+          fingerprints match. Logs fresh-migration.log, upgrade-migration.log
+          and repeat logs.
+        truncated: false
+    - name:
+        text: Drizzle schema regeneration, repository root
+        truncated: false
+      result: passed
+      note:
+        text: bun --filter=@repo/db run db:generate --name=verify_sync_schema reports no
+          schema changes. Log verify-drizzle-generation.log.
+        truncated: false
+    - name:
+        text: Focused code and security review of conflict resolution
+        truncated: false
+      result: passed
+      note:
+        text: Checked transaction boundaries, project access filters, document
+          visibility and deterministic migration guard. No blocking findings in
+          the resolution.
+        truncated: false
+  checks_truncated: false
+  known_limits:
+    - text: An earlier full Web run at default worker count intermittently failed in
+        the existing Strict Mode link-preview test. The full run with two
+        workers passed.
+      truncated: false
+    - text: Web behavior is covered by automated tests. Browser interaction was not
+        part of this verification.
+      truncated: false
+  known_limits_truncated: false
+  review: null
+  submitted_at: 2026-11-23T00:24:17.492Z
+blockers: []
+verification:
+  candidate_id: sync-upstream-main:3
+  identity_provider: skill-coordinated
+  verifier_execution_ref: 01a205aa-ca7e-7d31-ba7b-b0b10807dd60
+  iteration: 1
+  attempt: 1
+  assurance: self-reviewed
+  verdict: pass
+  checks: []
+  reported_checks:
+    - name:
+        text: Git merge ancestry and staged diff check, repository root
+        truncated: false
+      result: passed
+      note:
+        text: HEAD ec5556ad, MERGE_HEAD cc396276, no unmerged entries, git diff --cached
+          --check clean.
+        truncated: false
+    - name:
+        text: bun run typecheck and bun run lint, repository root
+        truncated: false
+      result: passed
+      note:
+        text: Both workspace runs passed 13/13. After editing the two Web test files,
+          Web typecheck and ESLint on those files passed. Logs typecheck.log,
+          lint.log, web-final-typecheck.log, web-final-lint.log.
+        truncated: false
+    - name:
+        text: Prettier check on staged files and final Web test edits, repository root
+        truncated: false
+      result: passed
+      note:
+        text: All staged code passes. format-staged.log records the staged-file check.
+          The active Comet YAML is generated and formatted by the commit hook
+          after archive.
+        truncated: false
+    - name:
+        text: Bun API integration tests against throwaway PostgreSQL, apps/api
+        truncated: false
+      result: passed
+      note:
+        text: 56 passed for documents, pins, weekly reports and delivery. 71 more passed
+          for run initiators, initiatives and saved actions. Logs api-tests.log
+          and api-upstream-tests.log.
+        truncated: false
+    - name:
+        text: Bun Web tests with ./test/setup.ts and two parallel workers, apps/web
+        truncated: false
+      result: passed
+      note:
+        text: 797 passed in 160 files. The dedicated table and Docs run also passed 62
+          tests. Logs web-tests-final-limited.log and web-targeted.log.
+        truncated: false
+    - name:
+        text: Programmatic Postgres migration rehearsal, repository root
+        truncated: false
+      result: passed
+      note:
+        text: Clean database and restored local fork data migrated twice. All 197
+          journal entries appear once in both databases and the restored copy
+          retains its one legacy row. Public schema and selected project data
+          fingerprints match. Logs fresh-migration.log, upgrade-migration.log
+          and repeat logs.
+        truncated: false
+    - name:
+        text: Drizzle schema regeneration, repository root
+        truncated: false
+      result: passed
+      note:
+        text: bun --filter=@repo/db run db:generate --name=verify_sync_schema reports no
+          schema changes. Log verify-drizzle-generation.log.
+        truncated: false
+    - name:
+        text: Focused code and security review of conflict resolution
+        truncated: false
+      result: passed
+      note:
+        text: Checked transaction boundaries, project access filters, document
+          visibility and deterministic migration guard. No blocking findings in
+          the resolution.
+        truncated: false
+  summary:
+    text: All three acceptance checks passed.
+    truncated: false
+  risks:
+    - text: The full Web suite passed with two workers. An earlier default-worker run
+        had a timing-sensitive failure in the unchanged Strict Mode link-preview
+        test.
+      truncated: false
+    - text: The local rollout and live service verification are post-acceptance
+        delivery steps.
+      truncated: false
+  risks_truncated: false
+  completed_at: 2026-11-23T00:24:49.081Z
+history:
+  - goal_cycle: 1
+    iteration: 1
+    attempt: 1
+    outcome: pass
+    unresolved_ids: []
+    summary:
+      text: All three acceptance checks passed.
+      truncated: false
+    completed_at: 2026-11-23T00:24:49.081Z
+history_overflow:
+  dropped_entries: 0
+  first_dropped_at: null
+  last_dropped_at: null
+  outcome_counts:
+    pass: 0
+    fail: 0
+    blocked: 0
+    execution-error: 0
+    recovery: 0
+verification_result: pass
+verification_report: verification.md
+archived: true
+created_at: 2026-11-23T00:09:43.177Z
+archive_receipt:
+  runId: sync-upstream-main
+  change: sync-upstream-main
+  archiveRef: 2026-11-23-sync-upstream-main
+  transactionId: eb2af7fb-c2fe-4975-9c9c-87046b25e131
+  stateVersion: 8
+  specs: []
+run_checkpoint:
+  {
+    'schema': 'comet.workflow-run-checkpoint.v2',
+    'hash': 'cfd28d30c39b7b341a7360767fd7e523ee2f30caa59456993485713d3cd8c71b',
+    'run':
+      {
+        'protocolVersion': 1,
+        'schemaVersion': 1,
+        'runId': 'sync-upstream-main',
+        'revision': 1,
+        'workflow':
+          {
+            'id': 'comet-native',
+            'version': '4',
+            'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+          },
+        'definitionHashes':
+          {
+            '["comet-native","4"]': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+          },
+        'initialStateHash': '3ce40d5481c1d73fed092388ece579f3e7301047f07758983c730850a601d367',
+        'input':
+          {
+            'artifactRootRef': 'docs',
+            'name': 'sync-upstream-main',
+            'task': '用comet处理, 合并, 处理冲突, 提交PR, 部署到本地',
+          },
+        'state':
+          {
+            'acceptance':
+              [
+                {
+                  'id': 'A1',
+                  'reason':
+                    {
+                      'text': 'Verified the staged candidate with fork ec5556ad and upstream cc396276 as merge parents, no unmerged entries, and no diff errors. Typecheck, lint, and formatting checks passed on the relevant candidate files.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'The candidate includes both Git histories. No conflict remains, and relevant type, lint, and format checks pass.',
+                },
+                {
+                  'id': 'A2',
+                  'reason':
+                    {
+                      'text': '127 API integration and unit checks passed. Document access tests exercise selected members and inherited access, alongside weekly snapshots and delivery handoff. The 797-test Web suite includes nested rows, number edits and Docs behavior.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'Targeted tests cover private document sharing and inherited access, weekly report snapshots, delivery progress and handoff, nested task display, and inline numeric editing.',
+                },
+                {
+                  'id': 'A3',
+                  'reason':
+                    {
+                      'text': 'The empty database and the isolated restored fork database migrated twice. Observed identical public schema, all 197 current journal entries once, the expected legacy ledger row only on the restored path, and unchanged data fingerprints for issues, documents, project settings, and handoffs. Drizzle detects no further schema change.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': "Migrations complete on an empty PostgreSQL database and on an isolated copy of the local database that has applied the fork's `0187_delivery_workflow`. Both paths produce the expected schema, the upgrade preserves existing project data, and a second migration run has no pending work.",
+                },
+              ],
+            'archived': true,
+            'blockers': [],
+            'brief': 'brief.md',
+            'builder_handoff':
+              {
+                'addressed_acceptance_ids': ['A1', 'A2', 'A3'],
+                'builder_execution_ref': '01a205aa-ca7e-7d31-ba7b-b0b10807dd60',
+                'candidate_id': 'sync-upstream-main:3',
+                'checks':
+                  [
+                    {
+                      'name':
+                        {
+                          'text': 'Git merge ancestry and staged diff check, repository root',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'HEAD ec5556ad, MERGE_HEAD cc396276, no unmerged entries, git diff --cached --check clean.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'bun run typecheck and bun run lint, repository root',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'Both workspace runs passed 13/13. After editing the two Web test files, Web typecheck and ESLint on those files passed. Logs typecheck.log, lint.log, web-final-typecheck.log, web-final-lint.log.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Prettier check on staged files and final Web test edits, repository root',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'All staged code passes. format-staged.log records the staged-file check. The active Comet YAML is generated and formatted by the commit hook after archive.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Bun API integration tests against throwaway PostgreSQL, apps/api',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': '56 passed for documents, pins, weekly reports and delivery. 71 more passed for run initiators, initiatives and saved actions. Logs api-tests.log and api-upstream-tests.log.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Bun Web tests with ./test/setup.ts and two parallel workers, apps/web',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': '797 passed in 160 files. The dedicated table and Docs run also passed 62 tests. Logs web-tests-final-limited.log and web-targeted.log.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Programmatic Postgres migration rehearsal, repository root',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'Clean database and restored local fork data migrated twice. All 197 journal entries appear once in both databases and the restored copy retains its one legacy row. Public schema and selected project data fingerprints match. Logs fresh-migration.log, upgrade-migration.log and repeat logs.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Drizzle schema regeneration, repository root',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'bun --filter=@repo/db run db:generate --name=verify_sync_schema reports no schema changes. Log verify-drizzle-generation.log.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Focused code and security review of conflict resolution',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'Checked transaction boundaries, project access filters, document visibility and deterministic migration guard. No blocking findings in the resolution.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                  ],
+                'checks_truncated': false,
+                'identity_provider': 'skill-coordinated',
+                'iteration': 1,
+                'known_limits':
+                  [
+                    {
+                      'text': 'An earlier full Web run at default worker count intermittently failed in the existing Strict Mode link-preview test. The full run with two workers passed.',
+                      'truncated': false,
+                    },
+                    {
+                      'text': 'Web behavior is covered by automated tests. Browser interaction was not part of this verification.',
+                      'truncated': false,
+                    },
+                  ],
+                'known_limits_truncated': false,
+                'review': null,
+                'submitted_at': '2026-11-23T00:24:17.492Z',
+                'summary':
+                  {
+                    'text': 'Resolved the upstream merge against ec5556ad, with cc396276 as the pending second parent. Document creation combines the weekly snapshot transaction helper with private-child sharing. The thirteen locale files keep both groups of strings. The upstream Drizzle chain is intact through 0195 and the generated 0196 migration recognizes the exact legacy fork entry. Two imported Web tests now drain pending React Query notifications before JSDOM teardown.',
+                    'truncated': false,
+                  },
+              },
+            'created_at': '2026-11-23T00:09:43.177Z',
+            'document_constraints_version': 3,
+            'history':
+              [
+                {
+                  'attempt': 1,
+                  'completed_at': '2026-11-23T00:24:49.081Z',
+                  'goal_cycle': 1,
+                  'iteration': 1,
+                  'outcome': 'pass',
+                  'summary': { 'text': 'All three acceptance checks passed.', 'truncated': false },
+                  'unresolved_ids': [],
+                },
+              ],
+            'history_overflow':
+              {
+                'dropped_entries': 0,
+                'first_dropped_at': null,
+                'last_dropped_at': null,
+                'outcome_counts':
+                  { 'blocked': 0, 'execution-error': 0, 'fail': 0, 'pass': 0, 'recovery': 0 },
+              },
+            'language': 'en',
+            'loop':
+              {
+                'attempt': 1,
+                'execution_failure_count': 0,
+                'failed_iteration_count': 0,
+                'goal_cycle': 1,
+                'iteration': 1,
+                'next_action': null,
+                'no_progress_count': 0,
+                'previous_unresolved_ids': [],
+                'retry_epoch': 0,
+                'stage': 'done',
+              },
+            'name': 'sync-upstream-main',
+            'phase': 'archive',
+            'schema': 'comet.native.v4',
+            'spec_changes': [],
+            'state_version': 8,
+            'status': 'done',
+            'verification':
+              {
+                'assurance': 'self-reviewed',
+                'attempt': 1,
+                'candidate_id': 'sync-upstream-main:3',
+                'checks': [],
+                'completed_at': '2026-11-23T00:24:49.081Z',
+                'identity_provider': 'skill-coordinated',
+                'iteration': 1,
+                'reported_checks':
+                  [
+                    {
+                      'name':
+                        {
+                          'text': 'Git merge ancestry and staged diff check, repository root',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'HEAD ec5556ad, MERGE_HEAD cc396276, no unmerged entries, git diff --cached --check clean.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'bun run typecheck and bun run lint, repository root',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'Both workspace runs passed 13/13. After editing the two Web test files, Web typecheck and ESLint on those files passed. Logs typecheck.log, lint.log, web-final-typecheck.log, web-final-lint.log.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Prettier check on staged files and final Web test edits, repository root',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'All staged code passes. format-staged.log records the staged-file check. The active Comet YAML is generated and formatted by the commit hook after archive.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Bun API integration tests against throwaway PostgreSQL, apps/api',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': '56 passed for documents, pins, weekly reports and delivery. 71 more passed for run initiators, initiatives and saved actions. Logs api-tests.log and api-upstream-tests.log.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Bun Web tests with ./test/setup.ts and two parallel workers, apps/web',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': '797 passed in 160 files. The dedicated table and Docs run also passed 62 tests. Logs web-tests-final-limited.log and web-targeted.log.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Programmatic Postgres migration rehearsal, repository root',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'Clean database and restored local fork data migrated twice. All 197 journal entries appear once in both databases and the restored copy retains its one legacy row. Public schema and selected project data fingerprints match. Logs fresh-migration.log, upgrade-migration.log and repeat logs.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Drizzle schema regeneration, repository root',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'bun --filter=@repo/db run db:generate --name=verify_sync_schema reports no schema changes. Log verify-drizzle-generation.log.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Focused code and security review of conflict resolution',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'Checked transaction boundaries, project access filters, document visibility and deterministic migration guard. No blocking findings in the resolution.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                  ],
+                'risks':
+                  [
+                    {
+                      'text': 'The full Web suite passed with two workers. An earlier default-worker run had a timing-sensitive failure in the unchanged Strict Mode link-preview test.',
+                      'truncated': false,
+                    },
+                    {
+                      'text': 'The local rollout and live service verification are post-acceptance delivery steps.',
+                      'truncated': false,
+                    },
+                  ],
+                'risks_truncated': false,
+                'summary': { 'text': 'All three acceptance checks passed.', 'truncated': false },
+                'verdict': 'pass',
+                'verifier_execution_ref': '01a205aa-ca7e-7d31-ba7b-b0b10807dd60',
+              },
+            'verification_report': 'verification.md',
+            'verification_result': 'pass',
+            'workspace':
+              {
+                'change_branch': 'main',
+                'finish': null,
+                'isolation': 'current',
+                'target_branch': 'main',
+              },
+          },
+        'status': 'completed',
+        'sequence': 8,
+        'actions':
+          [
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a205aa-ca7e-7d31-ba7b-b0b10807dd60',
+                  'token': 'portable-753f7e29daef5e1d976dd1f5dd4341efb7687c44ebff9d1248b1f81b5b2bd971',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'sync-upstream-main:1',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'sync-upstream-main',
+                      'task': '用comet处理, 合并, 处理冲突, 提交PR, 部署到本地',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '68adea180770ba4b71ad08e0180bac842809d592240ce17fb678c0b0fe47e672',
+              'outcome':
+                {
+                  'actionId': 'sync-upstream-main:1',
+                  'attempt': 1,
+                  'claimToken': 'portable-753f7e29daef5e1d976dd1f5dd4341efb7687c44ebff9d1248b1f81b5b2bd971',
+                  'inputHash': '68adea180770ba4b71ad08e0180bac842809d592240ce17fb678c0b0fe47e672',
+                  'outcomeId': 'native-result-8b4ae0b4501d951cf8fc75e3c9c0490a750d3248041a18442a8f0dbbe6eeb3fe',
+                  'output':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'source': 'brief.md',
+                            'text': 'The candidate includes both Git histories. No conflict remains, and relevant type, lint, and format checks pass.',
+                          },
+                          {
+                            'id': 'A2',
+                            'source': 'brief.md',
+                            'text': 'Targeted tests cover private document sharing and inherited access, weekly report snapshots, delivery progress and handoff, nested task display, and inline numeric editing.',
+                          },
+                          {
+                            'id': 'A3',
+                            'source': 'brief.md',
+                            'text': "Migrations complete on an empty PostgreSQL database and on an isolated copy of the local database that has applied the fork's `0187_delivery_workflow`. Both paths produce the expected schema, the upgrade preserves existing project data, and a second migration run has no pending work.",
+                          },
+                        ],
+                      'children': null,
+                      'specChanges': [],
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'a3310f895a9130c96b7436d72749486f429d2e4b9b1611988cfe47ac920ae0d3',
+                    'outcomeId': 'native-result-8b4ae0b4501d951cf8fc75e3c9c0490a750d3248041a18442a8f0dbbe6eeb3fe',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-shape-prepare',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'sync-upstream-main',
+              'status': 'succeeded',
+              'stepId': 'shape.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a205aa-ca7e-7d31-ba7b-b0b10807dd60',
+                  'token': 'portable-5d47be2daea81a298627ca8c191a80159df57265cf3e8518964145934dd32340',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'sync-upstream-main:3',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'sync-upstream-main',
+                      'task': '用comet处理, 合并, 处理冲突, 提交PR, 部署到本地',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '67ca02f4692841527d1b9d838633ade52695ba6394c7e28513e002d4dd587117',
+              'outcome':
+                {
+                  'actionId': 'sync-upstream-main:3',
+                  'attempt': 1,
+                  'claimToken': 'portable-5d47be2daea81a298627ca8c191a80159df57265cf3e8518964145934dd32340',
+                  'inputHash': '67ca02f4692841527d1b9d838633ade52695ba6394c7e28513e002d4dd587117',
+                  'outcomeId': 'native-result-61c2d5abf5167623f80141dbeee0542c288897961518327427cbfd889b418158',
+                  'output':
+                    {
+                      'addressedAcceptanceIds': ['A1', 'A2', 'A3'],
+                      'checks':
+                        [
+                          {
+                            'name': 'Git merge ancestry and staged diff check, repository root',
+                            'note': 'HEAD ec5556ad, MERGE_HEAD cc396276, no unmerged entries, git diff --cached --check clean.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun run typecheck and bun run lint, repository root',
+                            'note': 'Both workspace runs passed 13/13. After editing the two Web test files, Web typecheck and ESLint on those files passed. Logs typecheck.log, lint.log, web-final-typecheck.log, web-final-lint.log.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Prettier check on staged files and final Web test edits, repository root',
+                            'note': 'All staged code passes. format-staged.log records the staged-file check. The active Comet YAML is generated and formatted by the commit hook after archive.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Bun API integration tests against throwaway PostgreSQL, apps/api',
+                            'note': '56 passed for documents, pins, weekly reports and delivery. 71 more passed for run initiators, initiatives and saved actions. Logs api-tests.log and api-upstream-tests.log.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Bun Web tests with ./test/setup.ts and two parallel workers, apps/web',
+                            'note': '797 passed in 160 files. The dedicated table and Docs run also passed 62 tests. Logs web-tests-final-limited.log and web-targeted.log.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Programmatic Postgres migration rehearsal, repository root',
+                            'note': 'Clean database and restored local fork data migrated twice. All 197 journal entries appear once in both databases and the restored copy retains its one legacy row. Public schema and selected project data fingerprints match. Logs fresh-migration.log, upgrade-migration.log and repeat logs.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Drizzle schema regeneration, repository root',
+                            'note': 'bun --filter=@repo/db run db:generate --name=verify_sync_schema reports no schema changes. Log verify-drizzle-generation.log.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Focused code and security review of conflict resolution',
+                            'note': 'Checked transaction boundaries, project access filters, document visibility and deterministic migration guard. No blocking findings in the resolution.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'knownLimits':
+                        [
+                          'An earlier full Web run at default worker count intermittently failed in the existing Strict Mode link-preview test. The full run with two workers passed.',
+                          'Web behavior is covered by automated tests. Browser interaction was not part of this verification.',
+                        ],
+                      'requireIndependentReview': false,
+                      'summary': 'Resolved the upstream merge against ec5556ad, with cc396276 as the pending second parent. Document creation combines the weekly snapshot transaction helper with private-child sharing. The thirteen locale files keep both groups of strings. The upstream Drizzle chain is intact through 0195 and the generated 0196 migration recognizes the exact legacy fork entry. Two imported Web tests now drain pending React Query notifications before JSDOM teardown.',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '94feadcdb19d2930e72c6787293f544878aaaaff6455e46f86d0e6e2d034aaad',
+                    'outcomeId': 'native-result-61c2d5abf5167623f80141dbeee0542c288897961518327427cbfd889b418158',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-builder',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'sync-upstream-main',
+              'status': 'succeeded',
+              'stepId': 'build.builder',
+              'type': 'handoff',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a205aa-ca7e-7d31-ba7b-b0b10807dd60',
+                  'token': 'portable-1fbb488af573b23c8464f07fcd07a25a646b8421e2ec74a220576da3c9c62d75',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'sync-upstream-main:4',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'sync-upstream-main',
+                      'task': '用comet处理, 合并, 处理冲突, 提交PR, 部署到本地',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': 'f9f8e6c3c28f1d255c3961d1c3dd208f18415668f84cf303003d875c6ba55d46',
+              'outcome':
+                {
+                  'actionId': 'sync-upstream-main:4',
+                  'attempt': 1,
+                  'claimToken': 'portable-1fbb488af573b23c8464f07fcd07a25a646b8421e2ec74a220576da3c9c62d75',
+                  'inputHash': 'f9f8e6c3c28f1d255c3961d1c3dd208f18415668f84cf303003d875c6ba55d46',
+                  'outcomeId': 'native-result-d826e2e79c29f5ee3d6a8552e9630f5f217bba5b97ce9678ea9ff1304a8fa64f',
+                  'output':
+                    {
+                      'candidateId': 'sync-upstream-main:3',
+                      'checks':
+                        [
+                          {
+                            'name': 'Git merge ancestry and staged diff check, repository root',
+                            'note': 'HEAD ec5556ad, MERGE_HEAD cc396276, no unmerged entries, git diff --cached --check clean.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'bun run typecheck and bun run lint, repository root',
+                            'note': 'Both workspace runs passed 13/13. After editing the two Web test files, Web typecheck and ESLint on those files passed. Logs typecheck.log, lint.log, web-final-typecheck.log, web-final-lint.log.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Prettier check on staged files and final Web test edits, repository root',
+                            'note': 'All staged code passes. format-staged.log records the staged-file check. The active Comet YAML is generated and formatted by the commit hook after archive.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Bun API integration tests against throwaway PostgreSQL, apps/api',
+                            'note': '56 passed for documents, pins, weekly reports and delivery. 71 more passed for run initiators, initiatives and saved actions. Logs api-tests.log and api-upstream-tests.log.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Bun Web tests with ./test/setup.ts and two parallel workers, apps/web',
+                            'note': '797 passed in 160 files. The dedicated table and Docs run also passed 62 tests. Logs web-tests-final-limited.log and web-targeted.log.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Programmatic Postgres migration rehearsal, repository root',
+                            'note': 'Clean database and restored local fork data migrated twice. All 197 journal entries appear once in both databases and the restored copy retains its one legacy row. Public schema and selected project data fingerprints match. Logs fresh-migration.log, upgrade-migration.log and repeat logs.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Drizzle schema regeneration, repository root',
+                            'note': 'bun --filter=@repo/db run db:generate --name=verify_sync_schema reports no schema changes. Log verify-drizzle-generation.log.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Focused code and security review of conflict resolution',
+                            'note': 'Checked transaction boundaries, project access filters, document visibility and deterministic migration guard. No blocking findings in the resolution.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'response':
+                        {
+                          'kind': 'final-result',
+                          'result':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'reason': 'Verified the staged candidate with fork ec5556ad and upstream cc396276 as merge parents, no unmerged entries, and no diff errors. Typecheck, lint, and formatting checks passed on the relevant candidate files.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'reason': '127 API integration and unit checks passed. Document access tests exercise selected members and inherited access, alongside weekly snapshots and delivery handoff. The 797-test Web suite includes nested rows, number edits and Docs behavior.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'reason': 'The empty database and the isolated restored fork database migrated twice. Observed identical public schema, all 197 current journal entries once, the expected legacy ledger row only on the restored path, and unchanged data fingerprints for issues, documents, project settings, and handoffs. Drizzle detects no further schema change.',
+                                    'result': 'passed',
+                                  },
+                                ],
+                              'attempt': 1,
+                              'iteration': 1,
+                              'requestReview':
+                                {
+                                  'reason': 'The integration candidate preserves the upstream change and the requested fork behavior. The original request also authorizes publishing the PR and deploying the checked revision to the local instance after acceptance.',
+                                  'result': 'aligned',
+                                },
+                              'risks':
+                                [
+                                  'The full Web suite passed with two workers. An earlier default-worker run had a timing-sensitive failure in the unchanged Strict Mode link-preview test.',
+                                  'The local rollout and live service verification are post-acceptance delivery steps.',
+                                ],
+                              'summary': 'All three acceptance checks passed.',
+                              'verdict': 'pass',
+                            },
+                        },
+                      'verifierExecutionRef': '01a205aa-ca7e-7d31-ba7b-b0b10807dd60',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '30ca0f599c2da8f9418d641798f2e0a73a756c17ad7b4a7478b522ed996b5fc3',
+                    'outcomeId': 'native-result-d826e2e79c29f5ee3d6a8552e9630f5f217bba5b97ce9678ea9ff1304a8fa64f',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-verifier',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'sync-upstream-main',
+              'status': 'succeeded',
+              'stepId': 'verify.verifier',
+              'type': 'handoff',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-preflight',
+                  'token': 'portable-fb92904f081c0fb1ce60c98231bd6b51202992a4c3df9ba938f36dbfff777064',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'sync-upstream-main:6',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'sync-upstream-main',
+                      'task': '用comet处理, 合并, 处理冲突, 提交PR, 部署到本地',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': 'c56dffee5350e6e53719d185a8fd3d85e5e94a961455b1ede40f7d42bbf5d162',
+              'outcome':
+                {
+                  'actionId': 'sync-upstream-main:6',
+                  'attempt': 1,
+                  'claimToken': 'portable-fb92904f081c0fb1ce60c98231bd6b51202992a4c3df9ba938f36dbfff777064',
+                  'inputHash': 'c56dffee5350e6e53719d185a8fd3d85e5e94a961455b1ede40f7d42bbf5d162',
+                  'outcomeId': 'sync-upstream-main:6:1:executor-result',
+                  'output':
+                    {
+                      'archiveDirRef': 'docs/comet/archive/2026-11-23-sync-upstream-main',
+                      'blockers': [],
+                      'candidateId': 'sync-upstream-main:3',
+                      'capabilityPeers': [],
+                      'ready': true,
+                      'reportRef': 'docs/comet/changes/sync-upstream-main/verification.md',
+                      'reportStateVersion': 6,
+                      'requiresReverification': false,
+                      'specPreview': [],
+                      'stateVersion': 7,
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '28e07877208aaf46a11283f785ca8512cffb73a46f99e332dc1b2ea02457d120',
+                    'outcomeId': 'sync-upstream-main:6:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive-preflight',
+              'requiredCapabilities': [],
+              'retry': 'idempotent',
+              'runId': 'sync-upstream-main',
+              'status': 'succeeded',
+              'stepId': 'archive.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-apply',
+                  'token': 'portable-097043a99fcf6b3bd90bb3d3822fddfd3b2a97eed8102054f33ea6c87c85a251',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'sync-upstream-main:7',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'sync-upstream-main',
+                      'task': '用comet处理, 合并, 处理冲突, 提交PR, 部署到本地',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '004ea0f3e606d80038c60d631607d3ec6d9e57fb03eb0749cf428526392c99e5',
+              'outcome':
+                {
+                  'actionId': 'sync-upstream-main:7',
+                  'attempt': 1,
+                  'claimToken': 'portable-097043a99fcf6b3bd90bb3d3822fddfd3b2a97eed8102054f33ea6c87c85a251',
+                  'inputHash': '004ea0f3e606d80038c60d631607d3ec6d9e57fb03eb0749cf428526392c99e5',
+                  'outcomeId': 'sync-upstream-main:7:1:executor-result',
+                  'output':
+                    {
+                      'archiveRef': '2026-11-23-sync-upstream-main',
+                      'specCount': 0,
+                      'stateVersion': 7,
+                      'transactionId': 'eb2af7fb-c2fe-4975-9c9c-87046b25e131',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'f43565f3dabd46870d8b38dba983c772d00a1f4b1481148d3f005dbd171f5ba9',
+                    'outcomeId': 'sync-upstream-main:7:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'sync-upstream-main',
+              'status': 'succeeded',
+              'stepId': 'archive.execute',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-finalize',
+                  'token': 'portable-717cbeece58a0162615cbebfefd5988b8254cc93059d0b0c6a2fbb41f4c84e9e',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'sync-upstream-main:8',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'sync-upstream-main',
+                      'task': '用comet处理, 合并, 处理冲突, 提交PR, 部署到本地',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '7c5e79058f5913924d3461cae31e40dece4e5cac61a111b5cdc21d9ab3abbc8d',
+              'outcome':
+                {
+                  'actionId': 'sync-upstream-main:8',
+                  'attempt': 1,
+                  'claimToken': 'portable-717cbeece58a0162615cbebfefd5988b8254cc93059d0b0c6a2fbb41f4c84e9e',
+                  'inputHash': '7c5e79058f5913924d3461cae31e40dece4e5cac61a111b5cdc21d9ab3abbc8d',
+                  'outcomeId': 'sync-upstream-main:8:1:executor-result',
+                  'output':
+                    {
+                      'archiveRef': '2026-11-23-sync-upstream-main',
+                      'change': 'sync-upstream-main',
+                      'runId': 'sync-upstream-main',
+                      'specs': [],
+                      'stateVersion': 8,
+                      'transactionId': 'eb2af7fb-c2fe-4975-9c9c-87046b25e131',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '5d9fb96ca4a2b26422f84aab12ae7b7ea1127546d55039c8d5d9079c90b6ec48',
+                    'outcomeId': 'sync-upstream-main:8:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive-finalize',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'sync-upstream-main',
+              'status': 'succeeded',
+              'stepId': 'archive.finalize',
+              'type': 'call_tool',
+            },
+          ],
+        'actionContexts':
+          {
+            'sync-upstream-main:1': { 'results': {}, 'sequence': 1 },
+            'sync-upstream-main:3': { 'results': {}, 'sequence': 3 },
+            'sync-upstream-main:4': { 'results': {}, 'sequence': 4 },
+            'sync-upstream-main:6': { 'results': {}, 'sequence': 6 },
+            'sync-upstream-main:7': { 'results': {}, 'sequence': 7 },
+            'sync-upstream-main:8': { 'results': {}, 'sequence': 8 },
+          },
+        'waits':
+          [
+            {
+              'id': 'sync-upstream-main:2',
+              'stepId': 'shape.confirm',
+              'sequence': 2,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'sync-upstream-main',
+                      'task': '用comet处理, 合并, 处理冲突, 提交PR, 部署到本地',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'The candidate includes both Git histories. No conflict remains, and relevant type, lint, and format checks pass.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'Targeted tests cover private document sharing and inherited access, weekly report snapshots, delivery progress and handoff, nested task display, and inline numeric editing.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': "Migrations complete on an empty PostgreSQL database and on an isolated copy of the local database that has applied the fork's `0187_delivery_workflow`. Both paths produce the expected schema, the upgrade preserves existing project data, and a second migration run has no pending work.",
+                              },
+                            ],
+                          'children': null,
+                          'specChanges': [],
+                        },
+                    },
+                },
+              'proposalHash': 'cd21f5cfd6ccddb46e05ff6cba63fe177c85cab282dbb73afb1e8d675d34c946',
+              'choices': ['approved', 'rejected'],
+              'results': {},
+              'decision':
+                {
+                  'id': '811b1cdd1cbc211079c5a1c51747ab14b967b5d8d79aa5eb3862719882724387',
+                  'choice': 'approved',
+                  'proposalHash': 'cd21f5cfd6ccddb46e05ff6cba63fe177c85cab282dbb73afb1e8d675d34c946',
+                },
+            },
+            {
+              'id': 'sync-upstream-main:5',
+              'stepId': 'verify.confirm',
+              'sequence': 5,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'activation':
+                    {
+                      'report':
+                        {
+                          'attempt': 1,
+                          'candidateId': 'sync-upstream-main:3',
+                          'iteration': 1,
+                          'reportRef': 'docs/comet/changes/sync-upstream-main/verification.md',
+                          'stateVersion': 6,
+                        },
+                    },
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'sync-upstream-main',
+                      'task': '用comet处理, 合并, 处理冲突, 提交PR, 部署到本地',
+                    },
+                  'outputs':
+                    {
+                      'verify.verifier':
+                        {
+                          'candidateId': 'sync-upstream-main:3',
+                          'checks':
+                            [
+                              {
+                                'name': 'Git merge ancestry and staged diff check, repository root',
+                                'note': 'HEAD ec5556ad, MERGE_HEAD cc396276, no unmerged entries, git diff --cached --check clean.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun run typecheck and bun run lint, repository root',
+                                'note': 'Both workspace runs passed 13/13. After editing the two Web test files, Web typecheck and ESLint on those files passed. Logs typecheck.log, lint.log, web-final-typecheck.log, web-final-lint.log.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Prettier check on staged files and final Web test edits, repository root',
+                                'note': 'All staged code passes. format-staged.log records the staged-file check. The active Comet YAML is generated and formatted by the commit hook after archive.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Bun API integration tests against throwaway PostgreSQL, apps/api',
+                                'note': '56 passed for documents, pins, weekly reports and delivery. 71 more passed for run initiators, initiatives and saved actions. Logs api-tests.log and api-upstream-tests.log.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Bun Web tests with ./test/setup.ts and two parallel workers, apps/web',
+                                'note': '797 passed in 160 files. The dedicated table and Docs run also passed 62 tests. Logs web-tests-final-limited.log and web-targeted.log.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Programmatic Postgres migration rehearsal, repository root',
+                                'note': 'Clean database and restored local fork data migrated twice. All 197 journal entries appear once in both databases and the restored copy retains its one legacy row. Public schema and selected project data fingerprints match. Logs fresh-migration.log, upgrade-migration.log and repeat logs.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Drizzle schema regeneration, repository root',
+                                'note': 'bun --filter=@repo/db run db:generate --name=verify_sync_schema reports no schema changes. Log verify-drizzle-generation.log.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Focused code and security review of conflict resolution',
+                                'note': 'Checked transaction boundaries, project access filters, document visibility and deterministic migration guard. No blocking findings in the resolution.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'response':
+                            {
+                              'kind': 'final-result',
+                              'result':
+                                {
+                                  'acceptance':
+                                    [
+                                      {
+                                        'id': 'A1',
+                                        'reason': 'Verified the staged candidate with fork ec5556ad and upstream cc396276 as merge parents, no unmerged entries, and no diff errors. Typecheck, lint, and formatting checks passed on the relevant candidate files.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A2',
+                                        'reason': '127 API integration and unit checks passed. Document access tests exercise selected members and inherited access, alongside weekly snapshots and delivery handoff. The 797-test Web suite includes nested rows, number edits and Docs behavior.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A3',
+                                        'reason': 'The empty database and the isolated restored fork database migrated twice. Observed identical public schema, all 197 current journal entries once, the expected legacy ledger row only on the restored path, and unchanged data fingerprints for issues, documents, project settings, and handoffs. Drizzle detects no further schema change.',
+                                        'result': 'passed',
+                                      },
+                                    ],
+                                  'attempt': 1,
+                                  'iteration': 1,
+                                  'requestReview':
+                                    {
+                                      'reason': 'The integration candidate preserves the upstream change and the requested fork behavior. The original request also authorizes publishing the PR and deploying the checked revision to the local instance after acceptance.',
+                                      'result': 'aligned',
+                                    },
+                                  'risks':
+                                    [
+                                      'The full Web suite passed with two workers. An earlier default-worker run had a timing-sensitive failure in the unchanged Strict Mode link-preview test.',
+                                      'The local rollout and live service verification are post-acceptance delivery steps.',
+                                    ],
+                                  'summary': 'All three acceptance checks passed.',
+                                  'verdict': 'pass',
+                                },
+                            },
+                          'verifierExecutionRef': '01a205aa-ca7e-7d31-ba7b-b0b10807dd60',
+                        },
+                    },
+                },
+              'proposalHash': '933abd70a2e00d0be350c235cdd7bd2af13d6351e80447390940831ae3b2a2fd',
+              'choices': ['approved', 'rejected', 'reverify'],
+              'results': {},
+              'decision':
+                {
+                  'id': '37bf33d01f8f0cf77a56a1dd2691c61fe32a60fd24a3336910886cdee3d62042',
+                  'choice': 'approved',
+                  'proposalHash': '933abd70a2e00d0be350c235cdd7bd2af13d6351e80447390940831ae3b2a2fd',
+                  'reason': '用户明确授权：确认方案，验收通过后接受并归档',
+                },
+            },
+          ],
+        'ready': [],
+        'joins': {},
+        'outputs': {},
+        'children': [],
+        'lineage': [],
+      },
+    'sourceRevision': 15,
+    'sourceHash': 'e69d2cd30e1d65079fb92a9d068dcd7453dfc785db52be0c13304cdc6ef6fde2',
+    'pool':
+      {
+        'version': 3,
+        'values':
+          [
+            {
+              'choice': 'approved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'sync-upstream-main',
+                      'task': '用comet处理, 合并, 处理冲突, 提交PR, 部署到本地',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'The candidate includes both Git histories. No conflict remains, and relevant type, lint, and format checks pass.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'Targeted tests cover private document sharing and inherited access, weekly report snapshots, delivery progress and handoff, nested task display, and inline numeric editing.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': "Migrations complete on an empty PostgreSQL database and on an isolated copy of the local database that has applied the fork's `0187_delivery_workflow`. Both paths produce the expected schema, the upgrade preserves existing project data, and a second migration run has no pending work.",
+                              },
+                            ],
+                          'children': null,
+                          'specChanges': [],
+                        },
+                    },
+                },
+            },
+            {
+              'acceptance':
+                [
+                  {
+                    'id': 'A1',
+                    'source': 'brief.md',
+                    'text': 'The candidate includes both Git histories. No conflict remains, and relevant type, lint, and format checks pass.',
+                  },
+                  {
+                    'id': 'A2',
+                    'source': 'brief.md',
+                    'text': 'Targeted tests cover private document sharing and inherited access, weekly report snapshots, delivery progress and handoff, nested task display, and inline numeric editing.',
+                  },
+                  {
+                    'id': 'A3',
+                    'source': 'brief.md',
+                    'text': "Migrations complete on an empty PostgreSQL database and on an isolated copy of the local database that has applied the fork's `0187_delivery_workflow`. Both paths produce the expected schema, the upgrade preserves existing project data, and a second migration run has no pending work.",
+                  },
+                ],
+              'children': null,
+              'specChanges': [],
+            },
+            {
+              'addressedAcceptanceIds': ['A1', 'A2', 'A3'],
+              'checks':
+                [
+                  {
+                    'name': 'Git merge ancestry and staged diff check, repository root',
+                    'note': 'HEAD ec5556ad, MERGE_HEAD cc396276, no unmerged entries, git diff --cached --check clean.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun run typecheck and bun run lint, repository root',
+                    'note': 'Both workspace runs passed 13/13. After editing the two Web test files, Web typecheck and ESLint on those files passed. Logs typecheck.log, lint.log, web-final-typecheck.log, web-final-lint.log.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Prettier check on staged files and final Web test edits, repository root',
+                    'note': 'All staged code passes. format-staged.log records the staged-file check. The active Comet YAML is generated and formatted by the commit hook after archive.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Bun API integration tests against throwaway PostgreSQL, apps/api',
+                    'note': '56 passed for documents, pins, weekly reports and delivery. 71 more passed for run initiators, initiatives and saved actions. Logs api-tests.log and api-upstream-tests.log.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Bun Web tests with ./test/setup.ts and two parallel workers, apps/web',
+                    'note': '797 passed in 160 files. The dedicated table and Docs run also passed 62 tests. Logs web-tests-final-limited.log and web-targeted.log.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Programmatic Postgres migration rehearsal, repository root',
+                    'note': 'Clean database and restored local fork data migrated twice. All 197 journal entries appear once in both databases and the restored copy retains its one legacy row. Public schema and selected project data fingerprints match. Logs fresh-migration.log, upgrade-migration.log and repeat logs.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Drizzle schema regeneration, repository root',
+                    'note': 'bun --filter=@repo/db run db:generate --name=verify_sync_schema reports no schema changes. Log verify-drizzle-generation.log.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Focused code and security review of conflict resolution',
+                    'note': 'Checked transaction boundaries, project access filters, document visibility and deterministic migration guard. No blocking findings in the resolution.',
+                    'result': 'passed',
+                  },
+                ],
+              'knownLimits':
+                [
+                  'An earlier full Web run at default worker count intermittently failed in the existing Strict Mode link-preview test. The full run with two workers passed.',
+                  'Web behavior is covered by automated tests. Browser interaction was not part of this verification.',
+                ],
+              'requireIndependentReview': false,
+              'summary': 'Resolved the upstream merge against ec5556ad, with cc396276 as the pending second parent. Document creation combines the weekly snapshot transaction helper with private-child sharing. The thirteen locale files keep both groups of strings. The upstream Drizzle chain is intact through 0195 and the generated 0196 migration recognizes the exact legacy fork entry. Two imported Web tests now drain pending React Query notifications before JSDOM teardown.',
+            },
+            {
+              'choice': 'approved',
+              'proposal':
+                {
+                  'activation':
+                    {
+                      'report':
+                        {
+                          'attempt': 1,
+                          'candidateId': 'sync-upstream-main:3',
+                          'iteration': 1,
+                          'reportRef': 'docs/comet/changes/sync-upstream-main/verification.md',
+                          'stateVersion': 6,
+                        },
+                    },
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'sync-upstream-main',
+                      'task': '用comet处理, 合并, 处理冲突, 提交PR, 部署到本地',
+                    },
+                  'outputs':
+                    {
+                      'verify.verifier':
+                        {
+                          'candidateId': 'sync-upstream-main:3',
+                          'checks':
+                            [
+                              {
+                                'name': 'Git merge ancestry and staged diff check, repository root',
+                                'note': 'HEAD ec5556ad, MERGE_HEAD cc396276, no unmerged entries, git diff --cached --check clean.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'bun run typecheck and bun run lint, repository root',
+                                'note': 'Both workspace runs passed 13/13. After editing the two Web test files, Web typecheck and ESLint on those files passed. Logs typecheck.log, lint.log, web-final-typecheck.log, web-final-lint.log.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Prettier check on staged files and final Web test edits, repository root',
+                                'note': 'All staged code passes. format-staged.log records the staged-file check. The active Comet YAML is generated and formatted by the commit hook after archive.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Bun API integration tests against throwaway PostgreSQL, apps/api',
+                                'note': '56 passed for documents, pins, weekly reports and delivery. 71 more passed for run initiators, initiatives and saved actions. Logs api-tests.log and api-upstream-tests.log.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Bun Web tests with ./test/setup.ts and two parallel workers, apps/web',
+                                'note': '797 passed in 160 files. The dedicated table and Docs run also passed 62 tests. Logs web-tests-final-limited.log and web-targeted.log.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Programmatic Postgres migration rehearsal, repository root',
+                                'note': 'Clean database and restored local fork data migrated twice. All 197 journal entries appear once in both databases and the restored copy retains its one legacy row. Public schema and selected project data fingerprints match. Logs fresh-migration.log, upgrade-migration.log and repeat logs.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Drizzle schema regeneration, repository root',
+                                'note': 'bun --filter=@repo/db run db:generate --name=verify_sync_schema reports no schema changes. Log verify-drizzle-generation.log.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Focused code and security review of conflict resolution',
+                                'note': 'Checked transaction boundaries, project access filters, document visibility and deterministic migration guard. No blocking findings in the resolution.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'response':
+                            {
+                              'kind': 'final-result',
+                              'result':
+                                {
+                                  'acceptance':
+                                    [
+                                      {
+                                        'id': 'A1',
+                                        'reason': 'Verified the staged candidate with fork ec5556ad and upstream cc396276 as merge parents, no unmerged entries, and no diff errors. Typecheck, lint, and formatting checks passed on the relevant candidate files.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A2',
+                                        'reason': '127 API integration and unit checks passed. Document access tests exercise selected members and inherited access, alongside weekly snapshots and delivery handoff. The 797-test Web suite includes nested rows, number edits and Docs behavior.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A3',
+                                        'reason': 'The empty database and the isolated restored fork database migrated twice. Observed identical public schema, all 197 current journal entries once, the expected legacy ledger row only on the restored path, and unchanged data fingerprints for issues, documents, project settings, and handoffs. Drizzle detects no further schema change.',
+                                        'result': 'passed',
+                                      },
+                                    ],
+                                  'attempt': 1,
+                                  'iteration': 1,
+                                  'requestReview':
+                                    {
+                                      'reason': 'The integration candidate preserves the upstream change and the requested fork behavior. The original request also authorizes publishing the PR and deploying the checked revision to the local instance after acceptance.',
+                                      'result': 'aligned',
+                                    },
+                                  'risks':
+                                    [
+                                      'The full Web suite passed with two workers. An earlier default-worker run had a timing-sensitive failure in the unchanged Strict Mode link-preview test.',
+                                      'The local rollout and live service verification are post-acceptance delivery steps.',
+                                    ],
+                                  'summary': 'All three acceptance checks passed.',
+                                  'verdict': 'pass',
+                                },
+                            },
+                          'verifierExecutionRef': '01a205aa-ca7e-7d31-ba7b-b0b10807dd60',
+                        },
+                    },
+                },
+            },
+            {
+              'candidateId': 'sync-upstream-main:3',
+              'checks':
+                [
+                  {
+                    'name': 'Git merge ancestry and staged diff check, repository root',
+                    'note': 'HEAD ec5556ad, MERGE_HEAD cc396276, no unmerged entries, git diff --cached --check clean.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'bun run typecheck and bun run lint, repository root',
+                    'note': 'Both workspace runs passed 13/13. After editing the two Web test files, Web typecheck and ESLint on those files passed. Logs typecheck.log, lint.log, web-final-typecheck.log, web-final-lint.log.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Prettier check on staged files and final Web test edits, repository root',
+                    'note': 'All staged code passes. format-staged.log records the staged-file check. The active Comet YAML is generated and formatted by the commit hook after archive.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Bun API integration tests against throwaway PostgreSQL, apps/api',
+                    'note': '56 passed for documents, pins, weekly reports and delivery. 71 more passed for run initiators, initiatives and saved actions. Logs api-tests.log and api-upstream-tests.log.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Bun Web tests with ./test/setup.ts and two parallel workers, apps/web',
+                    'note': '797 passed in 160 files. The dedicated table and Docs run also passed 62 tests. Logs web-tests-final-limited.log and web-targeted.log.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Programmatic Postgres migration rehearsal, repository root',
+                    'note': 'Clean database and restored local fork data migrated twice. All 197 journal entries appear once in both databases and the restored copy retains its one legacy row. Public schema and selected project data fingerprints match. Logs fresh-migration.log, upgrade-migration.log and repeat logs.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Drizzle schema regeneration, repository root',
+                    'note': 'bun --filter=@repo/db run db:generate --name=verify_sync_schema reports no schema changes. Log verify-drizzle-generation.log.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Focused code and security review of conflict resolution',
+                    'note': 'Checked transaction boundaries, project access filters, document visibility and deterministic migration guard. No blocking findings in the resolution.',
+                    'result': 'passed',
+                  },
+                ],
+              'response':
+                {
+                  'kind': 'final-result',
+                  'result':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'reason': 'Verified the staged candidate with fork ec5556ad and upstream cc396276 as merge parents, no unmerged entries, and no diff errors. Typecheck, lint, and formatting checks passed on the relevant candidate files.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A2',
+                            'reason': '127 API integration and unit checks passed. Document access tests exercise selected members and inherited access, alongside weekly snapshots and delivery handoff. The 797-test Web suite includes nested rows, number edits and Docs behavior.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A3',
+                            'reason': 'The empty database and the isolated restored fork database migrated twice. Observed identical public schema, all 197 current journal entries once, the expected legacy ledger row only on the restored path, and unchanged data fingerprints for issues, documents, project settings, and handoffs. Drizzle detects no further schema change.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'attempt': 1,
+                      'iteration': 1,
+                      'requestReview':
+                        {
+                          'reason': 'The integration candidate preserves the upstream change and the requested fork behavior. The original request also authorizes publishing the PR and deploying the checked revision to the local instance after acceptance.',
+                          'result': 'aligned',
+                        },
+                      'risks':
+                        [
+                          'The full Web suite passed with two workers. An earlier default-worker run had a timing-sensitive failure in the unchanged Strict Mode link-preview test.',
+                          'The local rollout and live service verification are post-acceptance delivery steps.',
+                        ],
+                      'summary': 'All three acceptance checks passed.',
+                      'verdict': 'pass',
+                    },
+                },
+              'verifierExecutionRef': '01a205aa-ca7e-7d31-ba7b-b0b10807dd60',
+            },
+            {
+              'archiveDirRef': 'docs/comet/archive/2026-11-23-sync-upstream-main',
+              'blockers': [],
+              'candidateId': 'sync-upstream-main:3',
+              'capabilityPeers': [],
+              'ready': true,
+              'reportRef': 'docs/comet/changes/sync-upstream-main/verification.md',
+              'reportStateVersion': 6,
+              'requiresReverification': false,
+              'specPreview': [],
+              'stateVersion': 7,
+            },
+            {
+              'archiveRef': '2026-11-23-sync-upstream-main',
+              'specCount': 0,
+              'stateVersion': 7,
+              'transactionId': 'eb2af7fb-c2fe-4975-9c9c-87046b25e131',
+            },
+            {
+              'sequence': 2,
+              'value':
+                {
+                  'choice': 'approved',
+                  'proposal':
+                    {
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'sync-upstream-main',
+                          'task': '用comet处理, 合并, 处理冲突, 提交PR, 部署到本地',
+                        },
+                      'outputs':
+                        {
+                          'shape.prepare':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'source': 'brief.md',
+                                    'text': 'The candidate includes both Git histories. No conflict remains, and relevant type, lint, and format checks pass.',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'source': 'brief.md',
+                                    'text': 'Targeted tests cover private document sharing and inherited access, weekly report snapshots, delivery progress and handoff, nested task display, and inline numeric editing.',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'source': 'brief.md',
+                                    'text': "Migrations complete on an empty PostgreSQL database and on an isolated copy of the local database that has applied the fork's `0187_delivery_workflow`. Both paths produce the expected schema, the upgrade preserves existing project data, and a second migration run has no pending work.",
+                                  },
+                                ],
+                              'children': null,
+                              'specChanges': [],
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 1,
+              'value':
+                {
+                  'acceptance':
+                    [
+                      {
+                        'id': 'A1',
+                        'source': 'brief.md',
+                        'text': 'The candidate includes both Git histories. No conflict remains, and relevant type, lint, and format checks pass.',
+                      },
+                      {
+                        'id': 'A2',
+                        'source': 'brief.md',
+                        'text': 'Targeted tests cover private document sharing and inherited access, weekly report snapshots, delivery progress and handoff, nested task display, and inline numeric editing.',
+                      },
+                      {
+                        'id': 'A3',
+                        'source': 'brief.md',
+                        'text': "Migrations complete on an empty PostgreSQL database and on an isolated copy of the local database that has applied the fork's `0187_delivery_workflow`. Both paths produce the expected schema, the upgrade preserves existing project data, and a second migration run has no pending work.",
+                      },
+                    ],
+                  'children': null,
+                  'specChanges': [],
+                },
+            },
+            {
+              'sequence': 3,
+              'value':
+                {
+                  'addressedAcceptanceIds': ['A1', 'A2', 'A3'],
+                  'checks':
+                    [
+                      {
+                        'name': 'Git merge ancestry and staged diff check, repository root',
+                        'note': 'HEAD ec5556ad, MERGE_HEAD cc396276, no unmerged entries, git diff --cached --check clean.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun run typecheck and bun run lint, repository root',
+                        'note': 'Both workspace runs passed 13/13. After editing the two Web test files, Web typecheck and ESLint on those files passed. Logs typecheck.log, lint.log, web-final-typecheck.log, web-final-lint.log.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Prettier check on staged files and final Web test edits, repository root',
+                        'note': 'All staged code passes. format-staged.log records the staged-file check. The active Comet YAML is generated and formatted by the commit hook after archive.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Bun API integration tests against throwaway PostgreSQL, apps/api',
+                        'note': '56 passed for documents, pins, weekly reports and delivery. 71 more passed for run initiators, initiatives and saved actions. Logs api-tests.log and api-upstream-tests.log.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Bun Web tests with ./test/setup.ts and two parallel workers, apps/web',
+                        'note': '797 passed in 160 files. The dedicated table and Docs run also passed 62 tests. Logs web-tests-final-limited.log and web-targeted.log.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Programmatic Postgres migration rehearsal, repository root',
+                        'note': 'Clean database and restored local fork data migrated twice. All 197 journal entries appear once in both databases and the restored copy retains its one legacy row. Public schema and selected project data fingerprints match. Logs fresh-migration.log, upgrade-migration.log and repeat logs.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Drizzle schema regeneration, repository root',
+                        'note': 'bun --filter=@repo/db run db:generate --name=verify_sync_schema reports no schema changes. Log verify-drizzle-generation.log.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Focused code and security review of conflict resolution',
+                        'note': 'Checked transaction boundaries, project access filters, document visibility and deterministic migration guard. No blocking findings in the resolution.',
+                        'result': 'passed',
+                      },
+                    ],
+                  'knownLimits':
+                    [
+                      'An earlier full Web run at default worker count intermittently failed in the existing Strict Mode link-preview test. The full run with two workers passed.',
+                      'Web behavior is covered by automated tests. Browser interaction was not part of this verification.',
+                    ],
+                  'requireIndependentReview': false,
+                  'summary': 'Resolved the upstream merge against ec5556ad, with cc396276 as the pending second parent. Document creation combines the weekly snapshot transaction helper with private-child sharing. The thirteen locale files keep both groups of strings. The upstream Drizzle chain is intact through 0195 and the generated 0196 migration recognizes the exact legacy fork entry. Two imported Web tests now drain pending React Query notifications before JSDOM teardown.',
+                },
+            },
+            {
+              'sequence': 5,
+              'value':
+                {
+                  'choice': 'approved',
+                  'proposal':
+                    {
+                      'activation':
+                        {
+                          'report':
+                            {
+                              'attempt': 1,
+                              'candidateId': 'sync-upstream-main:3',
+                              'iteration': 1,
+                              'reportRef': 'docs/comet/changes/sync-upstream-main/verification.md',
+                              'stateVersion': 6,
+                            },
+                        },
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'sync-upstream-main',
+                          'task': '用comet处理, 合并, 处理冲突, 提交PR, 部署到本地',
+                        },
+                      'outputs':
+                        {
+                          'verify.verifier':
+                            {
+                              'candidateId': 'sync-upstream-main:3',
+                              'checks':
+                                [
+                                  {
+                                    'name': 'Git merge ancestry and staged diff check, repository root',
+                                    'note': 'HEAD ec5556ad, MERGE_HEAD cc396276, no unmerged entries, git diff --cached --check clean.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'bun run typecheck and bun run lint, repository root',
+                                    'note': 'Both workspace runs passed 13/13. After editing the two Web test files, Web typecheck and ESLint on those files passed. Logs typecheck.log, lint.log, web-final-typecheck.log, web-final-lint.log.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Prettier check on staged files and final Web test edits, repository root',
+                                    'note': 'All staged code passes. format-staged.log records the staged-file check. The active Comet YAML is generated and formatted by the commit hook after archive.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Bun API integration tests against throwaway PostgreSQL, apps/api',
+                                    'note': '56 passed for documents, pins, weekly reports and delivery. 71 more passed for run initiators, initiatives and saved actions. Logs api-tests.log and api-upstream-tests.log.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Bun Web tests with ./test/setup.ts and two parallel workers, apps/web',
+                                    'note': '797 passed in 160 files. The dedicated table and Docs run also passed 62 tests. Logs web-tests-final-limited.log and web-targeted.log.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Programmatic Postgres migration rehearsal, repository root',
+                                    'note': 'Clean database and restored local fork data migrated twice. All 197 journal entries appear once in both databases and the restored copy retains its one legacy row. Public schema and selected project data fingerprints match. Logs fresh-migration.log, upgrade-migration.log and repeat logs.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Drizzle schema regeneration, repository root',
+                                    'note': 'bun --filter=@repo/db run db:generate --name=verify_sync_schema reports no schema changes. Log verify-drizzle-generation.log.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Focused code and security review of conflict resolution',
+                                    'note': 'Checked transaction boundaries, project access filters, document visibility and deterministic migration guard. No blocking findings in the resolution.',
+                                    'result': 'passed',
+                                  },
+                                ],
+                              'response':
+                                {
+                                  'kind': 'final-result',
+                                  'result':
+                                    {
+                                      'acceptance':
+                                        [
+                                          {
+                                            'id': 'A1',
+                                            'reason': 'Verified the staged candidate with fork ec5556ad and upstream cc396276 as merge parents, no unmerged entries, and no diff errors. Typecheck, lint, and formatting checks passed on the relevant candidate files.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A2',
+                                            'reason': '127 API integration and unit checks passed. Document access tests exercise selected members and inherited access, alongside weekly snapshots and delivery handoff. The 797-test Web suite includes nested rows, number edits and Docs behavior.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A3',
+                                            'reason': 'The empty database and the isolated restored fork database migrated twice. Observed identical public schema, all 197 current journal entries once, the expected legacy ledger row only on the restored path, and unchanged data fingerprints for issues, documents, project settings, and handoffs. Drizzle detects no further schema change.',
+                                            'result': 'passed',
+                                          },
+                                        ],
+                                      'attempt': 1,
+                                      'iteration': 1,
+                                      'requestReview':
+                                        {
+                                          'reason': 'The integration candidate preserves the upstream change and the requested fork behavior. The original request also authorizes publishing the PR and deploying the checked revision to the local instance after acceptance.',
+                                          'result': 'aligned',
+                                        },
+                                      'risks':
+                                        [
+                                          'The full Web suite passed with two workers. An earlier default-worker run had a timing-sensitive failure in the unchanged Strict Mode link-preview test.',
+                                          'The local rollout and live service verification are post-acceptance delivery steps.',
+                                        ],
+                                      'summary': 'All three acceptance checks passed.',
+                                      'verdict': 'pass',
+                                    },
+                                },
+                              'verifierExecutionRef': '01a205aa-ca7e-7d31-ba7b-b0b10807dd60',
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 4,
+              'value':
+                {
+                  'candidateId': 'sync-upstream-main:3',
+                  'checks':
+                    [
+                      {
+                        'name': 'Git merge ancestry and staged diff check, repository root',
+                        'note': 'HEAD ec5556ad, MERGE_HEAD cc396276, no unmerged entries, git diff --cached --check clean.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'bun run typecheck and bun run lint, repository root',
+                        'note': 'Both workspace runs passed 13/13. After editing the two Web test files, Web typecheck and ESLint on those files passed. Logs typecheck.log, lint.log, web-final-typecheck.log, web-final-lint.log.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Prettier check on staged files and final Web test edits, repository root',
+                        'note': 'All staged code passes. format-staged.log records the staged-file check. The active Comet YAML is generated and formatted by the commit hook after archive.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Bun API integration tests against throwaway PostgreSQL, apps/api',
+                        'note': '56 passed for documents, pins, weekly reports and delivery. 71 more passed for run initiators, initiatives and saved actions. Logs api-tests.log and api-upstream-tests.log.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Bun Web tests with ./test/setup.ts and two parallel workers, apps/web',
+                        'note': '797 passed in 160 files. The dedicated table and Docs run also passed 62 tests. Logs web-tests-final-limited.log and web-targeted.log.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Programmatic Postgres migration rehearsal, repository root',
+                        'note': 'Clean database and restored local fork data migrated twice. All 197 journal entries appear once in both databases and the restored copy retains its one legacy row. Public schema and selected project data fingerprints match. Logs fresh-migration.log, upgrade-migration.log and repeat logs.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Drizzle schema regeneration, repository root',
+                        'note': 'bun --filter=@repo/db run db:generate --name=verify_sync_schema reports no schema changes. Log verify-drizzle-generation.log.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Focused code and security review of conflict resolution',
+                        'note': 'Checked transaction boundaries, project access filters, document visibility and deterministic migration guard. No blocking findings in the resolution.',
+                        'result': 'passed',
+                      },
+                    ],
+                  'response':
+                    {
+                      'kind': 'final-result',
+                      'result':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'reason': 'Verified the staged candidate with fork ec5556ad and upstream cc396276 as merge parents, no unmerged entries, and no diff errors. Typecheck, lint, and formatting checks passed on the relevant candidate files.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A2',
+                                'reason': '127 API integration and unit checks passed. Document access tests exercise selected members and inherited access, alongside weekly snapshots and delivery handoff. The 797-test Web suite includes nested rows, number edits and Docs behavior.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A3',
+                                'reason': 'The empty database and the isolated restored fork database migrated twice. Observed identical public schema, all 197 current journal entries once, the expected legacy ledger row only on the restored path, and unchanged data fingerprints for issues, documents, project settings, and handoffs. Drizzle detects no further schema change.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'attempt': 1,
+                          'iteration': 1,
+                          'requestReview':
+                            {
+                              'reason': 'The integration candidate preserves the upstream change and the requested fork behavior. The original request also authorizes publishing the PR and deploying the checked revision to the local instance after acceptance.',
+                              'result': 'aligned',
+                            },
+                          'risks':
+                            [
+                              'The full Web suite passed with two workers. An earlier default-worker run had a timing-sensitive failure in the unchanged Strict Mode link-preview test.',
+                              'The local rollout and live service verification are post-acceptance delivery steps.',
+                            ],
+                          'summary': 'All three acceptance checks passed.',
+                          'verdict': 'pass',
+                        },
+                    },
+                  'verifierExecutionRef': '01a205aa-ca7e-7d31-ba7b-b0b10807dd60',
+                },
+            },
+            {
+              'sequence': 6,
+              'value':
+                {
+                  'archiveDirRef': 'docs/comet/archive/2026-11-23-sync-upstream-main',
+                  'blockers': [],
+                  'candidateId': 'sync-upstream-main:3',
+                  'capabilityPeers': [],
+                  'ready': true,
+                  'reportRef': 'docs/comet/changes/sync-upstream-main/verification.md',
+                  'reportStateVersion': 6,
+                  'requiresReverification': false,
+                  'specPreview': [],
+                  'stateVersion': 7,
+                },
+            },
+            {
+              'sequence': 7,
+              'value':
+                {
+                  'archiveRef': '2026-11-23-sync-upstream-main',
+                  'specCount': 0,
+                  'stateVersion': 7,
+                  'transactionId': 'eb2af7fb-c2fe-4975-9c9c-87046b25e131',
+                },
+            },
+            {
+              'sequence': 8,
+              'value':
+                {
+                  'archiveRef': '2026-11-23-sync-upstream-main',
+                  'change': 'sync-upstream-main',
+                  'runId': 'sync-upstream-main',
+                  'specs': [],
+                  'stateVersion': 8,
+                  'transactionId': 'eb2af7fb-c2fe-4975-9c9c-87046b25e131',
+                },
+            },
+          ],
+        'nodes':
+          [
+            { 'key': 'shape.prepare', 'value': 1, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': null, 'right': 0, 'height': 2 },
+            { 'key': 'build.builder', 'value': 2, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 2, 'right': 0, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 1, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 4, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.confirm', 'value': 3, 'left': 4, 'right': 5, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 2, 'right': 6, 'height': 3 },
+            { 'key': 'archive.prepare', 'value': 5, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 2, 'left': 8, 'right': null, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 9, 'right': 6, 'height': 3 },
+            { 'key': 'archive.execute', 'value': 6, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 2, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.prepare', 'value': 5, 'left': 11, 'right': 12, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 13, 'right': 6, 'height': 3 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': null, 'right': 15, 'height': 2 },
+            { 'key': 'build.builder', 'value': 9, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 17, 'right': 15, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 11, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.confirm', 'value': 10, 'left': 19, 'right': 20, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 17, 'right': 21, 'height': 3 },
+            { 'key': 'archive.prepare', 'value': 12, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 9, 'left': 23, 'right': null, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 24, 'right': 21, 'height': 3 },
+            { 'key': 'archive.execute', 'value': 13, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 9, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.prepare', 'value': 12, 'left': 26, 'right': 27, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 28, 'right': 21, 'height': 3 },
+            { 'key': 'archive.finalize', 'value': 14, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.execute', 'value': 13, 'left': null, 'right': 30, 'height': 2 },
+            { 'key': 'archive.prepare', 'value': 12, 'left': 31, 'right': 27, 'height': 3 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 32, 'right': 21, 'height': 4 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 9, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 11, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': 36, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 35, 'right': 37, 'height': 3 },
+          ],
+        'maps': [null, 1, 3, 7, 10, 14, 16, 18, 22, 25, 29, 33, 34, 38],
+        'bindings':
+          [
+            { 'path': ['actions', '0', 'input', 'outputs'], 'map': 0 },
+            { 'path': ['actions', '1', 'input', 'outputs'], 'map': 1 },
+            { 'path': ['actions', '2', 'input', 'outputs'], 'map': 2 },
+            { 'path': ['actions', '3', 'input', 'outputs'], 'map': 3 },
+            { 'path': ['actions', '4', 'input', 'outputs'], 'map': 4 },
+            { 'path': ['actions', '5', 'input', 'outputs'], 'map': 5 },
+            { 'path': ['actionContexts', 'sync-upstream-main:1', 'results'], 'map': 0 },
+            { 'path': ['actionContexts', 'sync-upstream-main:3', 'results'], 'map': 6 },
+            { 'path': ['actionContexts', 'sync-upstream-main:4', 'results'], 'map': 7 },
+            { 'path': ['actionContexts', 'sync-upstream-main:6', 'results'], 'map': 8 },
+            { 'path': ['actionContexts', 'sync-upstream-main:7', 'results'], 'map': 9 },
+            { 'path': ['actionContexts', 'sync-upstream-main:8', 'results'], 'map': 10 },
+            { 'path': ['outputs'], 'map': 11 },
+            { 'path': ['waits', '0', 'results'], 'map': 12 },
+            { 'path': ['waits', '1', 'results'], 'map': 13 },
+          ],
+      },
+    'storageHash': 'e4d516dec9fec216bbe045a05739b8d463655fbac2ae7a887fba6805ec13834a',
+  }
