@@ -218,6 +218,7 @@ export default function IssueDetailContent({
         identifier={issue.identifier}
         issueTitle={issue.title}
         links={issue.development ?? []}
+        repositoryIssue={issue.repositoryIssue ?? null}
         canEdit={canEdit}
         canManage={canManageDevelopment}
       />

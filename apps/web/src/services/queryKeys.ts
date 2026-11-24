@@ -96,6 +96,8 @@ export const qk = {
   gitConnections: (projectKey: string) => ['gitConnections', projectKey] as const,
   gitAvailableRepositories: (projectKey: string, connectionId: number, search: string) =>
     ['gitConnections', projectKey, connectionId, 'repositories', search] as const,
+  gitRepositoryMapping: (projectKey: string, repositoryId: number) =>
+    ['gitConnections', projectKey, 'mapping', repositoryId] as const,
   // The member's own notification preferences for a project.
   notificationPreferences: (projectKey: string) => ['notificationPreferences', projectKey] as const,
   views: (projectKey: string) => ['views', projectKey] as const,
@@ -307,6 +309,9 @@ export const qk = {
   // The caller's favorite initiatives in a project, listed under Initiatives in the sidebar.
   favoriteInitiatives: (projectKey: string) => ['initiatives', projectKey, 'favorites'] as const,
   initiativeCounts: (projectKey: string) => ['initiativeCounts', projectKey] as const,
+  // Command-palette initiative search; a null projectId searches every project.
+  initiativeSearch: (q: string, projectId: number | null) =>
+    ['initiativeSearch', q, projectId] as const,
   initiative: (id: number) => ['initiative', id] as const,
   initiativeFeed: (id: number) => ['initiativeFeed', id] as const,
   // Prefix keys: issue mutations invalidate every initiative query without
