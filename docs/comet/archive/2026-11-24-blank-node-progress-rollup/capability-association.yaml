@@ -1,0 +1,13 @@
+schema: comet.capability-association.v1
+status: explicit
+workflow: native
+capability: plan-node-execution
+current_spec: docs/comet/specs/plan-node-execution/spec.md
+current_hash: 222775efa31eb6c646d1c68684db10e2c6d05e6ae243b92e5d221e498af239bb
+confidence: high
+query: 对于汇总来说, 没填就是0呀, 这下级进度不可用很有歧义
+reason: 用户显式指定能力，已直接核对当前总 Spec 路径。
+historical_sources: []
+evidence:
+  - source: docs/comet/specs/plan-node-execution/spec.md
+    kind: native-spec

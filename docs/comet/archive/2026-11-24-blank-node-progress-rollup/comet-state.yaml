@@ -1,0 +1,2155 @@
+# comet-execution: managed-run
+schema: comet.native.v4
+name: blank-node-progress-rollup
+language: en
+phase: archive
+status: done
+state_version: 8
+brief: brief.md
+document_constraints_version: 3
+spec_changes:
+  - capability: plan-node-execution
+    operation: modify
+    source: specs/plan-node-execution/spec.md
+    delta_source: specs/plan-node-execution/delta.yaml
+workspace:
+  isolation: current
+  change_branch: main
+  target_branch: main
+  finish: null
+loop:
+  stage: done
+  goal_cycle: 1
+  iteration: 1
+  attempt: 1
+  retry_epoch: 0
+  failed_iteration_count: 0
+  no_progress_count: 0
+  execution_failure_count: 0
+  previous_unresolved_ids: []
+  next_action: null
+acceptance:
+  - id: A1
+    source: brief.md
+    text: Three nodes without contributing execution tasks, with blank progress and
+      weights of 40%, 40%, and 20%, give the plan 0%. The plan list, plan
+      detail, and table group header show 0%. Each node keeps an empty editable
+      field and shows 0% as its calculated progress.
+    result: passed
+    reason:
+      text: The PostgreSQL-backed regression returns 0% for three blank nodes at
+        weights 40/40/20 in the plan list, plan detail and table summary
+        endpoint. Node detail returns effective 0%, a null saved value and an
+        editable progress field. The table zero rendering test passed, and the
+        shared Plans and node formatters handle numeric zero as a value.
+      truncated: false
+  - id: A2
+    source: brief.md
+    text: Setting the 40%-weighted node's progress to 25% gives the plan 10%.
+      Marking a blank 40%-weighted node completed gives the plan 40% when the
+      remaining nodes are at 0%.
+    result: passed
+    reason:
+      text: The regression confirms 40% after marking a blank node with weight 40
+        completed, 0% after reopening it and 10% after entering 25% manually.
+      truncated: false
+  - id: A3
+    source: brief.md
+    text: A plan without contributing nodes, an invalid node weight allocation, or a
+      node whose execution progress cannot be calculated still shows its
+      corresponding unavailability reason.
+    result: passed
+    reason:
+      text: Delivery integration tests preserve the reasons for an empty plan, invalid
+        allocation and a child rollup unavailable due to invalid execution
+        weights. Legacy nodes with blank progress retain their existing
+        behavior.
+      truncated: false
+builder_handoff:
+  candidate_id: blank-node-progress-rollup:3
+  identity_provider: skill-coordinated
+  builder_execution_ref: 01a20c9a-9292-75b0-913e-b4338d7234f1
+  iteration: 1
+  summary:
+    text: Plan delivery nodes with missing manual progress contribute 0% when no
+      execution tasks contribute. Migration 0200 preserves the stored field and
+      legacy delivery behavior. Existing UI renders the effective rate and
+      distinguishes invalid rollups.
+    truncated: false
+  addressed_acceptance_ids:
+    - A1
+    - A2
+    - A3
+  checks:
+    - name:
+        text: Apply Drizzle migration to existing test PostgreSQL 17 database
+        truncated: false
+      result: passed
+      note:
+        text: 'From /Users/poco/Projects/itsaplan: SKIP_PRE_MIGRATION_BACKUP=1 bun
+          --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env
+          packages/db/src/migrate.ts. Applied migration 0200 to a database
+          initialized at 0199. Log:
+          /tmp/itsaplan-blank-progress.b9K0BC/upgrade-migrate.log.'
+        truncated: false
+      acceptance_ids:
+        - A1
+        - A2
+        - A3
+    - name:
+        text: Delivery workflow API integration suite
+        truncated: false
+      result: passed
+      note:
+        text: 'From /Users/poco/Projects/itsaplan/apps/api: bun test --timeout 30000
+          --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env
+          src/modules/delivery-workflow/__tests__/integration/delivery.test.ts.
+          8 passed. The added regression reproduced null/child at 0199 and
+          verifies 0%, editable null, 40% when completed, 0% when reopened, and
+          10% after manual entry. Existing tests cover empty plans, invalid
+          allocations, unavailable child rollups, and legacy delivery behavior.
+          Logs: /tmp/itsaplan-blank-progress.b9K0BC/red.log,
+          /tmp/itsaplan-blank-progress.b9K0BC/api-final.log.'
+        truncated: false
+      acceptance_ids:
+        - A1
+        - A2
+        - A3
+    - name:
+        text: Web plan progress and work item table tests
+        truncated: false
+      result: passed
+      note:
+        text: "From /Users/poco/Projects/itsaplan/apps/web: bun test --preload
+          ./test/setup.ts
+          src/features/initiatives/components/shared/InitiativeDeliveryProgress\
+          .test.tsx
+          src/features/work-items/components/table/TableSectionHeader.test.tsx
+          src/features/work-items/components/table/TableRowSubtasks.test.tsx. 5
+          passed. The table renders numeric zero and preserves unavailable
+          reasons. The Plans list and detail share the tested progress
+          component, which formats zero as a numeric percentage. Log:
+          /tmp/itsaplan-blank-progress.b9K0BC/web.log."
+        truncated: false
+      acceptance_ids:
+        - A1
+        - A3
+    - name:
+        text: TypeScript typecheck
+        truncated: false
+      result: passed
+      note:
+        text: 'From /Users/poco/Projects/itsaplan: bun run typecheck passed. Log:
+          /tmp/itsaplan-blank-progress.b9K0BC/typecheck-final.log.'
+        truncated: false
+    - name:
+        text: Migration journal, changed-file lint and formatting
+        truncated: false
+      result: passed
+      note:
+        text: 'From /Users/poco/Projects/itsaplan/packages/db: bun x --no-install
+          drizzle-kit check. From /Users/poco/Projects/itsaplan: ESLint and
+          Prettier on changed files and git diff --check passed. The generated
+          snapshot preserves the previous schema.'
+        truncated: false
+    - name:
+        text: Focused code and security review
+        truncated: false
+      result: passed
+      note:
+        text: Reviewed the single calculation condition and regression test. The SQL
+          change is limited to a missing numeric value on a node in the Plan
+          hierarchy. Completion precedence, bounds, role and project filters,
+          weights and permissions retain their existing checks. The migration
+          changes a function definition and does not write issue fields.
+        truncated: false
+  checks_truncated: false
+  known_limits:
+    - text: Verification used isolated test PostgreSQL and component tests. The
+        running ROLL instance was not upgraded.
+      truncated: false
+  known_limits_truncated: false
+  review: null
+  submitted_at: 2026-11-24T08:51:06.322Z
+blockers: []
+verification:
+  candidate_id: blank-node-progress-rollup:3
+  identity_provider: skill-coordinated
+  verifier_execution_ref: 01a20c9a-9292-75b0-913e-b4338d7234f1
+  iteration: 1
+  attempt: 1
+  assurance: self-reviewed
+  verdict: pass
+  checks: []
+  reported_checks:
+    - name:
+        text: Apply Drizzle migration to existing test PostgreSQL 17 database
+        truncated: false
+      result: passed
+      note:
+        text: 'From /Users/poco/Projects/itsaplan: SKIP_PRE_MIGRATION_BACKUP=1 bun
+          --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env
+          packages/db/src/migrate.ts. Applied migration 0200 to a database
+          initialized at 0199. Log:
+          /tmp/itsaplan-blank-progress.b9K0BC/upgrade-migrate.log.'
+        truncated: false
+      acceptance_ids:
+        - A1
+        - A2
+        - A3
+    - name:
+        text: Delivery workflow API integration suite
+        truncated: false
+      result: passed
+      note:
+        text: 'From /Users/poco/Projects/itsaplan/apps/api: bun test --timeout 30000
+          --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env
+          src/modules/delivery-workflow/__tests__/integration/delivery.test.ts.
+          8 passed. The added regression reproduced null/child at 0199 and
+          verifies 0%, editable null, 40% when completed, 0% when reopened, and
+          10% after manual entry. Existing tests cover empty plans, invalid
+          allocations, unavailable child rollups, and legacy delivery behavior.
+          Logs: /tmp/itsaplan-blank-progress.b9K0BC/red.log,
+          /tmp/itsaplan-blank-progress.b9K0BC/api-final.log.'
+        truncated: false
+      acceptance_ids:
+        - A1
+        - A2
+        - A3
+    - name:
+        text: Web plan progress and work item table tests
+        truncated: false
+      result: passed
+      note:
+        text: "From /Users/poco/Projects/itsaplan/apps/web: bun test --preload
+          ./test/setup.ts
+          src/features/initiatives/components/shared/InitiativeDeliveryProgress\
+          .test.tsx
+          src/features/work-items/components/table/TableSectionHeader.test.tsx
+          src/features/work-items/components/table/TableRowSubtasks.test.tsx. 5
+          passed. The table renders numeric zero and preserves unavailable
+          reasons. The Plans list and detail share the tested progress
+          component, which formats zero as a numeric percentage. Log:
+          /tmp/itsaplan-blank-progress.b9K0BC/web.log."
+        truncated: false
+      acceptance_ids:
+        - A1
+        - A3
+    - name:
+        text: TypeScript typecheck
+        truncated: false
+      result: passed
+      note:
+        text: 'From /Users/poco/Projects/itsaplan: bun run typecheck passed. Log:
+          /tmp/itsaplan-blank-progress.b9K0BC/typecheck-final.log.'
+        truncated: false
+    - name:
+        text: Migration journal, changed-file lint and formatting
+        truncated: false
+      result: passed
+      note:
+        text: 'From /Users/poco/Projects/itsaplan/packages/db: bun x --no-install
+          drizzle-kit check. From /Users/poco/Projects/itsaplan: ESLint and
+          Prettier on changed files and git diff --check passed. The generated
+          snapshot preserves the previous schema.'
+        truncated: false
+    - name:
+        text: Focused code and security review
+        truncated: false
+      result: passed
+      note:
+        text: Reviewed the single calculation condition and regression test. The SQL
+          change is limited to a missing numeric value on a node in the Plan
+          hierarchy. Completion precedence, bounds, role and project filters,
+          weights and permissions retain their existing checks. The migration
+          changes a function definition and does not write issue fields.
+        truncated: false
+  summary:
+    text: All three approved cases passed. The change is limited to effective
+      progress for blank nodes without contributing tasks in the Plan hierarchy.
+    truncated: false
+  risks:
+    - text: The running ROLL instance has not received migration 0200. Verification
+        used a disposable PostgreSQL 17 database and Web component tests.
+      truncated: false
+  risks_truncated: false
+  completed_at: 2026-11-24T08:51:15.844Z
+history:
+  - goal_cycle: 1
+    iteration: 1
+    attempt: 1
+    outcome: pass
+    unresolved_ids: []
+    summary:
+      text: All three approved cases passed. The change is limited to effective
+        progress for blank nodes without contributing tasks in the Plan
+        hierarchy.
+      truncated: false
+    completed_at: 2026-11-24T08:51:15.844Z
+history_overflow:
+  dropped_entries: 0
+  first_dropped_at: null
+  last_dropped_at: null
+  outcome_counts:
+    pass: 0
+    fail: 0
+    blocked: 0
+    execution-error: 0
+    recovery: 0
+verification_result: pass
+verification_report: verification.md
+archived: true
+created_at: 2026-11-24T08:47:30.473Z
+archive_receipt:
+  runId: blank-node-progress-rollup
+  change: blank-node-progress-rollup
+  archiveRef: 2026-11-24-blank-node-progress-rollup
+  transactionId: d78ee7b0-7e92-481a-b617-6a3fb6cabfe0
+  stateVersion: 8
+  specs:
+    - capability: plan-node-execution
+      operation: modify
+run_checkpoint:
+  {
+    'schema': 'comet.workflow-run-checkpoint.v2',
+    'hash': 'de09b856f3c70a76e9b2fffe30f028f724936b9f2cc71606d8a2aa629bf1b49b',
+    'run':
+      {
+        'protocolVersion': 1,
+        'schemaVersion': 1,
+        'runId': 'blank-node-progress-rollup',
+        'revision': 1,
+        'workflow':
+          {
+            'id': 'comet-native',
+            'version': '4',
+            'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+          },
+        'definitionHashes':
+          {
+            '["comet-native","4"]': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+          },
+        'initialStateHash': '1ce45e363c0929f503117594e175aefc78ab4e318354d40acb874e1b483a456f',
+        'input':
+          {
+            'artifactRootRef': 'docs',
+            'name': 'blank-node-progress-rollup',
+            'task': '对于汇总来说, 没填就是0呀, 这下级进度不可用很有歧义',
+          },
+        'state':
+          {
+            'acceptance':
+              [
+                {
+                  'id': 'A1',
+                  'reason':
+                    {
+                      'text': 'The PostgreSQL-backed regression returns 0% for three blank nodes at weights 40/40/20 in the plan list, plan detail and table summary endpoint. Node detail returns effective 0%, a null saved value and an editable progress field. The table zero rendering test passed, and the shared Plans and node formatters handle numeric zero as a value.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'Three nodes without contributing execution tasks, with blank progress and weights of 40%, 40%, and 20%, give the plan 0%. The plan list, plan detail, and table group header show 0%. Each node keeps an empty editable field and shows 0% as its calculated progress.',
+                },
+                {
+                  'id': 'A2',
+                  'reason':
+                    {
+                      'text': 'The regression confirms 40% after marking a blank node with weight 40 completed, 0% after reopening it and 10% after entering 25% manually.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': "Setting the 40%-weighted node's progress to 25% gives the plan 10%. Marking a blank 40%-weighted node completed gives the plan 40% when the remaining nodes are at 0%.",
+                },
+                {
+                  'id': 'A3',
+                  'reason':
+                    {
+                      'text': 'Delivery integration tests preserve the reasons for an empty plan, invalid allocation and a child rollup unavailable due to invalid execution weights. Legacy nodes with blank progress retain their existing behavior.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'A plan without contributing nodes, an invalid node weight allocation, or a node whose execution progress cannot be calculated still shows its corresponding unavailability reason.',
+                },
+              ],
+            'archived': true,
+            'blockers': [],
+            'brief': 'brief.md',
+            'builder_handoff':
+              {
+                'addressed_acceptance_ids': ['A1', 'A2', 'A3'],
+                'builder_execution_ref': '01a20c9a-9292-75b0-913e-b4338d7234f1',
+                'candidate_id': 'blank-node-progress-rollup:3',
+                'checks':
+                  [
+                    {
+                      'acceptance_ids': ['A1', 'A2', 'A3'],
+                      'name':
+                        {
+                          'text': 'Apply Drizzle migration to existing test PostgreSQL 17 database',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'From /Users/poco/Projects/itsaplan: SKIP_PRE_MIGRATION_BACKUP=1 bun --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env packages/db/src/migrate.ts. Applied migration 0200 to a database initialized at 0199. Log: /tmp/itsaplan-blank-progress.b9K0BC/upgrade-migrate.log.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'acceptance_ids': ['A1', 'A2', 'A3'],
+                      'name':
+                        { 'text': 'Delivery workflow API integration suite', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'From /Users/poco/Projects/itsaplan/apps/api: bun test --timeout 30000 --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env src/modules/delivery-workflow/__tests__/integration/delivery.test.ts. 8 passed. The added regression reproduced null/child at 0199 and verifies 0%, editable null, 40% when completed, 0% when reopened, and 10% after manual entry. Existing tests cover empty plans, invalid allocations, unavailable child rollups, and legacy delivery behavior. Logs: /tmp/itsaplan-blank-progress.b9K0BC/red.log, /tmp/itsaplan-blank-progress.b9K0BC/api-final.log.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'acceptance_ids': ['A1', 'A3'],
+                      'name':
+                        {
+                          'text': 'Web plan progress and work item table tests',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'From /Users/poco/Projects/itsaplan/apps/web: bun test --preload ./test/setup.ts src/features/initiatives/components/shared/InitiativeDeliveryProgress.test.tsx src/features/work-items/components/table/TableSectionHeader.test.tsx src/features/work-items/components/table/TableRowSubtasks.test.tsx. 5 passed. The table renders numeric zero and preserves unavailable reasons. The Plans list and detail share the tested progress component, which formats zero as a numeric percentage. Log: /tmp/itsaplan-blank-progress.b9K0BC/web.log.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name': { 'text': 'TypeScript typecheck', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'From /Users/poco/Projects/itsaplan: bun run typecheck passed. Log: /tmp/itsaplan-blank-progress.b9K0BC/typecheck-final.log.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Migration journal, changed-file lint and formatting',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'From /Users/poco/Projects/itsaplan/packages/db: bun x --no-install drizzle-kit check. From /Users/poco/Projects/itsaplan: ESLint and Prettier on changed files and git diff --check passed. The generated snapshot preserves the previous schema.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name': { 'text': 'Focused code and security review', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'Reviewed the single calculation condition and regression test. The SQL change is limited to a missing numeric value on a node in the Plan hierarchy. Completion precedence, bounds, role and project filters, weights and permissions retain their existing checks. The migration changes a function definition and does not write issue fields.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                  ],
+                'checks_truncated': false,
+                'identity_provider': 'skill-coordinated',
+                'iteration': 1,
+                'known_limits':
+                  [
+                    {
+                      'text': 'Verification used isolated test PostgreSQL and component tests. The running ROLL instance was not upgraded.',
+                      'truncated': false,
+                    },
+                  ],
+                'known_limits_truncated': false,
+                'review': null,
+                'submitted_at': '2026-11-24T08:51:06.322Z',
+                'summary':
+                  {
+                    'text': 'Plan delivery nodes with missing manual progress contribute 0% when no execution tasks contribute. Migration 0200 preserves the stored field and legacy delivery behavior. Existing UI renders the effective rate and distinguishes invalid rollups.',
+                    'truncated': false,
+                  },
+              },
+            'created_at': '2026-11-24T08:47:30.473Z',
+            'document_constraints_version': 3,
+            'history':
+              [
+                {
+                  'attempt': 1,
+                  'completed_at': '2026-11-24T08:51:15.844Z',
+                  'goal_cycle': 1,
+                  'iteration': 1,
+                  'outcome': 'pass',
+                  'summary':
+                    {
+                      'text': 'All three approved cases passed. The change is limited to effective progress for blank nodes without contributing tasks in the Plan hierarchy.',
+                      'truncated': false,
+                    },
+                  'unresolved_ids': [],
+                },
+              ],
+            'history_overflow':
+              {
+                'dropped_entries': 0,
+                'first_dropped_at': null,
+                'last_dropped_at': null,
+                'outcome_counts':
+                  { 'blocked': 0, 'execution-error': 0, 'fail': 0, 'pass': 0, 'recovery': 0 },
+              },
+            'language': 'en',
+            'loop':
+              {
+                'attempt': 1,
+                'execution_failure_count': 0,
+                'failed_iteration_count': 0,
+                'goal_cycle': 1,
+                'iteration': 1,
+                'next_action': null,
+                'no_progress_count': 0,
+                'previous_unresolved_ids': [],
+                'retry_epoch': 0,
+                'stage': 'done',
+              },
+            'name': 'blank-node-progress-rollup',
+            'phase': 'archive',
+            'schema': 'comet.native.v4',
+            'spec_changes':
+              [
+                {
+                  'capability': 'plan-node-execution',
+                  'delta_source': 'specs/plan-node-execution/delta.yaml',
+                  'operation': 'modify',
+                  'source': 'specs/plan-node-execution/spec.md',
+                },
+              ],
+            'state_version': 8,
+            'status': 'done',
+            'verification':
+              {
+                'assurance': 'self-reviewed',
+                'attempt': 1,
+                'candidate_id': 'blank-node-progress-rollup:3',
+                'checks': [],
+                'completed_at': '2026-11-24T08:51:15.844Z',
+                'identity_provider': 'skill-coordinated',
+                'iteration': 1,
+                'reported_checks':
+                  [
+                    {
+                      'acceptance_ids': ['A1', 'A2', 'A3'],
+                      'name':
+                        {
+                          'text': 'Apply Drizzle migration to existing test PostgreSQL 17 database',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'From /Users/poco/Projects/itsaplan: SKIP_PRE_MIGRATION_BACKUP=1 bun --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env packages/db/src/migrate.ts. Applied migration 0200 to a database initialized at 0199. Log: /tmp/itsaplan-blank-progress.b9K0BC/upgrade-migrate.log.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'acceptance_ids': ['A1', 'A2', 'A3'],
+                      'name':
+                        { 'text': 'Delivery workflow API integration suite', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'From /Users/poco/Projects/itsaplan/apps/api: bun test --timeout 30000 --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env src/modules/delivery-workflow/__tests__/integration/delivery.test.ts. 8 passed. The added regression reproduced null/child at 0199 and verifies 0%, editable null, 40% when completed, 0% when reopened, and 10% after manual entry. Existing tests cover empty plans, invalid allocations, unavailable child rollups, and legacy delivery behavior. Logs: /tmp/itsaplan-blank-progress.b9K0BC/red.log, /tmp/itsaplan-blank-progress.b9K0BC/api-final.log.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'acceptance_ids': ['A1', 'A3'],
+                      'name':
+                        {
+                          'text': 'Web plan progress and work item table tests',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'From /Users/poco/Projects/itsaplan/apps/web: bun test --preload ./test/setup.ts src/features/initiatives/components/shared/InitiativeDeliveryProgress.test.tsx src/features/work-items/components/table/TableSectionHeader.test.tsx src/features/work-items/components/table/TableRowSubtasks.test.tsx. 5 passed. The table renders numeric zero and preserves unavailable reasons. The Plans list and detail share the tested progress component, which formats zero as a numeric percentage. Log: /tmp/itsaplan-blank-progress.b9K0BC/web.log.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name': { 'text': 'TypeScript typecheck', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'From /Users/poco/Projects/itsaplan: bun run typecheck passed. Log: /tmp/itsaplan-blank-progress.b9K0BC/typecheck-final.log.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name':
+                        {
+                          'text': 'Migration journal, changed-file lint and formatting',
+                          'truncated': false,
+                        },
+                      'note':
+                        {
+                          'text': 'From /Users/poco/Projects/itsaplan/packages/db: bun x --no-install drizzle-kit check. From /Users/poco/Projects/itsaplan: ESLint and Prettier on changed files and git diff --check passed. The generated snapshot preserves the previous schema.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'name': { 'text': 'Focused code and security review', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'Reviewed the single calculation condition and regression test. The SQL change is limited to a missing numeric value on a node in the Plan hierarchy. Completion precedence, bounds, role and project filters, weights and permissions retain their existing checks. The migration changes a function definition and does not write issue fields.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                  ],
+                'risks':
+                  [
+                    {
+                      'text': 'The running ROLL instance has not received migration 0200. Verification used a disposable PostgreSQL 17 database and Web component tests.',
+                      'truncated': false,
+                    },
+                  ],
+                'risks_truncated': false,
+                'summary':
+                  {
+                    'text': 'All three approved cases passed. The change is limited to effective progress for blank nodes without contributing tasks in the Plan hierarchy.',
+                    'truncated': false,
+                  },
+                'verdict': 'pass',
+                'verifier_execution_ref': '01a20c9a-9292-75b0-913e-b4338d7234f1',
+              },
+            'verification_report': 'verification.md',
+            'verification_result': 'pass',
+            'workspace':
+              {
+                'change_branch': 'main',
+                'finish': null,
+                'isolation': 'current',
+                'target_branch': 'main',
+              },
+          },
+        'status': 'completed',
+        'sequence': 8,
+        'actions':
+          [
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-cli',
+                  'token': 'portable-69f6ccdb2b95759e1dd00b48c4908e9198f995701ea1d1469698b1334b9ba83a',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'blank-node-progress-rollup:1',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'blank-node-progress-rollup',
+                      'task': '对于汇总来说, 没填就是0呀, 这下级进度不可用很有歧义',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '1b1073f05b4cad0f476127f56a2741e579ff5ca09c7b258200c7140ec43951f2',
+              'outcome':
+                {
+                  'actionId': 'blank-node-progress-rollup:1',
+                  'attempt': 1,
+                  'claimToken': 'portable-69f6ccdb2b95759e1dd00b48c4908e9198f995701ea1d1469698b1334b9ba83a',
+                  'inputHash': '1b1073f05b4cad0f476127f56a2741e579ff5ca09c7b258200c7140ec43951f2',
+                  'outcomeId': '5185298e-444c-4ae5-b268-cbbc21d18e8b',
+                  'output':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'source': 'brief.md',
+                            'text': 'Three nodes without contributing execution tasks, with blank progress and weights of 40%, 40%, and 20%, give the plan 0%. The plan list, plan detail, and table group header show 0%. Each node keeps an empty editable field and shows 0% as its calculated progress.',
+                          },
+                          {
+                            'id': 'A2',
+                            'source': 'brief.md',
+                            'text': "Setting the 40%-weighted node's progress to 25% gives the plan 10%. Marking a blank 40%-weighted node completed gives the plan 40% when the remaining nodes are at 0%.",
+                          },
+                          {
+                            'id': 'A3',
+                            'source': 'brief.md',
+                            'text': 'A plan without contributing nodes, an invalid node weight allocation, or a node whose execution progress cannot be calculated still shows its corresponding unavailability reason.',
+                          },
+                        ],
+                      'children': null,
+                      'specChanges':
+                        [
+                          {
+                            'capability': 'plan-node-execution',
+                            'delta_source': 'specs/plan-node-execution/delta.yaml',
+                            'operation': 'modify',
+                            'source': 'specs/plan-node-execution/spec.md',
+                          },
+                        ],
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '82098b554ad2d13871ee553789356bbe9410936c46bf926e66c669cb613fbd2a',
+                    'outcomeId': '5185298e-444c-4ae5-b268-cbbc21d18e8b',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-shape-prepare',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'blank-node-progress-rollup',
+              'status': 'succeeded',
+              'stepId': 'shape.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a20c9a-9292-75b0-913e-b4338d7234f1',
+                  'token': 'portable-953a9aff7b2de354e3e5db9b97d8147414c0115d6f4ded48387644b98a77a4a5',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'blank-node-progress-rollup:3',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'blank-node-progress-rollup',
+                      'task': '对于汇总来说, 没填就是0呀, 这下级进度不可用很有歧义',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '80942d79b756ccb781f902cb5db6b5206f2027759094cf3df943db31cecf484b',
+              'outcome':
+                {
+                  'actionId': 'blank-node-progress-rollup:3',
+                  'attempt': 1,
+                  'claimToken': 'portable-953a9aff7b2de354e3e5db9b97d8147414c0115d6f4ded48387644b98a77a4a5',
+                  'inputHash': '80942d79b756ccb781f902cb5db6b5206f2027759094cf3df943db31cecf484b',
+                  'outcomeId': 'native-result-2e5066a199473a20acefff6d10751b83d5911a37771f73ba70da589add8d9c56',
+                  'output':
+                    {
+                      'addressedAcceptanceIds': ['A1', 'A2', 'A3'],
+                      'checks':
+                        [
+                          {
+                            'acceptanceIds': ['A1', 'A2', 'A3'],
+                            'name': 'Apply Drizzle migration to existing test PostgreSQL 17 database',
+                            'note': 'From /Users/poco/Projects/itsaplan: SKIP_PRE_MIGRATION_BACKUP=1 bun --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env packages/db/src/migrate.ts. Applied migration 0200 to a database initialized at 0199. Log: /tmp/itsaplan-blank-progress.b9K0BC/upgrade-migrate.log.',
+                            'result': 'passed',
+                          },
+                          {
+                            'acceptanceIds': ['A1', 'A2', 'A3'],
+                            'name': 'Delivery workflow API integration suite',
+                            'note': 'From /Users/poco/Projects/itsaplan/apps/api: bun test --timeout 30000 --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env src/modules/delivery-workflow/__tests__/integration/delivery.test.ts. 8 passed. The added regression reproduced null/child at 0199 and verifies 0%, editable null, 40% when completed, 0% when reopened, and 10% after manual entry. Existing tests cover empty plans, invalid allocations, unavailable child rollups, and legacy delivery behavior. Logs: /tmp/itsaplan-blank-progress.b9K0BC/red.log, /tmp/itsaplan-blank-progress.b9K0BC/api-final.log.',
+                            'result': 'passed',
+                          },
+                          {
+                            'acceptanceIds': ['A1', 'A3'],
+                            'name': 'Web plan progress and work item table tests',
+                            'note': 'From /Users/poco/Projects/itsaplan/apps/web: bun test --preload ./test/setup.ts src/features/initiatives/components/shared/InitiativeDeliveryProgress.test.tsx src/features/work-items/components/table/TableSectionHeader.test.tsx src/features/work-items/components/table/TableRowSubtasks.test.tsx. 5 passed. The table renders numeric zero and preserves unavailable reasons. The Plans list and detail share the tested progress component, which formats zero as a numeric percentage. Log: /tmp/itsaplan-blank-progress.b9K0BC/web.log.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'TypeScript typecheck',
+                            'note': 'From /Users/poco/Projects/itsaplan: bun run typecheck passed. Log: /tmp/itsaplan-blank-progress.b9K0BC/typecheck-final.log.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Migration journal, changed-file lint and formatting',
+                            'note': 'From /Users/poco/Projects/itsaplan/packages/db: bun x --no-install drizzle-kit check. From /Users/poco/Projects/itsaplan: ESLint and Prettier on changed files and git diff --check passed. The generated snapshot preserves the previous schema.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Focused code and security review',
+                            'note': 'Reviewed the single calculation condition and regression test. The SQL change is limited to a missing numeric value on a node in the Plan hierarchy. Completion precedence, bounds, role and project filters, weights and permissions retain their existing checks. The migration changes a function definition and does not write issue fields.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'knownLimits':
+                        [
+                          'Verification used isolated test PostgreSQL and component tests. The running ROLL instance was not upgraded.',
+                        ],
+                      'requireIndependentReview': false,
+                      'summary': 'Plan delivery nodes with missing manual progress contribute 0% when no execution tasks contribute. Migration 0200 preserves the stored field and legacy delivery behavior. Existing UI renders the effective rate and distinguishes invalid rollups.',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '41451c33fe5a0d9830483e1ba64140d41ef61c6bec412c00c90db184065989e9',
+                    'outcomeId': 'native-result-2e5066a199473a20acefff6d10751b83d5911a37771f73ba70da589add8d9c56',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-builder',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'blank-node-progress-rollup',
+              'status': 'succeeded',
+              'stepId': 'build.builder',
+              'type': 'handoff',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a20c9a-9292-75b0-913e-b4338d7234f1',
+                  'token': 'portable-2414f047888ad7ef7f2d13da4ed0f38c9fbe001455e36e987b092045f33a20de',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'blank-node-progress-rollup:4',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'blank-node-progress-rollup',
+                      'task': '对于汇总来说, 没填就是0呀, 这下级进度不可用很有歧义',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '32cd02f50f755853036081f8e1d05bb1c8583353a61b1b2a3f392f0e2df9978d',
+              'outcome':
+                {
+                  'actionId': 'blank-node-progress-rollup:4',
+                  'attempt': 1,
+                  'claimToken': 'portable-2414f047888ad7ef7f2d13da4ed0f38c9fbe001455e36e987b092045f33a20de',
+                  'inputHash': '32cd02f50f755853036081f8e1d05bb1c8583353a61b1b2a3f392f0e2df9978d',
+                  'outcomeId': 'native-result-7c119a57d8fb25d8195f56e9253bb2e8c02a0be6ee4503a21bd8caa5a17af72c',
+                  'output':
+                    {
+                      'candidateId': 'blank-node-progress-rollup:3',
+                      'checks':
+                        [
+                          {
+                            'acceptanceIds': ['A1', 'A2', 'A3'],
+                            'name': 'Apply Drizzle migration to existing test PostgreSQL 17 database',
+                            'note': 'From /Users/poco/Projects/itsaplan: SKIP_PRE_MIGRATION_BACKUP=1 bun --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env packages/db/src/migrate.ts. Applied migration 0200 to a database initialized at 0199. Log: /tmp/itsaplan-blank-progress.b9K0BC/upgrade-migrate.log.',
+                            'result': 'passed',
+                          },
+                          {
+                            'acceptanceIds': ['A1', 'A2', 'A3'],
+                            'name': 'Delivery workflow API integration suite',
+                            'note': 'From /Users/poco/Projects/itsaplan/apps/api: bun test --timeout 30000 --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env src/modules/delivery-workflow/__tests__/integration/delivery.test.ts. 8 passed. The added regression reproduced null/child at 0199 and verifies 0%, editable null, 40% when completed, 0% when reopened, and 10% after manual entry. Existing tests cover empty plans, invalid allocations, unavailable child rollups, and legacy delivery behavior. Logs: /tmp/itsaplan-blank-progress.b9K0BC/red.log, /tmp/itsaplan-blank-progress.b9K0BC/api-final.log.',
+                            'result': 'passed',
+                          },
+                          {
+                            'acceptanceIds': ['A1', 'A3'],
+                            'name': 'Web plan progress and work item table tests',
+                            'note': 'From /Users/poco/Projects/itsaplan/apps/web: bun test --preload ./test/setup.ts src/features/initiatives/components/shared/InitiativeDeliveryProgress.test.tsx src/features/work-items/components/table/TableSectionHeader.test.tsx src/features/work-items/components/table/TableRowSubtasks.test.tsx. 5 passed. The table renders numeric zero and preserves unavailable reasons. The Plans list and detail share the tested progress component, which formats zero as a numeric percentage. Log: /tmp/itsaplan-blank-progress.b9K0BC/web.log.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'TypeScript typecheck',
+                            'note': 'From /Users/poco/Projects/itsaplan: bun run typecheck passed. Log: /tmp/itsaplan-blank-progress.b9K0BC/typecheck-final.log.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Migration journal, changed-file lint and formatting',
+                            'note': 'From /Users/poco/Projects/itsaplan/packages/db: bun x --no-install drizzle-kit check. From /Users/poco/Projects/itsaplan: ESLint and Prettier on changed files and git diff --check passed. The generated snapshot preserves the previous schema.',
+                            'result': 'passed',
+                          },
+                          {
+                            'name': 'Focused code and security review',
+                            'note': 'Reviewed the single calculation condition and regression test. The SQL change is limited to a missing numeric value on a node in the Plan hierarchy. Completion precedence, bounds, role and project filters, weights and permissions retain their existing checks. The migration changes a function definition and does not write issue fields.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'response':
+                        {
+                          'kind': 'final-result',
+                          'result':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'reason': 'The PostgreSQL-backed regression returns 0% for three blank nodes at weights 40/40/20 in the plan list, plan detail and table summary endpoint. Node detail returns effective 0%, a null saved value and an editable progress field. The table zero rendering test passed, and the shared Plans and node formatters handle numeric zero as a value.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'reason': 'The regression confirms 40% after marking a blank node with weight 40 completed, 0% after reopening it and 10% after entering 25% manually.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'reason': 'Delivery integration tests preserve the reasons for an empty plan, invalid allocation and a child rollup unavailable due to invalid execution weights. Legacy nodes with blank progress retain their existing behavior.',
+                                    'result': 'passed',
+                                  },
+                                ],
+                              'attempt': 1,
+                              'iteration': 1,
+                              'requestReview':
+                                {
+                                  'reason': 'The user asked for blank progress to count as 0 in rollups. The approved brief and target spec retain editable blank fields, completed progress and genuine rollup reasons. Migration 0200 and the integration tests match those rules.',
+                                  'result': 'aligned',
+                                },
+                              'risks':
+                                [
+                                  'The running ROLL instance has not received migration 0200. Verification used a disposable PostgreSQL 17 database and Web component tests.',
+                                ],
+                              'summary': 'All three approved cases passed. The change is limited to effective progress for blank nodes without contributing tasks in the Plan hierarchy.',
+                              'verdict': 'pass',
+                            },
+                        },
+                      'verifierExecutionRef': '01a20c9a-9292-75b0-913e-b4338d7234f1',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'fd8606d0e23ace846b2d1e72d4c785539d106751dd2db2e5931db5c47c625b94',
+                    'outcomeId': 'native-result-7c119a57d8fb25d8195f56e9253bb2e8c02a0be6ee4503a21bd8caa5a17af72c',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-verifier',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'blank-node-progress-rollup',
+              'status': 'succeeded',
+              'stepId': 'verify.verifier',
+              'type': 'handoff',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-preflight',
+                  'token': 'portable-d3061e8506fa20c3384dd9da4d797545ddf629dd5a5efdffeb1e9319ab517e2f',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'blank-node-progress-rollup:6',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'blank-node-progress-rollup',
+                      'task': '对于汇总来说, 没填就是0呀, 这下级进度不可用很有歧义',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': 'e952a4d6a49b1011d0b8a04b314f9c1be77197850779605db3680a71cdf4ae3c',
+              'outcome':
+                {
+                  'actionId': 'blank-node-progress-rollup:6',
+                  'attempt': 1,
+                  'claimToken': 'portable-d3061e8506fa20c3384dd9da4d797545ddf629dd5a5efdffeb1e9319ab517e2f',
+                  'inputHash': 'e952a4d6a49b1011d0b8a04b314f9c1be77197850779605db3680a71cdf4ae3c',
+                  'outcomeId': 'blank-node-progress-rollup:6:1:executor-result',
+                  'output':
+                    {
+                      'archiveDirRef': 'docs/comet/archive/2026-11-24-blank-node-progress-rollup',
+                      'blockers': [],
+                      'candidateId': 'blank-node-progress-rollup:3',
+                      'capabilityPeers': [],
+                      'ready': true,
+                      'reportRef': 'docs/comet/changes/blank-node-progress-rollup/verification.md',
+                      'reportStateVersion': 6,
+                      'requiresReverification': false,
+                      'specPreview':
+                        [
+                          {
+                            'capability': 'plan-node-execution',
+                            'delta_operations':
+                              [
+                                {
+                                  'id': 'plan-node-execution.blank-node-progress',
+                                  'operation': 'add',
+                                  'status': 'changed',
+                                  'targetIds': ['plan-node-execution.blank-node-progress'],
+                                },
+                              ],
+                            'delta_source': 'specs/plan-node-execution/delta.yaml',
+                            'operation': 'modify',
+                            'source': 'specs/plan-node-execution/spec.md',
+                          },
+                        ],
+                      'stateVersion': 7,
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '66a22cdd2b9c1637a448d017b273924815ce8c41306c4eb0a4848d49e37f6987',
+                    'outcomeId': 'blank-node-progress-rollup:6:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive-preflight',
+              'requiredCapabilities': [],
+              'retry': 'idempotent',
+              'runId': 'blank-node-progress-rollup',
+              'status': 'succeeded',
+              'stepId': 'archive.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-apply',
+                  'token': 'portable-7f150a2a392ab4da7589537c13a1cf443dccb710bc79c9f06d839a835a98c44e',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'blank-node-progress-rollup:7',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'blank-node-progress-rollup',
+                      'task': '对于汇总来说, 没填就是0呀, 这下级进度不可用很有歧义',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '2d3b0d06205d664275502a11286e7409ea9f18bbf0a8a3091952cbca8ccbf02b',
+              'outcome':
+                {
+                  'actionId': 'blank-node-progress-rollup:7',
+                  'attempt': 1,
+                  'claimToken': 'portable-7f150a2a392ab4da7589537c13a1cf443dccb710bc79c9f06d839a835a98c44e',
+                  'inputHash': '2d3b0d06205d664275502a11286e7409ea9f18bbf0a8a3091952cbca8ccbf02b',
+                  'outcomeId': 'blank-node-progress-rollup:7:1:executor-result',
+                  'output':
+                    {
+                      'archiveRef': '2026-11-24-blank-node-progress-rollup',
+                      'specCount': 1,
+                      'stateVersion': 7,
+                      'transactionId': 'd78ee7b0-7e92-481a-b617-6a3fb6cabfe0',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'c018ce236c04b556842e8eb8d6e6526d96f99ae1393ff9569960aa820b07b2f4',
+                    'outcomeId': 'blank-node-progress-rollup:7:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'blank-node-progress-rollup',
+              'status': 'succeeded',
+              'stepId': 'archive.execute',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-finalize',
+                  'token': 'portable-1ae6be41cdefa9b47cea3ce0d677ef9d7adf2aa218f83566d9fbae3f9cbd89fe',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'blank-node-progress-rollup:8',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'blank-node-progress-rollup',
+                      'task': '对于汇总来说, 没填就是0呀, 这下级进度不可用很有歧义',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '7f4388df3b61c60dff09094d44cf4bc5b2b2c1e42f60e86516ab74960c026148',
+              'outcome':
+                {
+                  'actionId': 'blank-node-progress-rollup:8',
+                  'attempt': 1,
+                  'claimToken': 'portable-1ae6be41cdefa9b47cea3ce0d677ef9d7adf2aa218f83566d9fbae3f9cbd89fe',
+                  'inputHash': '7f4388df3b61c60dff09094d44cf4bc5b2b2c1e42f60e86516ab74960c026148',
+                  'outcomeId': 'blank-node-progress-rollup:8:1:executor-result',
+                  'output':
+                    {
+                      'archiveRef': '2026-11-24-blank-node-progress-rollup',
+                      'change': 'blank-node-progress-rollup',
+                      'runId': 'blank-node-progress-rollup',
+                      'specs': [{ 'capability': 'plan-node-execution', 'operation': 'modify' }],
+                      'stateVersion': 8,
+                      'transactionId': 'd78ee7b0-7e92-481a-b617-6a3fb6cabfe0',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '49c0f13663cdb07da2f6d0f3d19dcf29539c7e9f9dfe19b12b20993e6c440ba5',
+                    'outcomeId': 'blank-node-progress-rollup:8:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive-finalize',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'blank-node-progress-rollup',
+              'status': 'succeeded',
+              'stepId': 'archive.finalize',
+              'type': 'call_tool',
+            },
+          ],
+        'actionContexts':
+          {
+            'blank-node-progress-rollup:1': { 'results': {}, 'sequence': 1 },
+            'blank-node-progress-rollup:3': { 'results': {}, 'sequence': 3 },
+            'blank-node-progress-rollup:4': { 'results': {}, 'sequence': 4 },
+            'blank-node-progress-rollup:6': { 'results': {}, 'sequence': 6 },
+            'blank-node-progress-rollup:7': { 'results': {}, 'sequence': 7 },
+            'blank-node-progress-rollup:8': { 'results': {}, 'sequence': 8 },
+          },
+        'waits':
+          [
+            {
+              'id': 'blank-node-progress-rollup:2',
+              'stepId': 'shape.confirm',
+              'sequence': 2,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'blank-node-progress-rollup',
+                      'task': '对于汇总来说, 没填就是0呀, 这下级进度不可用很有歧义',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'Three nodes without contributing execution tasks, with blank progress and weights of 40%, 40%, and 20%, give the plan 0%. The plan list, plan detail, and table group header show 0%. Each node keeps an empty editable field and shows 0% as its calculated progress.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': "Setting the 40%-weighted node's progress to 25% gives the plan 10%. Marking a blank 40%-weighted node completed gives the plan 40% when the remaining nodes are at 0%.",
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'A plan without contributing nodes, an invalid node weight allocation, or a node whose execution progress cannot be calculated still shows its corresponding unavailability reason.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges':
+                            [
+                              {
+                                'capability': 'plan-node-execution',
+                                'delta_source': 'specs/plan-node-execution/delta.yaml',
+                                'operation': 'modify',
+                                'source': 'specs/plan-node-execution/spec.md',
+                              },
+                            ],
+                        },
+                    },
+                },
+              'proposalHash': 'c10b35a4a8e17b993cec866d936bc3d8a0bdaf2e210f1d5633f868c2141c947c',
+              'choices': ['approved', 'rejected'],
+              'results': {},
+              'decision':
+                {
+                  'id': '99b1fe29357dab343b2ebd114324d498d3c4daf0da628a5f570e42f7f2ea77b6',
+                  'choice': 'approved',
+                  'proposalHash': 'c10b35a4a8e17b993cec866d936bc3d8a0bdaf2e210f1d5633f868c2141c947c',
+                },
+            },
+            {
+              'id': 'blank-node-progress-rollup:5',
+              'stepId': 'verify.confirm',
+              'sequence': 5,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'activation':
+                    {
+                      'report':
+                        {
+                          'attempt': 1,
+                          'candidateId': 'blank-node-progress-rollup:3',
+                          'iteration': 1,
+                          'reportRef': 'docs/comet/changes/blank-node-progress-rollup/verification.md',
+                          'stateVersion': 6,
+                        },
+                    },
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'blank-node-progress-rollup',
+                      'task': '对于汇总来说, 没填就是0呀, 这下级进度不可用很有歧义',
+                    },
+                  'outputs':
+                    {
+                      'verify.verifier':
+                        {
+                          'candidateId': 'blank-node-progress-rollup:3',
+                          'checks':
+                            [
+                              {
+                                'acceptanceIds': ['A1', 'A2', 'A3'],
+                                'name': 'Apply Drizzle migration to existing test PostgreSQL 17 database',
+                                'note': 'From /Users/poco/Projects/itsaplan: SKIP_PRE_MIGRATION_BACKUP=1 bun --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env packages/db/src/migrate.ts. Applied migration 0200 to a database initialized at 0199. Log: /tmp/itsaplan-blank-progress.b9K0BC/upgrade-migrate.log.',
+                                'result': 'passed',
+                              },
+                              {
+                                'acceptanceIds': ['A1', 'A2', 'A3'],
+                                'name': 'Delivery workflow API integration suite',
+                                'note': 'From /Users/poco/Projects/itsaplan/apps/api: bun test --timeout 30000 --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env src/modules/delivery-workflow/__tests__/integration/delivery.test.ts. 8 passed. The added regression reproduced null/child at 0199 and verifies 0%, editable null, 40% when completed, 0% when reopened, and 10% after manual entry. Existing tests cover empty plans, invalid allocations, unavailable child rollups, and legacy delivery behavior. Logs: /tmp/itsaplan-blank-progress.b9K0BC/red.log, /tmp/itsaplan-blank-progress.b9K0BC/api-final.log.',
+                                'result': 'passed',
+                              },
+                              {
+                                'acceptanceIds': ['A1', 'A3'],
+                                'name': 'Web plan progress and work item table tests',
+                                'note': 'From /Users/poco/Projects/itsaplan/apps/web: bun test --preload ./test/setup.ts src/features/initiatives/components/shared/InitiativeDeliveryProgress.test.tsx src/features/work-items/components/table/TableSectionHeader.test.tsx src/features/work-items/components/table/TableRowSubtasks.test.tsx. 5 passed. The table renders numeric zero and preserves unavailable reasons. The Plans list and detail share the tested progress component, which formats zero as a numeric percentage. Log: /tmp/itsaplan-blank-progress.b9K0BC/web.log.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'TypeScript typecheck',
+                                'note': 'From /Users/poco/Projects/itsaplan: bun run typecheck passed. Log: /tmp/itsaplan-blank-progress.b9K0BC/typecheck-final.log.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Migration journal, changed-file lint and formatting',
+                                'note': 'From /Users/poco/Projects/itsaplan/packages/db: bun x --no-install drizzle-kit check. From /Users/poco/Projects/itsaplan: ESLint and Prettier on changed files and git diff --check passed. The generated snapshot preserves the previous schema.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Focused code and security review',
+                                'note': 'Reviewed the single calculation condition and regression test. The SQL change is limited to a missing numeric value on a node in the Plan hierarchy. Completion precedence, bounds, role and project filters, weights and permissions retain their existing checks. The migration changes a function definition and does not write issue fields.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'response':
+                            {
+                              'kind': 'final-result',
+                              'result':
+                                {
+                                  'acceptance':
+                                    [
+                                      {
+                                        'id': 'A1',
+                                        'reason': 'The PostgreSQL-backed regression returns 0% for three blank nodes at weights 40/40/20 in the plan list, plan detail and table summary endpoint. Node detail returns effective 0%, a null saved value and an editable progress field. The table zero rendering test passed, and the shared Plans and node formatters handle numeric zero as a value.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A2',
+                                        'reason': 'The regression confirms 40% after marking a blank node with weight 40 completed, 0% after reopening it and 10% after entering 25% manually.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A3',
+                                        'reason': 'Delivery integration tests preserve the reasons for an empty plan, invalid allocation and a child rollup unavailable due to invalid execution weights. Legacy nodes with blank progress retain their existing behavior.',
+                                        'result': 'passed',
+                                      },
+                                    ],
+                                  'attempt': 1,
+                                  'iteration': 1,
+                                  'requestReview':
+                                    {
+                                      'reason': 'The user asked for blank progress to count as 0 in rollups. The approved brief and target spec retain editable blank fields, completed progress and genuine rollup reasons. Migration 0200 and the integration tests match those rules.',
+                                      'result': 'aligned',
+                                    },
+                                  'risks':
+                                    [
+                                      'The running ROLL instance has not received migration 0200. Verification used a disposable PostgreSQL 17 database and Web component tests.',
+                                    ],
+                                  'summary': 'All three approved cases passed. The change is limited to effective progress for blank nodes without contributing tasks in the Plan hierarchy.',
+                                  'verdict': 'pass',
+                                },
+                            },
+                          'verifierExecutionRef': '01a20c9a-9292-75b0-913e-b4338d7234f1',
+                        },
+                    },
+                },
+              'proposalHash': '1abeae33f7f0fccf187b7266915c6c7c59f1d467953a2edada3d6263adf2cde8',
+              'choices': ['approved', 'rejected', 'reverify'],
+              'results': {},
+              'decision':
+                {
+                  'id': '5c18ac34443877b85c22a0cf98e09e75a6c9e17f785eece34730ba1fe604ddec',
+                  'choice': 'approved',
+                  'proposalHash': '1abeae33f7f0fccf187b7266915c6c7c59f1d467953a2edada3d6263adf2cde8',
+                  'reason': '接受已通过的验收结果，按授权归档并通过 PR 交付。',
+                },
+            },
+          ],
+        'ready': [],
+        'joins': {},
+        'outputs': {},
+        'children': [],
+        'lineage': [],
+      },
+    'sourceRevision': 14,
+    'sourceHash': 'af4e2e8a4ff1fa6f7ba3c86e9a690c58e0fda0ed8d2eb5a2e4ea6b965361b884',
+    'pool':
+      {
+        'version': 3,
+        'values':
+          [
+            {
+              'choice': 'approved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'blank-node-progress-rollup',
+                      'task': '对于汇总来说, 没填就是0呀, 这下级进度不可用很有歧义',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'Three nodes without contributing execution tasks, with blank progress and weights of 40%, 40%, and 20%, give the plan 0%. The plan list, plan detail, and table group header show 0%. Each node keeps an empty editable field and shows 0% as its calculated progress.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': "Setting the 40%-weighted node's progress to 25% gives the plan 10%. Marking a blank 40%-weighted node completed gives the plan 40% when the remaining nodes are at 0%.",
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'A plan without contributing nodes, an invalid node weight allocation, or a node whose execution progress cannot be calculated still shows its corresponding unavailability reason.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges':
+                            [
+                              {
+                                'capability': 'plan-node-execution',
+                                'delta_source': 'specs/plan-node-execution/delta.yaml',
+                                'operation': 'modify',
+                                'source': 'specs/plan-node-execution/spec.md',
+                              },
+                            ],
+                        },
+                    },
+                },
+            },
+            {
+              'acceptance':
+                [
+                  {
+                    'id': 'A1',
+                    'source': 'brief.md',
+                    'text': 'Three nodes without contributing execution tasks, with blank progress and weights of 40%, 40%, and 20%, give the plan 0%. The plan list, plan detail, and table group header show 0%. Each node keeps an empty editable field and shows 0% as its calculated progress.',
+                  },
+                  {
+                    'id': 'A2',
+                    'source': 'brief.md',
+                    'text': "Setting the 40%-weighted node's progress to 25% gives the plan 10%. Marking a blank 40%-weighted node completed gives the plan 40% when the remaining nodes are at 0%.",
+                  },
+                  {
+                    'id': 'A3',
+                    'source': 'brief.md',
+                    'text': 'A plan without contributing nodes, an invalid node weight allocation, or a node whose execution progress cannot be calculated still shows its corresponding unavailability reason.',
+                  },
+                ],
+              'children': null,
+              'specChanges':
+                [
+                  {
+                    'capability': 'plan-node-execution',
+                    'delta_source': 'specs/plan-node-execution/delta.yaml',
+                    'operation': 'modify',
+                    'source': 'specs/plan-node-execution/spec.md',
+                  },
+                ],
+            },
+            {
+              'addressedAcceptanceIds': ['A1', 'A2', 'A3'],
+              'checks':
+                [
+                  {
+                    'acceptanceIds': ['A1', 'A2', 'A3'],
+                    'name': 'Apply Drizzle migration to existing test PostgreSQL 17 database',
+                    'note': 'From /Users/poco/Projects/itsaplan: SKIP_PRE_MIGRATION_BACKUP=1 bun --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env packages/db/src/migrate.ts. Applied migration 0200 to a database initialized at 0199. Log: /tmp/itsaplan-blank-progress.b9K0BC/upgrade-migrate.log.',
+                    'result': 'passed',
+                  },
+                  {
+                    'acceptanceIds': ['A1', 'A2', 'A3'],
+                    'name': 'Delivery workflow API integration suite',
+                    'note': 'From /Users/poco/Projects/itsaplan/apps/api: bun test --timeout 30000 --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env src/modules/delivery-workflow/__tests__/integration/delivery.test.ts. 8 passed. The added regression reproduced null/child at 0199 and verifies 0%, editable null, 40% when completed, 0% when reopened, and 10% after manual entry. Existing tests cover empty plans, invalid allocations, unavailable child rollups, and legacy delivery behavior. Logs: /tmp/itsaplan-blank-progress.b9K0BC/red.log, /tmp/itsaplan-blank-progress.b9K0BC/api-final.log.',
+                    'result': 'passed',
+                  },
+                  {
+                    'acceptanceIds': ['A1', 'A3'],
+                    'name': 'Web plan progress and work item table tests',
+                    'note': 'From /Users/poco/Projects/itsaplan/apps/web: bun test --preload ./test/setup.ts src/features/initiatives/components/shared/InitiativeDeliveryProgress.test.tsx src/features/work-items/components/table/TableSectionHeader.test.tsx src/features/work-items/components/table/TableRowSubtasks.test.tsx. 5 passed. The table renders numeric zero and preserves unavailable reasons. The Plans list and detail share the tested progress component, which formats zero as a numeric percentage. Log: /tmp/itsaplan-blank-progress.b9K0BC/web.log.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'TypeScript typecheck',
+                    'note': 'From /Users/poco/Projects/itsaplan: bun run typecheck passed. Log: /tmp/itsaplan-blank-progress.b9K0BC/typecheck-final.log.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Migration journal, changed-file lint and formatting',
+                    'note': 'From /Users/poco/Projects/itsaplan/packages/db: bun x --no-install drizzle-kit check. From /Users/poco/Projects/itsaplan: ESLint and Prettier on changed files and git diff --check passed. The generated snapshot preserves the previous schema.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Focused code and security review',
+                    'note': 'Reviewed the single calculation condition and regression test. The SQL change is limited to a missing numeric value on a node in the Plan hierarchy. Completion precedence, bounds, role and project filters, weights and permissions retain their existing checks. The migration changes a function definition and does not write issue fields.',
+                    'result': 'passed',
+                  },
+                ],
+              'knownLimits':
+                [
+                  'Verification used isolated test PostgreSQL and component tests. The running ROLL instance was not upgraded.',
+                ],
+              'requireIndependentReview': false,
+              'summary': 'Plan delivery nodes with missing manual progress contribute 0% when no execution tasks contribute. Migration 0200 preserves the stored field and legacy delivery behavior. Existing UI renders the effective rate and distinguishes invalid rollups.',
+            },
+            {
+              'choice': 'approved',
+              'proposal':
+                {
+                  'activation':
+                    {
+                      'report':
+                        {
+                          'attempt': 1,
+                          'candidateId': 'blank-node-progress-rollup:3',
+                          'iteration': 1,
+                          'reportRef': 'docs/comet/changes/blank-node-progress-rollup/verification.md',
+                          'stateVersion': 6,
+                        },
+                    },
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'blank-node-progress-rollup',
+                      'task': '对于汇总来说, 没填就是0呀, 这下级进度不可用很有歧义',
+                    },
+                  'outputs':
+                    {
+                      'verify.verifier':
+                        {
+                          'candidateId': 'blank-node-progress-rollup:3',
+                          'checks':
+                            [
+                              {
+                                'acceptanceIds': ['A1', 'A2', 'A3'],
+                                'name': 'Apply Drizzle migration to existing test PostgreSQL 17 database',
+                                'note': 'From /Users/poco/Projects/itsaplan: SKIP_PRE_MIGRATION_BACKUP=1 bun --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env packages/db/src/migrate.ts. Applied migration 0200 to a database initialized at 0199. Log: /tmp/itsaplan-blank-progress.b9K0BC/upgrade-migrate.log.',
+                                'result': 'passed',
+                              },
+                              {
+                                'acceptanceIds': ['A1', 'A2', 'A3'],
+                                'name': 'Delivery workflow API integration suite',
+                                'note': 'From /Users/poco/Projects/itsaplan/apps/api: bun test --timeout 30000 --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env src/modules/delivery-workflow/__tests__/integration/delivery.test.ts. 8 passed. The added regression reproduced null/child at 0199 and verifies 0%, editable null, 40% when completed, 0% when reopened, and 10% after manual entry. Existing tests cover empty plans, invalid allocations, unavailable child rollups, and legacy delivery behavior. Logs: /tmp/itsaplan-blank-progress.b9K0BC/red.log, /tmp/itsaplan-blank-progress.b9K0BC/api-final.log.',
+                                'result': 'passed',
+                              },
+                              {
+                                'acceptanceIds': ['A1', 'A3'],
+                                'name': 'Web plan progress and work item table tests',
+                                'note': 'From /Users/poco/Projects/itsaplan/apps/web: bun test --preload ./test/setup.ts src/features/initiatives/components/shared/InitiativeDeliveryProgress.test.tsx src/features/work-items/components/table/TableSectionHeader.test.tsx src/features/work-items/components/table/TableRowSubtasks.test.tsx. 5 passed. The table renders numeric zero and preserves unavailable reasons. The Plans list and detail share the tested progress component, which formats zero as a numeric percentage. Log: /tmp/itsaplan-blank-progress.b9K0BC/web.log.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'TypeScript typecheck',
+                                'note': 'From /Users/poco/Projects/itsaplan: bun run typecheck passed. Log: /tmp/itsaplan-blank-progress.b9K0BC/typecheck-final.log.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Migration journal, changed-file lint and formatting',
+                                'note': 'From /Users/poco/Projects/itsaplan/packages/db: bun x --no-install drizzle-kit check. From /Users/poco/Projects/itsaplan: ESLint and Prettier on changed files and git diff --check passed. The generated snapshot preserves the previous schema.',
+                                'result': 'passed',
+                              },
+                              {
+                                'name': 'Focused code and security review',
+                                'note': 'Reviewed the single calculation condition and regression test. The SQL change is limited to a missing numeric value on a node in the Plan hierarchy. Completion precedence, bounds, role and project filters, weights and permissions retain their existing checks. The migration changes a function definition and does not write issue fields.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'response':
+                            {
+                              'kind': 'final-result',
+                              'result':
+                                {
+                                  'acceptance':
+                                    [
+                                      {
+                                        'id': 'A1',
+                                        'reason': 'The PostgreSQL-backed regression returns 0% for three blank nodes at weights 40/40/20 in the plan list, plan detail and table summary endpoint. Node detail returns effective 0%, a null saved value and an editable progress field. The table zero rendering test passed, and the shared Plans and node formatters handle numeric zero as a value.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A2',
+                                        'reason': 'The regression confirms 40% after marking a blank node with weight 40 completed, 0% after reopening it and 10% after entering 25% manually.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A3',
+                                        'reason': 'Delivery integration tests preserve the reasons for an empty plan, invalid allocation and a child rollup unavailable due to invalid execution weights. Legacy nodes with blank progress retain their existing behavior.',
+                                        'result': 'passed',
+                                      },
+                                    ],
+                                  'attempt': 1,
+                                  'iteration': 1,
+                                  'requestReview':
+                                    {
+                                      'reason': 'The user asked for blank progress to count as 0 in rollups. The approved brief and target spec retain editable blank fields, completed progress and genuine rollup reasons. Migration 0200 and the integration tests match those rules.',
+                                      'result': 'aligned',
+                                    },
+                                  'risks':
+                                    [
+                                      'The running ROLL instance has not received migration 0200. Verification used a disposable PostgreSQL 17 database and Web component tests.',
+                                    ],
+                                  'summary': 'All three approved cases passed. The change is limited to effective progress for blank nodes without contributing tasks in the Plan hierarchy.',
+                                  'verdict': 'pass',
+                                },
+                            },
+                          'verifierExecutionRef': '01a20c9a-9292-75b0-913e-b4338d7234f1',
+                        },
+                    },
+                },
+            },
+            {
+              'candidateId': 'blank-node-progress-rollup:3',
+              'checks':
+                [
+                  {
+                    'acceptanceIds': ['A1', 'A2', 'A3'],
+                    'name': 'Apply Drizzle migration to existing test PostgreSQL 17 database',
+                    'note': 'From /Users/poco/Projects/itsaplan: SKIP_PRE_MIGRATION_BACKUP=1 bun --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env packages/db/src/migrate.ts. Applied migration 0200 to a database initialized at 0199. Log: /tmp/itsaplan-blank-progress.b9K0BC/upgrade-migrate.log.',
+                    'result': 'passed',
+                  },
+                  {
+                    'acceptanceIds': ['A1', 'A2', 'A3'],
+                    'name': 'Delivery workflow API integration suite',
+                    'note': 'From /Users/poco/Projects/itsaplan/apps/api: bun test --timeout 30000 --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env src/modules/delivery-workflow/__tests__/integration/delivery.test.ts. 8 passed. The added regression reproduced null/child at 0199 and verifies 0%, editable null, 40% when completed, 0% when reopened, and 10% after manual entry. Existing tests cover empty plans, invalid allocations, unavailable child rollups, and legacy delivery behavior. Logs: /tmp/itsaplan-blank-progress.b9K0BC/red.log, /tmp/itsaplan-blank-progress.b9K0BC/api-final.log.',
+                    'result': 'passed',
+                  },
+                  {
+                    'acceptanceIds': ['A1', 'A3'],
+                    'name': 'Web plan progress and work item table tests',
+                    'note': 'From /Users/poco/Projects/itsaplan/apps/web: bun test --preload ./test/setup.ts src/features/initiatives/components/shared/InitiativeDeliveryProgress.test.tsx src/features/work-items/components/table/TableSectionHeader.test.tsx src/features/work-items/components/table/TableRowSubtasks.test.tsx. 5 passed. The table renders numeric zero and preserves unavailable reasons. The Plans list and detail share the tested progress component, which formats zero as a numeric percentage. Log: /tmp/itsaplan-blank-progress.b9K0BC/web.log.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'TypeScript typecheck',
+                    'note': 'From /Users/poco/Projects/itsaplan: bun run typecheck passed. Log: /tmp/itsaplan-blank-progress.b9K0BC/typecheck-final.log.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Migration journal, changed-file lint and formatting',
+                    'note': 'From /Users/poco/Projects/itsaplan/packages/db: bun x --no-install drizzle-kit check. From /Users/poco/Projects/itsaplan: ESLint and Prettier on changed files and git diff --check passed. The generated snapshot preserves the previous schema.',
+                    'result': 'passed',
+                  },
+                  {
+                    'name': 'Focused code and security review',
+                    'note': 'Reviewed the single calculation condition and regression test. The SQL change is limited to a missing numeric value on a node in the Plan hierarchy. Completion precedence, bounds, role and project filters, weights and permissions retain their existing checks. The migration changes a function definition and does not write issue fields.',
+                    'result': 'passed',
+                  },
+                ],
+              'response':
+                {
+                  'kind': 'final-result',
+                  'result':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'reason': 'The PostgreSQL-backed regression returns 0% for three blank nodes at weights 40/40/20 in the plan list, plan detail and table summary endpoint. Node detail returns effective 0%, a null saved value and an editable progress field. The table zero rendering test passed, and the shared Plans and node formatters handle numeric zero as a value.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A2',
+                            'reason': 'The regression confirms 40% after marking a blank node with weight 40 completed, 0% after reopening it and 10% after entering 25% manually.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A3',
+                            'reason': 'Delivery integration tests preserve the reasons for an empty plan, invalid allocation and a child rollup unavailable due to invalid execution weights. Legacy nodes with blank progress retain their existing behavior.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'attempt': 1,
+                      'iteration': 1,
+                      'requestReview':
+                        {
+                          'reason': 'The user asked for blank progress to count as 0 in rollups. The approved brief and target spec retain editable blank fields, completed progress and genuine rollup reasons. Migration 0200 and the integration tests match those rules.',
+                          'result': 'aligned',
+                        },
+                      'risks':
+                        [
+                          'The running ROLL instance has not received migration 0200. Verification used a disposable PostgreSQL 17 database and Web component tests.',
+                        ],
+                      'summary': 'All three approved cases passed. The change is limited to effective progress for blank nodes without contributing tasks in the Plan hierarchy.',
+                      'verdict': 'pass',
+                    },
+                },
+              'verifierExecutionRef': '01a20c9a-9292-75b0-913e-b4338d7234f1',
+            },
+            {
+              'archiveDirRef': 'docs/comet/archive/2026-11-24-blank-node-progress-rollup',
+              'blockers': [],
+              'candidateId': 'blank-node-progress-rollup:3',
+              'capabilityPeers': [],
+              'ready': true,
+              'reportRef': 'docs/comet/changes/blank-node-progress-rollup/verification.md',
+              'reportStateVersion': 6,
+              'requiresReverification': false,
+              'specPreview':
+                [
+                  {
+                    'capability': 'plan-node-execution',
+                    'delta_operations':
+                      [
+                        {
+                          'id': 'plan-node-execution.blank-node-progress',
+                          'operation': 'add',
+                          'status': 'changed',
+                          'targetIds': ['plan-node-execution.blank-node-progress'],
+                        },
+                      ],
+                    'delta_source': 'specs/plan-node-execution/delta.yaml',
+                    'operation': 'modify',
+                    'source': 'specs/plan-node-execution/spec.md',
+                  },
+                ],
+              'stateVersion': 7,
+            },
+            {
+              'archiveRef': '2026-11-24-blank-node-progress-rollup',
+              'specCount': 1,
+              'stateVersion': 7,
+              'transactionId': 'd78ee7b0-7e92-481a-b617-6a3fb6cabfe0',
+            },
+            {
+              'sequence': 2,
+              'value':
+                {
+                  'choice': 'approved',
+                  'proposal':
+                    {
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'blank-node-progress-rollup',
+                          'task': '对于汇总来说, 没填就是0呀, 这下级进度不可用很有歧义',
+                        },
+                      'outputs':
+                        {
+                          'shape.prepare':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'source': 'brief.md',
+                                    'text': 'Three nodes without contributing execution tasks, with blank progress and weights of 40%, 40%, and 20%, give the plan 0%. The plan list, plan detail, and table group header show 0%. Each node keeps an empty editable field and shows 0% as its calculated progress.',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'source': 'brief.md',
+                                    'text': "Setting the 40%-weighted node's progress to 25% gives the plan 10%. Marking a blank 40%-weighted node completed gives the plan 40% when the remaining nodes are at 0%.",
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'source': 'brief.md',
+                                    'text': 'A plan without contributing nodes, an invalid node weight allocation, or a node whose execution progress cannot be calculated still shows its corresponding unavailability reason.',
+                                  },
+                                ],
+                              'children': null,
+                              'specChanges':
+                                [
+                                  {
+                                    'capability': 'plan-node-execution',
+                                    'delta_source': 'specs/plan-node-execution/delta.yaml',
+                                    'operation': 'modify',
+                                    'source': 'specs/plan-node-execution/spec.md',
+                                  },
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 1,
+              'value':
+                {
+                  'acceptance':
+                    [
+                      {
+                        'id': 'A1',
+                        'source': 'brief.md',
+                        'text': 'Three nodes without contributing execution tasks, with blank progress and weights of 40%, 40%, and 20%, give the plan 0%. The plan list, plan detail, and table group header show 0%. Each node keeps an empty editable field and shows 0% as its calculated progress.',
+                      },
+                      {
+                        'id': 'A2',
+                        'source': 'brief.md',
+                        'text': "Setting the 40%-weighted node's progress to 25% gives the plan 10%. Marking a blank 40%-weighted node completed gives the plan 40% when the remaining nodes are at 0%.",
+                      },
+                      {
+                        'id': 'A3',
+                        'source': 'brief.md',
+                        'text': 'A plan without contributing nodes, an invalid node weight allocation, or a node whose execution progress cannot be calculated still shows its corresponding unavailability reason.',
+                      },
+                    ],
+                  'children': null,
+                  'specChanges':
+                    [
+                      {
+                        'capability': 'plan-node-execution',
+                        'delta_source': 'specs/plan-node-execution/delta.yaml',
+                        'operation': 'modify',
+                        'source': 'specs/plan-node-execution/spec.md',
+                      },
+                    ],
+                },
+            },
+            {
+              'sequence': 3,
+              'value':
+                {
+                  'addressedAcceptanceIds': ['A1', 'A2', 'A3'],
+                  'checks':
+                    [
+                      {
+                        'acceptanceIds': ['A1', 'A2', 'A3'],
+                        'name': 'Apply Drizzle migration to existing test PostgreSQL 17 database',
+                        'note': 'From /Users/poco/Projects/itsaplan: SKIP_PRE_MIGRATION_BACKUP=1 bun --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env packages/db/src/migrate.ts. Applied migration 0200 to a database initialized at 0199. Log: /tmp/itsaplan-blank-progress.b9K0BC/upgrade-migrate.log.',
+                        'result': 'passed',
+                      },
+                      {
+                        'acceptanceIds': ['A1', 'A2', 'A3'],
+                        'name': 'Delivery workflow API integration suite',
+                        'note': 'From /Users/poco/Projects/itsaplan/apps/api: bun test --timeout 30000 --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env src/modules/delivery-workflow/__tests__/integration/delivery.test.ts. 8 passed. The added regression reproduced null/child at 0199 and verifies 0%, editable null, 40% when completed, 0% when reopened, and 10% after manual entry. Existing tests cover empty plans, invalid allocations, unavailable child rollups, and legacy delivery behavior. Logs: /tmp/itsaplan-blank-progress.b9K0BC/red.log, /tmp/itsaplan-blank-progress.b9K0BC/api-final.log.',
+                        'result': 'passed',
+                      },
+                      {
+                        'acceptanceIds': ['A1', 'A3'],
+                        'name': 'Web plan progress and work item table tests',
+                        'note': 'From /Users/poco/Projects/itsaplan/apps/web: bun test --preload ./test/setup.ts src/features/initiatives/components/shared/InitiativeDeliveryProgress.test.tsx src/features/work-items/components/table/TableSectionHeader.test.tsx src/features/work-items/components/table/TableRowSubtasks.test.tsx. 5 passed. The table renders numeric zero and preserves unavailable reasons. The Plans list and detail share the tested progress component, which formats zero as a numeric percentage. Log: /tmp/itsaplan-blank-progress.b9K0BC/web.log.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'TypeScript typecheck',
+                        'note': 'From /Users/poco/Projects/itsaplan: bun run typecheck passed. Log: /tmp/itsaplan-blank-progress.b9K0BC/typecheck-final.log.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Migration journal, changed-file lint and formatting',
+                        'note': 'From /Users/poco/Projects/itsaplan/packages/db: bun x --no-install drizzle-kit check. From /Users/poco/Projects/itsaplan: ESLint and Prettier on changed files and git diff --check passed. The generated snapshot preserves the previous schema.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Focused code and security review',
+                        'note': 'Reviewed the single calculation condition and regression test. The SQL change is limited to a missing numeric value on a node in the Plan hierarchy. Completion precedence, bounds, role and project filters, weights and permissions retain their existing checks. The migration changes a function definition and does not write issue fields.',
+                        'result': 'passed',
+                      },
+                    ],
+                  'knownLimits':
+                    [
+                      'Verification used isolated test PostgreSQL and component tests. The running ROLL instance was not upgraded.',
+                    ],
+                  'requireIndependentReview': false,
+                  'summary': 'Plan delivery nodes with missing manual progress contribute 0% when no execution tasks contribute. Migration 0200 preserves the stored field and legacy delivery behavior. Existing UI renders the effective rate and distinguishes invalid rollups.',
+                },
+            },
+            {
+              'sequence': 5,
+              'value':
+                {
+                  'choice': 'approved',
+                  'proposal':
+                    {
+                      'activation':
+                        {
+                          'report':
+                            {
+                              'attempt': 1,
+                              'candidateId': 'blank-node-progress-rollup:3',
+                              'iteration': 1,
+                              'reportRef': 'docs/comet/changes/blank-node-progress-rollup/verification.md',
+                              'stateVersion': 6,
+                            },
+                        },
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'blank-node-progress-rollup',
+                          'task': '对于汇总来说, 没填就是0呀, 这下级进度不可用很有歧义',
+                        },
+                      'outputs':
+                        {
+                          'verify.verifier':
+                            {
+                              'candidateId': 'blank-node-progress-rollup:3',
+                              'checks':
+                                [
+                                  {
+                                    'acceptanceIds': ['A1', 'A2', 'A3'],
+                                    'name': 'Apply Drizzle migration to existing test PostgreSQL 17 database',
+                                    'note': 'From /Users/poco/Projects/itsaplan: SKIP_PRE_MIGRATION_BACKUP=1 bun --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env packages/db/src/migrate.ts. Applied migration 0200 to a database initialized at 0199. Log: /tmp/itsaplan-blank-progress.b9K0BC/upgrade-migrate.log.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'acceptanceIds': ['A1', 'A2', 'A3'],
+                                    'name': 'Delivery workflow API integration suite',
+                                    'note': 'From /Users/poco/Projects/itsaplan/apps/api: bun test --timeout 30000 --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env src/modules/delivery-workflow/__tests__/integration/delivery.test.ts. 8 passed. The added regression reproduced null/child at 0199 and verifies 0%, editable null, 40% when completed, 0% when reopened, and 10% after manual entry. Existing tests cover empty plans, invalid allocations, unavailable child rollups, and legacy delivery behavior. Logs: /tmp/itsaplan-blank-progress.b9K0BC/red.log, /tmp/itsaplan-blank-progress.b9K0BC/api-final.log.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'acceptanceIds': ['A1', 'A3'],
+                                    'name': 'Web plan progress and work item table tests',
+                                    'note': 'From /Users/poco/Projects/itsaplan/apps/web: bun test --preload ./test/setup.ts src/features/initiatives/components/shared/InitiativeDeliveryProgress.test.tsx src/features/work-items/components/table/TableSectionHeader.test.tsx src/features/work-items/components/table/TableRowSubtasks.test.tsx. 5 passed. The table renders numeric zero and preserves unavailable reasons. The Plans list and detail share the tested progress component, which formats zero as a numeric percentage. Log: /tmp/itsaplan-blank-progress.b9K0BC/web.log.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'TypeScript typecheck',
+                                    'note': 'From /Users/poco/Projects/itsaplan: bun run typecheck passed. Log: /tmp/itsaplan-blank-progress.b9K0BC/typecheck-final.log.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Migration journal, changed-file lint and formatting',
+                                    'note': 'From /Users/poco/Projects/itsaplan/packages/db: bun x --no-install drizzle-kit check. From /Users/poco/Projects/itsaplan: ESLint and Prettier on changed files and git diff --check passed. The generated snapshot preserves the previous schema.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'name': 'Focused code and security review',
+                                    'note': 'Reviewed the single calculation condition and regression test. The SQL change is limited to a missing numeric value on a node in the Plan hierarchy. Completion precedence, bounds, role and project filters, weights and permissions retain their existing checks. The migration changes a function definition and does not write issue fields.',
+                                    'result': 'passed',
+                                  },
+                                ],
+                              'response':
+                                {
+                                  'kind': 'final-result',
+                                  'result':
+                                    {
+                                      'acceptance':
+                                        [
+                                          {
+                                            'id': 'A1',
+                                            'reason': 'The PostgreSQL-backed regression returns 0% for three blank nodes at weights 40/40/20 in the plan list, plan detail and table summary endpoint. Node detail returns effective 0%, a null saved value and an editable progress field. The table zero rendering test passed, and the shared Plans and node formatters handle numeric zero as a value.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A2',
+                                            'reason': 'The regression confirms 40% after marking a blank node with weight 40 completed, 0% after reopening it and 10% after entering 25% manually.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A3',
+                                            'reason': 'Delivery integration tests preserve the reasons for an empty plan, invalid allocation and a child rollup unavailable due to invalid execution weights. Legacy nodes with blank progress retain their existing behavior.',
+                                            'result': 'passed',
+                                          },
+                                        ],
+                                      'attempt': 1,
+                                      'iteration': 1,
+                                      'requestReview':
+                                        {
+                                          'reason': 'The user asked for blank progress to count as 0 in rollups. The approved brief and target spec retain editable blank fields, completed progress and genuine rollup reasons. Migration 0200 and the integration tests match those rules.',
+                                          'result': 'aligned',
+                                        },
+                                      'risks':
+                                        [
+                                          'The running ROLL instance has not received migration 0200. Verification used a disposable PostgreSQL 17 database and Web component tests.',
+                                        ],
+                                      'summary': 'All three approved cases passed. The change is limited to effective progress for blank nodes without contributing tasks in the Plan hierarchy.',
+                                      'verdict': 'pass',
+                                    },
+                                },
+                              'verifierExecutionRef': '01a20c9a-9292-75b0-913e-b4338d7234f1',
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 4,
+              'value':
+                {
+                  'candidateId': 'blank-node-progress-rollup:3',
+                  'checks':
+                    [
+                      {
+                        'acceptanceIds': ['A1', 'A2', 'A3'],
+                        'name': 'Apply Drizzle migration to existing test PostgreSQL 17 database',
+                        'note': 'From /Users/poco/Projects/itsaplan: SKIP_PRE_MIGRATION_BACKUP=1 bun --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env packages/db/src/migrate.ts. Applied migration 0200 to a database initialized at 0199. Log: /tmp/itsaplan-blank-progress.b9K0BC/upgrade-migrate.log.',
+                        'result': 'passed',
+                      },
+                      {
+                        'acceptanceIds': ['A1', 'A2', 'A3'],
+                        'name': 'Delivery workflow API integration suite',
+                        'note': 'From /Users/poco/Projects/itsaplan/apps/api: bun test --timeout 30000 --env-file=/tmp/itsaplan-blank-progress.b9K0BC/env src/modules/delivery-workflow/__tests__/integration/delivery.test.ts. 8 passed. The added regression reproduced null/child at 0199 and verifies 0%, editable null, 40% when completed, 0% when reopened, and 10% after manual entry. Existing tests cover empty plans, invalid allocations, unavailable child rollups, and legacy delivery behavior. Logs: /tmp/itsaplan-blank-progress.b9K0BC/red.log, /tmp/itsaplan-blank-progress.b9K0BC/api-final.log.',
+                        'result': 'passed',
+                      },
+                      {
+                        'acceptanceIds': ['A1', 'A3'],
+                        'name': 'Web plan progress and work item table tests',
+                        'note': 'From /Users/poco/Projects/itsaplan/apps/web: bun test --preload ./test/setup.ts src/features/initiatives/components/shared/InitiativeDeliveryProgress.test.tsx src/features/work-items/components/table/TableSectionHeader.test.tsx src/features/work-items/components/table/TableRowSubtasks.test.tsx. 5 passed. The table renders numeric zero and preserves unavailable reasons. The Plans list and detail share the tested progress component, which formats zero as a numeric percentage. Log: /tmp/itsaplan-blank-progress.b9K0BC/web.log.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'TypeScript typecheck',
+                        'note': 'From /Users/poco/Projects/itsaplan: bun run typecheck passed. Log: /tmp/itsaplan-blank-progress.b9K0BC/typecheck-final.log.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Migration journal, changed-file lint and formatting',
+                        'note': 'From /Users/poco/Projects/itsaplan/packages/db: bun x --no-install drizzle-kit check. From /Users/poco/Projects/itsaplan: ESLint and Prettier on changed files and git diff --check passed. The generated snapshot preserves the previous schema.',
+                        'result': 'passed',
+                      },
+                      {
+                        'name': 'Focused code and security review',
+                        'note': 'Reviewed the single calculation condition and regression test. The SQL change is limited to a missing numeric value on a node in the Plan hierarchy. Completion precedence, bounds, role and project filters, weights and permissions retain their existing checks. The migration changes a function definition and does not write issue fields.',
+                        'result': 'passed',
+                      },
+                    ],
+                  'response':
+                    {
+                      'kind': 'final-result',
+                      'result':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'reason': 'The PostgreSQL-backed regression returns 0% for three blank nodes at weights 40/40/20 in the plan list, plan detail and table summary endpoint. Node detail returns effective 0%, a null saved value and an editable progress field. The table zero rendering test passed, and the shared Plans and node formatters handle numeric zero as a value.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A2',
+                                'reason': 'The regression confirms 40% after marking a blank node with weight 40 completed, 0% after reopening it and 10% after entering 25% manually.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A3',
+                                'reason': 'Delivery integration tests preserve the reasons for an empty plan, invalid allocation and a child rollup unavailable due to invalid execution weights. Legacy nodes with blank progress retain their existing behavior.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'attempt': 1,
+                          'iteration': 1,
+                          'requestReview':
+                            {
+                              'reason': 'The user asked for blank progress to count as 0 in rollups. The approved brief and target spec retain editable blank fields, completed progress and genuine rollup reasons. Migration 0200 and the integration tests match those rules.',
+                              'result': 'aligned',
+                            },
+                          'risks':
+                            [
+                              'The running ROLL instance has not received migration 0200. Verification used a disposable PostgreSQL 17 database and Web component tests.',
+                            ],
+                          'summary': 'All three approved cases passed. The change is limited to effective progress for blank nodes without contributing tasks in the Plan hierarchy.',
+                          'verdict': 'pass',
+                        },
+                    },
+                  'verifierExecutionRef': '01a20c9a-9292-75b0-913e-b4338d7234f1',
+                },
+            },
+            {
+              'sequence': 6,
+              'value':
+                {
+                  'archiveDirRef': 'docs/comet/archive/2026-11-24-blank-node-progress-rollup',
+                  'blockers': [],
+                  'candidateId': 'blank-node-progress-rollup:3',
+                  'capabilityPeers': [],
+                  'ready': true,
+                  'reportRef': 'docs/comet/changes/blank-node-progress-rollup/verification.md',
+                  'reportStateVersion': 6,
+                  'requiresReverification': false,
+                  'specPreview':
+                    [
+                      {
+                        'capability': 'plan-node-execution',
+                        'delta_operations':
+                          [
+                            {
+                              'id': 'plan-node-execution.blank-node-progress',
+                              'operation': 'add',
+                              'status': 'changed',
+                              'targetIds': ['plan-node-execution.blank-node-progress'],
+                            },
+                          ],
+                        'delta_source': 'specs/plan-node-execution/delta.yaml',
+                        'operation': 'modify',
+                        'source': 'specs/plan-node-execution/spec.md',
+                      },
+                    ],
+                  'stateVersion': 7,
+                },
+            },
+            {
+              'sequence': 7,
+              'value':
+                {
+                  'archiveRef': '2026-11-24-blank-node-progress-rollup',
+                  'specCount': 1,
+                  'stateVersion': 7,
+                  'transactionId': 'd78ee7b0-7e92-481a-b617-6a3fb6cabfe0',
+                },
+            },
+            {
+              'sequence': 8,
+              'value':
+                {
+                  'archiveRef': '2026-11-24-blank-node-progress-rollup',
+                  'change': 'blank-node-progress-rollup',
+                  'runId': 'blank-node-progress-rollup',
+                  'specs': [{ 'capability': 'plan-node-execution', 'operation': 'modify' }],
+                  'stateVersion': 8,
+                  'transactionId': 'd78ee7b0-7e92-481a-b617-6a3fb6cabfe0',
+                },
+            },
+          ],
+        'nodes':
+          [
+            { 'key': 'shape.prepare', 'value': 1, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': null, 'right': 0, 'height': 2 },
+            { 'key': 'build.builder', 'value': 2, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 2, 'right': 0, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 1, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 4, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.confirm', 'value': 3, 'left': 4, 'right': 5, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 2, 'right': 6, 'height': 3 },
+            { 'key': 'archive.prepare', 'value': 5, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 2, 'left': 8, 'right': null, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 9, 'right': 6, 'height': 3 },
+            { 'key': 'archive.execute', 'value': 6, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 2, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.prepare', 'value': 5, 'left': 11, 'right': 12, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 13, 'right': 6, 'height': 3 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': null, 'right': 15, 'height': 2 },
+            { 'key': 'build.builder', 'value': 9, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 17, 'right': 15, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 11, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.confirm', 'value': 10, 'left': 19, 'right': 20, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 17, 'right': 21, 'height': 3 },
+            { 'key': 'archive.prepare', 'value': 12, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 9, 'left': 23, 'right': null, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 24, 'right': 21, 'height': 3 },
+            { 'key': 'archive.execute', 'value': 13, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 9, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.prepare', 'value': 12, 'left': 26, 'right': 27, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 28, 'right': 21, 'height': 3 },
+            { 'key': 'archive.finalize', 'value': 14, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.execute', 'value': 13, 'left': null, 'right': 30, 'height': 2 },
+            { 'key': 'archive.prepare', 'value': 12, 'left': 31, 'right': 27, 'height': 3 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 32, 'right': 21, 'height': 4 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 9, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 11, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': 36, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 35, 'right': 37, 'height': 3 },
+          ],
+        'maps': [null, 1, 3, 7, 10, 14, 16, 18, 22, 25, 29, 33, 34, 38],
+        'bindings':
+          [
+            { 'path': ['actions', '0', 'input', 'outputs'], 'map': 0 },
+            { 'path': ['actions', '1', 'input', 'outputs'], 'map': 1 },
+            { 'path': ['actions', '2', 'input', 'outputs'], 'map': 2 },
+            { 'path': ['actions', '3', 'input', 'outputs'], 'map': 3 },
+            { 'path': ['actions', '4', 'input', 'outputs'], 'map': 4 },
+            { 'path': ['actions', '5', 'input', 'outputs'], 'map': 5 },
+            { 'path': ['actionContexts', 'blank-node-progress-rollup:1', 'results'], 'map': 0 },
+            { 'path': ['actionContexts', 'blank-node-progress-rollup:3', 'results'], 'map': 6 },
+            { 'path': ['actionContexts', 'blank-node-progress-rollup:4', 'results'], 'map': 7 },
+            { 'path': ['actionContexts', 'blank-node-progress-rollup:6', 'results'], 'map': 8 },
+            { 'path': ['actionContexts', 'blank-node-progress-rollup:7', 'results'], 'map': 9 },
+            { 'path': ['actionContexts', 'blank-node-progress-rollup:8', 'results'], 'map': 10 },
+            { 'path': ['outputs'], 'map': 11 },
+            { 'path': ['waits', '0', 'results'], 'map': 12 },
+            { 'path': ['waits', '1', 'results'], 'map': 13 },
+          ],
+      },
+    'storageHash': '872a6a05ee74c2afe46a6fc9318cac3b7e5adeacb6c72aea67aaf890ffc6bd62',
+  }

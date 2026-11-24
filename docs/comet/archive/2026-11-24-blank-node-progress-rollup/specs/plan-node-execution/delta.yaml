@@ -1,0 +1,11 @@
+schema: comet.native.delta.v1
+capability: plan-node-execution
+base_version: 1
+operations:
+  - id: plan-node-execution.blank-node-progress
+    operation: add
+    title: Effective progress for nodes with a blank value
+    body: |
+      In the Plan hierarchy, a contributing node outside the completed state with no contributing execution tasks and a blank progress field has an effective progress of 0%. The node displays that effective percentage and contributes it to weighted plan progress. The editable field can remain blank. Completed nodes contribute 100%.
+
+      A node with contributing execution tasks uses their weighted progress. Empty plans, invalid weight allocations, and unavailable execution rollups retain their calculation reasons.
