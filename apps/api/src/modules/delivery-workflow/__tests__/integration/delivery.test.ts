@@ -74,6 +74,48 @@ async function setup() {
   };
 }
 
+test('counts blank progress on directly tracked plan nodes as zero', async () => {
+  const { api, project, projectRef, settings, add, get, set, item, enable, started, done } =
+    await setup();
+  await enable();
+  const module = await add('Plan source', settings.moduleTypeId);
+  const nodes = await Promise.all(
+    [40, 40, 20].map(async (weight, i) => {
+      const node = await add(`Node ${i + 1}`, settings.nodeTypeId, module);
+      await set(node, settings.nodeWeightId, weight);
+      return node;
+    }),
+  );
+  expect(await get(nodes[0])).toMatchObject({ progress: null, problem: 'progress' });
+
+  const db = new SQL(process.env.DATABASE_URL!);
+  try {
+    await migrateDeliveryPlans(db, projectRef, true);
+  } finally {
+    await db.close();
+  }
+
+  const list = await project.initiatives.get();
+  const [plan] = list.data!.items;
+  expect(plan.delivery).toMatchObject({ progress: 0, problem: null });
+  const detail = api.initiatives({ initiativeId: plan.id });
+  expect((await detail.get()).data?.delivery).toMatchObject({ progress: 0, problem: null });
+  expect((await project.initiatives['delivery-progress'].get()).data).toMatchObject([
+    { id: plan.id, progress: 0, problem: null },
+  ]);
+  for (const node of nodes) {
+    expect(await get(node)).toMatchObject({ progress: 0, problem: null, progressReadOnly: false });
+    const fields = (await item(node).get()).data?.fields;
+    expect(fields?.find((field) => field.fieldId === settings.nodeProgressId)?.value).toBeNull();
+  }
+  expect((await item(nodes[0]).patch({ columnId: done })).status).toBe(200);
+  expect((await detail.get()).data?.delivery?.progress).toBe(40);
+  expect((await item(nodes[0]).patch({ columnId: started })).status).toBe(200);
+  expect((await detail.get()).data?.delivery?.progress).toBe(0);
+  await set(nodes[0], settings.nodeProgressId, 25);
+  expect((await detail.get()).data?.delivery?.progress).toBe(10);
+});
+
 test('migrates existing work and rolls up native plans as delivery changes', async () => {
   const {
     api,

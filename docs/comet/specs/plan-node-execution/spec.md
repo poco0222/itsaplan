@@ -23,3 +23,9 @@ The No plan group, projects without weighted plan progress, and other primary gr
 For the selected project, map each active delivery module to one built-in plan with its title, description, equivalent current status, and planned due date. Link that module's delivery nodes to the plan. Retain each execution task's existing parent node. Archive the superseded modules and link to their original records from the new plans. Retain work item IDs, statuses, history, attachments, and field values. Leave existing weight allocations as entered.
 
 Preview reports the proposed mapping and any conflicts without mutating project data. Apply the mapping atomically within the selected project. Repeating the apply must not duplicate plans or lose links. Projects outside the selected migration retain their existing hierarchy and workflow behavior.
+
+## Requirement: plan-node-execution.blank-node-progress Effective progress for nodes with a blank value
+
+In the Plan hierarchy, a contributing node outside the completed state with no contributing execution tasks and a blank progress field has an effective progress of 0%. The node displays that effective percentage and contributes it to weighted plan progress. The editable field can remain blank. Completed nodes contribute 100%.
+
+A node with contributing execution tasks uses their weighted progress. Empty plans, invalid weight allocations, and unavailable execution rollups retain their calculation reasons.

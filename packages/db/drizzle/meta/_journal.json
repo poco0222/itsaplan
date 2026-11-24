@@ -1401,6 +1401,13 @@
       "when": 1795454110776,
       "tag": "0199_git_issue_sync",
       "breakpoints": true
+    },
+    {
+      "idx": 200,
+      "version": "7",
+      "when": 1795510183296,
+      "tag": "0200_blank_plan_node_progress",
+      "breakpoints": true
     }
   ]
 }
