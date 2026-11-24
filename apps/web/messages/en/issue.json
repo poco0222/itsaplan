@@ -460,7 +460,8 @@
       "failed": "Failed",
       "canceled": "Canceled",
       "skipped": "Skipped"
-    }
+    },
+    "repositoryIssue": "{provider} issue"
   },
   "documents": {
     "title": "Docs",

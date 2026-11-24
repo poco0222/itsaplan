@@ -460,7 +460,8 @@
       "failed": "Gagal",
       "canceled": "Dibatalkan",
       "skipped": "Dilewati"
-    }
+    },
+    "repositoryIssue": "Issue {provider}"
   },
   "documents": {
     "title": "Dokumen",

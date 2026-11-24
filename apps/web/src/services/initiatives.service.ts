@@ -15,6 +15,7 @@ import {
   listFavoriteInitiatives,
   listInitiativeDeliveryProgress,
   listInitiativeOptions,
+  searchInitiatives,
   initiativeCounts,
   getInitiative,
   setInitiativeFavorite,
@@ -60,6 +61,24 @@ export function useInitiativeOptionsQuery(
     queryFn: () => listInitiativeOptions(projectKey!, params),
     enabled: projectKey != null,
     placeholderData: keepPreviousData,
+  });
+}
+
+// The palette's initiative search, in one project or, with a null projectId, in every
+// project. The previous hits stay on screen while only the term changes; hits from the
+// other scope never show in this one.
+export function useInitiativeSearchQuery(
+  q: string,
+  projectId: number | null,
+  opts: { enabled: boolean },
+) {
+  const term = q.trim();
+  return useQuery({
+    queryKey: qk.initiativeSearch(term, projectId),
+    queryFn: () => searchInitiatives({ q: term, projectId: projectId ?? undefined }),
+    enabled: opts.enabled && term.length > 0,
+    placeholderData: (previous, previousQuery) =>
+      previousQuery?.queryKey[2] === projectId ? previous : undefined,
   });
 }
 

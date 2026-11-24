@@ -460,7 +460,8 @@
       "failed": "فشل",
       "canceled": "ملغي",
       "skipped": "تم تخطيه"
-    }
+    },
+    "repositoryIssue": "مهمة {provider}"
   },
   "documents": {
     "title": "المستندات",

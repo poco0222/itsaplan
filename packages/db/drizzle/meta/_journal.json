@@ -1387,6 +1387,20 @@
       "when": 1795397577864,
       "tag": "0197_plan_delivery_hierarchy",
       "breakpoints": true
+    },
+    {
+      "idx": 198,
+      "version": "7",
+      "when": 1795439535540,
+      "tag": "0198_showcase_seen",
+      "breakpoints": true
+    },
+    {
+      "idx": 199,
+      "version": "7",
+      "when": 1795454110776,
+      "tag": "0199_git_issue_sync",
+      "breakpoints": true
     }
   ]
 }
