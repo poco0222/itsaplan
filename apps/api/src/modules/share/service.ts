@@ -49,7 +49,7 @@ import { projectSharingEnabled } from '#modules/workspaces/service';
 // project belongs to, whose name is the owner's username.
 export interface ShareScaffold {
   project: Omit<ProjectRow, 'teamId' | 'teamName'>;
-  columns: Awaited<ReturnType<typeof listColumns>>;
+  columns: Omit<Awaited<ReturnType<typeof listColumns>>[number], 'fieldUpdates'>[];
   issueTypes: Awaited<ReturnType<typeof listIssueTypes>>;
   labels: Awaited<ReturnType<typeof listLabels>>;
   labelGroups: Awaited<ReturnType<typeof listLabelGroups>>;
@@ -103,7 +103,7 @@ async function buildScaffold(project: ProjectRow, extended: boolean): Promise<Sh
   const { teamId: _teamId, teamName: _teamName, ...publicProject } = project;
   return {
     project: publicProject,
-    columns,
+    columns: columns.map(({ fieldUpdates: _rules, ...column }) => column),
     issueTypes,
     labels,
     labelGroups,

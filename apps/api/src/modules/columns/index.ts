@@ -70,7 +70,8 @@ export const columnRoutes = new Elysia({ name: 'columns', detail: { tags: ['Colu
       response: { 200: ColumnResponse, ...commonErrors },
       detail: {
         summary: 'Update a column',
-        description: "Update a column's name, state type, color, WIP limit or auto-assignee.",
+        description:
+          "Update a column's name, state type, color, WIP limit, auto-assignee or field updates.",
         ...mcpTool('update_column'),
       },
     },

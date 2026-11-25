@@ -198,6 +198,15 @@
     "days": "天"
   },
   "states": {
+    "fieldUpdates": {
+      "title": "更新字段",
+      "description": "工作项进入「{name}」时，自动更新所选字段。",
+      "add": "添加自定义字段",
+      "remove": "移除「{name}」",
+      "number": "固定数值",
+      "timeZone": "状态变更日期的时区",
+      "empty": "请先在「自定义字段」中添加数字或日期字段。"
+    },
     "addState": "添加{type}状态",
     "emptyTitle": "暂无{type}状态",
     "emptyHint": "为此分组添加工作流状态。",

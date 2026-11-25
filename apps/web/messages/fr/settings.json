@@ -198,6 +198,15 @@
     "days": "jours"
   },
   "states": {
+    "fieldUpdates": {
+      "title": "Mettre à jour les champs",
+      "description": "Mettre à jour les champs sélectionnés lorsqu’un élément passe à l’état {name}.",
+      "add": "Ajouter un champ personnalisé",
+      "remove": "Retirer {name}",
+      "number": "Nombre fixe",
+      "timeZone": "Fuseau horaire de la date de transition",
+      "empty": "Ajoutez d’abord un champ numérique ou de date dans Champs personnalisés."
+    },
     "addState": "Ajouter un état {type}",
     "emptyTitle": "Aucun état {type}",
     "emptyHint": "Ajoutez un état de flux de travail pour ce groupe.",

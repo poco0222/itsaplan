@@ -198,6 +198,15 @@
     "days": "days"
   },
   "states": {
+    "fieldUpdates": {
+      "title": "Update fields",
+      "description": "Update the selected fields when a work item enters {name}.",
+      "add": "Add a custom field",
+      "remove": "Remove {name}",
+      "number": "Fixed number",
+      "timeZone": "Transition date time zone",
+      "empty": "Add a number or date field in Custom fields first."
+    },
     "addState": "Add {type} state",
     "emptyTitle": "No {type} states",
     "emptyHint": "Add a workflow state for this group.",

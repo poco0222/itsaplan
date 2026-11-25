@@ -10,6 +10,18 @@ export const stateType = t.Union([
 
 export const columnParams = t.Object({ projectKey: t.String(), columnId: t.Numeric() });
 
+const statusFieldUpdates = t.Array(
+  t.Union([
+    t.Object({ type: t.Literal('number'), fieldId: t.Integer({ minimum: 1 }), value: t.Number() }),
+    t.Object({
+      type: t.Literal('date'),
+      fieldId: t.Integer({ minimum: 1 }),
+      timeZone: t.String({ minLength: 1, maxLength: 100 }),
+    }),
+  ]),
+  { maxItems: 100 },
+);
+
 export const ColumnResponse = t.Object({
   id: t.Number(),
   projectId: t.Number(),
@@ -20,6 +32,7 @@ export const ColumnResponse = t.Object({
   wipLimit: t.Union([t.Number(), t.Null()]),
   wipMode: t.String(),
   autoAssignUserId: t.Union([t.String(), t.Null()]),
+  fieldUpdates: statusFieldUpdates,
 });
 
 export const ColumnListResponse = t.Array(ColumnResponse);
@@ -53,6 +66,7 @@ export const createColumnBody = t.Object({
       }),
     ),
   ),
+  fieldUpdates: t.Optional(statusFieldUpdates),
 });
 
 export const updateColumnBody = t.Partial(createColumnBody);

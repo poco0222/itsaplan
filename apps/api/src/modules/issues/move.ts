@@ -187,6 +187,8 @@ export async function moveIssue(
           .update(issueFieldValue)
           .set({
             fieldId: v.fieldId,
+            restoreOnReopen: false,
+            numberBeforeCompletion: null,
             ...(v.valueUserId ? { valueUserId: member(v.valueUserId) } : {}),
           })
           .where(eq(issueFieldValue.id, v.id));

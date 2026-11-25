@@ -182,6 +182,15 @@
     "days": "giorni"
   },
   "states": {
+    "fieldUpdates": {
+      "title": "Aggiorna i campi",
+      "description": "Aggiorna i campi selezionati quando un elemento passa a {name}.",
+      "add": "Aggiungi un campo personalizzato",
+      "remove": "Rimuovi {name}",
+      "number": "Numero fisso",
+      "timeZone": "Fuso orario della data di transizione",
+      "empty": "Aggiungi prima un campo numerico o di data in Campi personalizzati."
+    },
     "addState": "Aggiungi stato {type}",
     "emptyTitle": "Nessuno stato {type}",
     "emptyHint": "Aggiungi uno stato di workflow per questo gruppo.",

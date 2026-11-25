@@ -1,6 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Pencil, Trash2, UserPlus } from 'lucide-react';
+import { GripVertical, ListChecks, Pencil, Trash2, UserPlus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { Column } from '@/lib/api/endpoints/columns';
 import type { Assignee } from '@/lib/api/endpoints/projects';
@@ -19,12 +19,14 @@ export function SettingsStateRow({
   autoAssignee,
   deletable,
   onEdit,
+  onEditFieldUpdates,
   onDelete,
 }: {
   column: Column;
   autoAssignee?: Assignee;
   deletable: boolean;
   onEdit: () => void;
+  onEditFieldUpdates: () => void;
   onDelete: () => void;
 }) {
   const t = useTranslations('settings.states');
@@ -86,7 +88,20 @@ export function SettingsStateRow({
             : t('wip.badgeSoft', { limit: column.wipLimit })}
         </span>
       )}
-      <ItemActions className="opacity-0 group-hover/item:opacity-100">
+      {canEdit && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className={cn('h-7', !column.fieldUpdates?.length && 'text-muted-foreground')}
+          aria-label={t('fieldUpdates.title')}
+          title={t('fieldUpdates.title')}
+          onClick={onEditFieldUpdates}
+        >
+          <ListChecks className="size-4" />
+          <span className="hidden sm:inline">{t('fieldUpdates.title')}</span>
+        </Button>
+      )}
+      <ItemActions className="opacity-0 group-focus-within/item:opacity-100 group-hover/item:opacity-100">
         {canEdit && (
           <Button
             variant="ghost"

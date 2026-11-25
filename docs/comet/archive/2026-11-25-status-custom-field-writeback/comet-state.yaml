@@ -1,0 +1,2314 @@
+# comet-execution: managed-run
+schema: comet.native.v4
+name: status-custom-field-writeback
+language: en
+phase: archive
+status: done
+state_version: 8
+brief: brief.md
+document_constraints_version: 3
+spec_changes:
+  - capability: status-custom-field-writeback
+    operation: create
+    source: specs/status-custom-field-writeback/spec.md
+workspace:
+  isolation: current
+  change_branch: main
+  target_branch: main
+  finish: null
+loop:
+  stage: done
+  goal_cycle: 1
+  iteration: 1
+  attempt: 1
+  retry_epoch: 0
+  failed_iteration_count: 0
+  no_progress_count: 0
+  execution_failure_count: 0
+  previous_unresolved_ids: []
+  next_action: null
+acceptance:
+  - id: A1
+    source: brief.md
+    text: A user with project status settings access can save and remove number and
+      date rules for a selected status. Reloading retains the saved rules.
+      Invalid field types, fields from other projects, and unauthorized edits
+      are rejected.
+    result: passed
+    reason:
+      text: Chrome saved and reloaded the two rules. PostgreSQL-backed API tests cover
+        clearing rules, wrong field type, foreign field, duplicate rule, invalid
+        timezone and a 403 for a nonmember.
+      truncated: false
+  - id: A2
+    source: brief.md
+    text: After configuring ROLL, moving an eligible item to 已完成 saves `100` and the
+      date of the transition in Asia/Taipei. The saved values appear in work
+      item details and the custom field API after reload. The weight value is
+      preserved.
+    result: passed
+    reason:
+      text: The Chrome test project's item detail showed progress 100, local
+        completion date Nov 25, 2026, and unchanged weight 40 after completion.
+        API detail independently returned the stored number and date.
+      truncated: false
+  - id: A3
+    source: brief.md
+    text: Matching transitions from detail, table, Kanban, API, and the delivery
+      workflow apply the same rules. Rejected transitions and edits that retain
+      the same status preserve the stored field values.
+    result: passed
+    reason:
+      text: Single and bulk API edits and automatic delivery parent completion
+        persisted the configured values. Detail, table and board status edits
+        reach the same service and SQL transition. Tests cover rejected managed
+        completion and saving an unchanged status. Chrome verified the detail
+        transition.
+      truncated: false
+  - id: A4
+    source: brief.md
+    text: Reopening a completed item restores its original number, including a blank
+      value, and clears the date written by the completion rule. The next
+      completion writes its own date. The plan recalculates from the reopened
+      item's effective progress.
+    result: passed
+    reason:
+      text: Chrome reopened the item and showed 60 and a blank date. API regressions
+        restored both 60 and an initially blank value, refreshed the date on a
+        later close, and verified the weighted plan returned to 0% after
+        reopening its formerly blank node.
+      truncated: false
+  - id: A5
+    source: brief.md
+    text: Enabling a rule leaves existing data as stored until a matching transition
+      occurs. Projects without rules retain their current behavior.
+    result: passed
+    reason:
+      text: The no-config delivery and state regressions passed. An issue completed
+        before configuration retained both null fields after configuration and a
+        same-status edit. The trigger applies only to actual same-project status
+        transitions.
+      truncated: false
+builder_handoff:
+  candidate_id: status-custom-field-writeback:3
+  identity_provider: skill-coordinated
+  builder_execution_ref: 01a2100e-bfe6-7d13-a98c-03b6137a680c
+  iteration: 1
+  summary:
+    text: Project status settings save number and local-date rules. PostgreSQL
+      applies them on status transitions and restores captured values when
+      reopening. API, browser and repository checks passed.
+    truncated: false
+  addressed_acceptance_ids:
+    - A1
+    - A2
+    - A3
+    - A4
+    - A5
+  checks:
+    - name:
+        text: PostgreSQL migration
+        truncated: false
+      result: passed
+      note:
+        text: From /Users/poco/Projects/itsaplan, SKIP_PRE_MIGRATION_BACKUP=1 bun
+          --env-file=/tmp/itsaplan-status-fields-final.env
+          packages/db/src/migrate.ts applied 0201 on a fresh isolated PostgreSQL
+          17 test database.
+        truncated: false
+      acceptance_ids:
+        - A2
+        - A3
+        - A4
+        - A5
+    - name:
+        text: API integration regressions
+        truncated: false
+      result: passed
+      note:
+        text: From apps/api, ran bun test
+          --env-file=/tmp/itsaplan-status-fields-final.env --timeout 15000 for
+          columns, delivery, issue moves and sharing with isolated PostgreSQL
+          and RustFS. 142 passed, 0 failed. Log
+          /tmp/itsaplan-status-fields-api.log.
+        truncated: false
+      acceptance_ids:
+        - A1
+        - A2
+        - A3
+        - A4
+        - A5
+    - name:
+        text: Web table, Kanban and plan regressions
+        truncated: false
+      result: passed
+      note:
+        text: From apps/web, bun test for TableRowSubtasks.test.tsx,
+          IssueCardSubtasks.test.tsx and InitiativeDeliveryProgress.test.tsx. 6
+          passed, 0 failed. Log /tmp/itsaplan-status-fields-web.log.
+        truncated: false
+      acceptance_ids:
+        - A3
+        - A4
+    - name:
+        text: Chrome extension acceptance
+        truncated: false
+      result: passed
+      note:
+        text: In the isolated local project at localhost:3101, saved and reloaded the
+          Done rules for progress 100 and Asia/Taipei. The test issue moved from
+          In Progress to Done and back. Detail values were 60/empty/40, then
+          100/Nov 25, 2026/40, then 60/empty/40.
+        truncated: false
+      acceptance_ids:
+        - A1
+        - A2
+        - A3
+        - A4
+    - name:
+        text: Workspace validation
+        truncated: false
+      result: passed
+      note:
+        text: From repository root, bun run typecheck, bun run lint, Prettier on changed
+          source and locale files, and git diff --check passed. Logs
+          /tmp/itsaplan-status-fields-typecheck.log and
+          /tmp/itsaplan-status-fields-lint.log.
+        truncated: false
+      acceptance_ids:
+        - A1
+        - A2
+        - A3
+        - A4
+        - A5
+    - name:
+        text: Focused code and security review
+        truncated: false
+      result: passed
+      note:
+        text: Checked workflow entry paths, migration trigger order, atomic restore,
+          permission guards, typed project-scoped field validation and public
+          link redaction. No unresolved findings in the reviewed changes.
+        truncated: false
+      acceptance_ids:
+        - A1
+        - A2
+        - A3
+        - A4
+        - A5
+  checks_truncated: false
+  known_limits:
+    - text: Verification used a disposable local ROLL project. Deployment and
+        historical backfill are outside this change.
+      truncated: false
+  known_limits_truncated: false
+  review: null
+  submitted_at: 2026-11-25T00:25:00.510Z
+blockers: []
+verification:
+  candidate_id: status-custom-field-writeback:3
+  identity_provider: skill-coordinated
+  verifier_execution_ref: 01a2100e-bfe6-7d13-a98c-03b6137a680c
+  iteration: 1
+  attempt: 1
+  assurance: self-reviewed
+  verdict: pass
+  checks: []
+  reported_checks:
+    - name:
+        text: PostgreSQL migration
+        truncated: false
+      result: passed
+      note:
+        text: From /Users/poco/Projects/itsaplan, SKIP_PRE_MIGRATION_BACKUP=1 bun
+          --env-file=/tmp/itsaplan-status-fields-final.env
+          packages/db/src/migrate.ts applied 0201 on a fresh isolated PostgreSQL
+          17 test database.
+        truncated: false
+      acceptance_ids:
+        - A2
+        - A3
+        - A4
+        - A5
+    - name:
+        text: API integration regressions
+        truncated: false
+      result: passed
+      note:
+        text: From apps/api, ran bun test
+          --env-file=/tmp/itsaplan-status-fields-final.env --timeout 15000 for
+          columns, delivery, issue moves and sharing with isolated PostgreSQL
+          and RustFS. 142 passed, 0 failed. Log
+          /tmp/itsaplan-status-fields-api.log.
+        truncated: false
+      acceptance_ids:
+        - A1
+        - A2
+        - A3
+        - A4
+        - A5
+    - name:
+        text: Web table, Kanban and plan regressions
+        truncated: false
+      result: passed
+      note:
+        text: From apps/web, bun test for TableRowSubtasks.test.tsx,
+          IssueCardSubtasks.test.tsx and InitiativeDeliveryProgress.test.tsx. 6
+          passed, 0 failed. Log /tmp/itsaplan-status-fields-web.log.
+        truncated: false
+      acceptance_ids:
+        - A3
+        - A4
+    - name:
+        text: Chrome extension acceptance
+        truncated: false
+      result: passed
+      note:
+        text: In the isolated local project at localhost:3101, saved and reloaded the
+          Done rules for progress 100 and Asia/Taipei. The test issue moved from
+          In Progress to Done and back. Detail values were 60/empty/40, then
+          100/Nov 25, 2026/40, then 60/empty/40.
+        truncated: false
+      acceptance_ids:
+        - A1
+        - A2
+        - A3
+        - A4
+    - name:
+        text: Workspace validation
+        truncated: false
+      result: passed
+      note:
+        text: From repository root, bun run typecheck, bun run lint, Prettier on changed
+          source and locale files, and git diff --check passed. Logs
+          /tmp/itsaplan-status-fields-typecheck.log and
+          /tmp/itsaplan-status-fields-lint.log.
+        truncated: false
+      acceptance_ids:
+        - A1
+        - A2
+        - A3
+        - A4
+        - A5
+    - name:
+        text: Focused code and security review
+        truncated: false
+      result: passed
+      note:
+        text: Checked workflow entry paths, migration trigger order, atomic restore,
+          permission guards, typed project-scoped field validation and public
+          link redaction. No unresolved findings in the reviewed changes.
+        truncated: false
+      acceptance_ids:
+        - A1
+        - A2
+        - A3
+        - A4
+        - A5
+  summary:
+    text: All five criteria passed. The isolated Chrome scenario confirmed saved
+      rules and 60 → 100 → 60, a completion date only while completed, and
+      preserved weight 40. The API and web regression suites passed.
+    truncated: false
+  risks:
+    - text: Verification used desktop Chrome and disposable local test data.
+        Deployment and historical backfill are outside the approved scope.
+      truncated: false
+  risks_truncated: false
+  completed_at: 2026-11-25T00:25:10.070Z
+history:
+  - goal_cycle: 1
+    iteration: 1
+    attempt: 1
+    outcome: pass
+    unresolved_ids: []
+    summary:
+      text: All five criteria passed. The isolated Chrome scenario confirmed saved
+        rules and 60 → 100 → 60, a completion date only while completed, and
+        preserved weight 40. The API and web regression suites passed.
+      truncated: false
+    completed_at: 2026-11-25T00:25:10.070Z
+history_overflow:
+  dropped_entries: 0
+  first_dropped_at: null
+  last_dropped_at: null
+  outcome_counts:
+    pass: 0
+    fail: 0
+    blocked: 0
+    execution-error: 0
+    recovery: 0
+verification_result: pass
+verification_report: verification.md
+archived: true
+created_at: 2026-11-25T00:16:38.939Z
+archive_receipt:
+  runId: status-custom-field-writeback
+  change: status-custom-field-writeback
+  archiveRef: 2026-11-25-status-custom-field-writeback
+  transactionId: a57ca9ea-e753-4443-a36f-55befb16b137
+  stateVersion: 8
+  specs:
+    - capability: status-custom-field-writeback
+      operation: create
+run_checkpoint:
+  {
+    'schema': 'comet.workflow-run-checkpoint.v2',
+    'hash': 'f008c2063d341c1b55c6861116044fa4ab1e3be42d57b0dcfc0dfb3e67dab773',
+    'run':
+      {
+        'protocolVersion': 1,
+        'schemaVersion': 1,
+        'runId': 'status-custom-field-writeback',
+        'revision': 1,
+        'workflow':
+          {
+            'id': 'comet-native',
+            'version': '4',
+            'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+          },
+        'definitionHashes':
+          {
+            '["comet-native","4"]': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+          },
+        'initialStateHash': '227b62869dfbff157a37fa2d7bb16566ffadefa99c3ef31d429e3fe7e75076c9',
+        'input':
+          {
+            'artifactRootRef': 'docs',
+            'name': 'status-custom-field-writeback',
+            'task': '按理来说, 如果我更改状态为已完成, 这两个数据要给我回写的, 虽然是自定义字段, 但至少要支持可配置吧, 比如说自带的状态属性更改时, 自定义字段怎么处理, 这种功能是可以加的吧, 原生支持吗?',
+          },
+        'state':
+          {
+            'acceptance':
+              [
+                {
+                  'id': 'A1',
+                  'reason':
+                    {
+                      'text': 'Chrome saved and reloaded the two rules. PostgreSQL-backed API tests cover clearing rules, wrong field type, foreign field, duplicate rule, invalid timezone and a 403 for a nonmember.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'A user with project status settings access can save and remove number and date rules for a selected status. Reloading retains the saved rules. Invalid field types, fields from other projects, and unauthorized edits are rejected.',
+                },
+                {
+                  'id': 'A2',
+                  'reason':
+                    {
+                      'text': "The Chrome test project's item detail showed progress 100, local completion date Nov 25, 2026, and unchanged weight 40 after completion. API detail independently returned the stored number and date.",
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'After configuring ROLL, moving an eligible item to 已完成 saves `100` and the date of the transition in Asia/Taipei. The saved values appear in work item details and the custom field API after reload. The weight value is preserved.',
+                },
+                {
+                  'id': 'A3',
+                  'reason':
+                    {
+                      'text': 'Single and bulk API edits and automatic delivery parent completion persisted the configured values. Detail, table and board status edits reach the same service and SQL transition. Tests cover rejected managed completion and saving an unchanged status. Chrome verified the detail transition.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'Matching transitions from detail, table, Kanban, API, and the delivery workflow apply the same rules. Rejected transitions and edits that retain the same status preserve the stored field values.',
+                },
+                {
+                  'id': 'A4',
+                  'reason':
+                    {
+                      'text': 'Chrome reopened the item and showed 60 and a blank date. API regressions restored both 60 and an initially blank value, refreshed the date on a later close, and verified the weighted plan returned to 0% after reopening its formerly blank node.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': "Reopening a completed item restores its original number, including a blank value, and clears the date written by the completion rule. The next completion writes its own date. The plan recalculates from the reopened item's effective progress.",
+                },
+                {
+                  'id': 'A5',
+                  'reason':
+                    {
+                      'text': 'The no-config delivery and state regressions passed. An issue completed before configuration retained both null fields after configuration and a same-status edit. The trigger applies only to actual same-project status transitions.',
+                      'truncated': false,
+                    },
+                  'result': 'passed',
+                  'source': 'brief.md',
+                  'text': 'Enabling a rule leaves existing data as stored until a matching transition occurs. Projects without rules retain their current behavior.',
+                },
+              ],
+            'archived': true,
+            'blockers': [],
+            'brief': 'brief.md',
+            'builder_handoff':
+              {
+                'addressed_acceptance_ids': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                'builder_execution_ref': '01a2100e-bfe6-7d13-a98c-03b6137a680c',
+                'candidate_id': 'status-custom-field-writeback:3',
+                'checks':
+                  [
+                    {
+                      'acceptance_ids': ['A2', 'A3', 'A4', 'A5'],
+                      'name': { 'text': 'PostgreSQL migration', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'From /Users/poco/Projects/itsaplan, SKIP_PRE_MIGRATION_BACKUP=1 bun --env-file=/tmp/itsaplan-status-fields-final.env packages/db/src/migrate.ts applied 0201 on a fresh isolated PostgreSQL 17 test database.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'acceptance_ids': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                      'name': { 'text': 'API integration regressions', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'From apps/api, ran bun test --env-file=/tmp/itsaplan-status-fields-final.env --timeout 15000 for columns, delivery, issue moves and sharing with isolated PostgreSQL and RustFS. 142 passed, 0 failed. Log /tmp/itsaplan-status-fields-api.log.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'acceptance_ids': ['A3', 'A4'],
+                      'name':
+                        { 'text': 'Web table, Kanban and plan regressions', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'From apps/web, bun test for TableRowSubtasks.test.tsx, IssueCardSubtasks.test.tsx and InitiativeDeliveryProgress.test.tsx. 6 passed, 0 failed. Log /tmp/itsaplan-status-fields-web.log.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'acceptance_ids': ['A1', 'A2', 'A3', 'A4'],
+                      'name': { 'text': 'Chrome extension acceptance', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'In the isolated local project at localhost:3101, saved and reloaded the Done rules for progress 100 and Asia/Taipei. The test issue moved from In Progress to Done and back. Detail values were 60/empty/40, then 100/Nov 25, 2026/40, then 60/empty/40.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'acceptance_ids': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                      'name': { 'text': 'Workspace validation', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'From repository root, bun run typecheck, bun run lint, Prettier on changed source and locale files, and git diff --check passed. Logs /tmp/itsaplan-status-fields-typecheck.log and /tmp/itsaplan-status-fields-lint.log.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'acceptance_ids': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                      'name': { 'text': 'Focused code and security review', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'Checked workflow entry paths, migration trigger order, atomic restore, permission guards, typed project-scoped field validation and public link redaction. No unresolved findings in the reviewed changes.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                  ],
+                'checks_truncated': false,
+                'identity_provider': 'skill-coordinated',
+                'iteration': 1,
+                'known_limits':
+                  [
+                    {
+                      'text': 'Verification used a disposable local ROLL project. Deployment and historical backfill are outside this change.',
+                      'truncated': false,
+                    },
+                  ],
+                'known_limits_truncated': false,
+                'review': null,
+                'submitted_at': '2026-11-25T00:25:00.510Z',
+                'summary':
+                  {
+                    'text': 'Project status settings save number and local-date rules. PostgreSQL applies them on status transitions and restores captured values when reopening. API, browser and repository checks passed.',
+                    'truncated': false,
+                  },
+              },
+            'created_at': '2026-11-25T00:16:38.939Z',
+            'document_constraints_version': 3,
+            'history':
+              [
+                {
+                  'attempt': 1,
+                  'completed_at': '2026-11-25T00:25:10.070Z',
+                  'goal_cycle': 1,
+                  'iteration': 1,
+                  'outcome': 'pass',
+                  'summary':
+                    {
+                      'text': 'All five criteria passed. The isolated Chrome scenario confirmed saved rules and 60 → 100 → 60, a completion date only while completed, and preserved weight 40. The API and web regression suites passed.',
+                      'truncated': false,
+                    },
+                  'unresolved_ids': [],
+                },
+              ],
+            'history_overflow':
+              {
+                'dropped_entries': 0,
+                'first_dropped_at': null,
+                'last_dropped_at': null,
+                'outcome_counts':
+                  { 'blocked': 0, 'execution-error': 0, 'fail': 0, 'pass': 0, 'recovery': 0 },
+              },
+            'language': 'en',
+            'loop':
+              {
+                'attempt': 1,
+                'execution_failure_count': 0,
+                'failed_iteration_count': 0,
+                'goal_cycle': 1,
+                'iteration': 1,
+                'next_action': null,
+                'no_progress_count': 0,
+                'previous_unresolved_ids': [],
+                'retry_epoch': 0,
+                'stage': 'done',
+              },
+            'name': 'status-custom-field-writeback',
+            'phase': 'archive',
+            'schema': 'comet.native.v4',
+            'spec_changes':
+              [
+                {
+                  'capability': 'status-custom-field-writeback',
+                  'operation': 'create',
+                  'source': 'specs/status-custom-field-writeback/spec.md',
+                },
+              ],
+            'state_version': 8,
+            'status': 'done',
+            'verification':
+              {
+                'assurance': 'self-reviewed',
+                'attempt': 1,
+                'candidate_id': 'status-custom-field-writeback:3',
+                'checks': [],
+                'completed_at': '2026-11-25T00:25:10.070Z',
+                'identity_provider': 'skill-coordinated',
+                'iteration': 1,
+                'reported_checks':
+                  [
+                    {
+                      'acceptance_ids': ['A2', 'A3', 'A4', 'A5'],
+                      'name': { 'text': 'PostgreSQL migration', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'From /Users/poco/Projects/itsaplan, SKIP_PRE_MIGRATION_BACKUP=1 bun --env-file=/tmp/itsaplan-status-fields-final.env packages/db/src/migrate.ts applied 0201 on a fresh isolated PostgreSQL 17 test database.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'acceptance_ids': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                      'name': { 'text': 'API integration regressions', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'From apps/api, ran bun test --env-file=/tmp/itsaplan-status-fields-final.env --timeout 15000 for columns, delivery, issue moves and sharing with isolated PostgreSQL and RustFS. 142 passed, 0 failed. Log /tmp/itsaplan-status-fields-api.log.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'acceptance_ids': ['A3', 'A4'],
+                      'name':
+                        { 'text': 'Web table, Kanban and plan regressions', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'From apps/web, bun test for TableRowSubtasks.test.tsx, IssueCardSubtasks.test.tsx and InitiativeDeliveryProgress.test.tsx. 6 passed, 0 failed. Log /tmp/itsaplan-status-fields-web.log.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'acceptance_ids': ['A1', 'A2', 'A3', 'A4'],
+                      'name': { 'text': 'Chrome extension acceptance', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'In the isolated local project at localhost:3101, saved and reloaded the Done rules for progress 100 and Asia/Taipei. The test issue moved from In Progress to Done and back. Detail values were 60/empty/40, then 100/Nov 25, 2026/40, then 60/empty/40.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'acceptance_ids': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                      'name': { 'text': 'Workspace validation', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'From repository root, bun run typecheck, bun run lint, Prettier on changed source and locale files, and git diff --check passed. Logs /tmp/itsaplan-status-fields-typecheck.log and /tmp/itsaplan-status-fields-lint.log.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                    {
+                      'acceptance_ids': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                      'name': { 'text': 'Focused code and security review', 'truncated': false },
+                      'note':
+                        {
+                          'text': 'Checked workflow entry paths, migration trigger order, atomic restore, permission guards, typed project-scoped field validation and public link redaction. No unresolved findings in the reviewed changes.',
+                          'truncated': false,
+                        },
+                      'result': 'passed',
+                    },
+                  ],
+                'risks':
+                  [
+                    {
+                      'text': 'Verification used desktop Chrome and disposable local test data. Deployment and historical backfill are outside the approved scope.',
+                      'truncated': false,
+                    },
+                  ],
+                'risks_truncated': false,
+                'summary':
+                  {
+                    'text': 'All five criteria passed. The isolated Chrome scenario confirmed saved rules and 60 → 100 → 60, a completion date only while completed, and preserved weight 40. The API and web regression suites passed.',
+                    'truncated': false,
+                  },
+                'verdict': 'pass',
+                'verifier_execution_ref': '01a2100e-bfe6-7d13-a98c-03b6137a680c',
+              },
+            'verification_report': 'verification.md',
+            'verification_result': 'pass',
+            'workspace':
+              {
+                'change_branch': 'main',
+                'finish': null,
+                'isolation': 'current',
+                'target_branch': 'main',
+              },
+          },
+        'status': 'completed',
+        'sequence': 8,
+        'actions':
+          [
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a2100e-bfe6-7d13-a98c-03b6137a680c',
+                  'token': 'portable-a168413efd7e5dc143e3c2f36f352bccffce9d8587aea5122d6ad2b0c6056b0e',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'status-custom-field-writeback:1',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'status-custom-field-writeback',
+                      'task': '按理来说, 如果我更改状态为已完成, 这两个数据要给我回写的, 虽然是自定义字段, 但至少要支持可配置吧, 比如说自带的状态属性更改时, 自定义字段怎么处理, 这种功能是可以加的吧, 原生支持吗?',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '47a0352bf22915e9ae2a3cc76a80fc6e67b923f3edd87027b3783e7e56fc5c32',
+              'outcome':
+                {
+                  'actionId': 'status-custom-field-writeback:1',
+                  'attempt': 1,
+                  'claimToken': 'portable-a168413efd7e5dc143e3c2f36f352bccffce9d8587aea5122d6ad2b0c6056b0e',
+                  'inputHash': '47a0352bf22915e9ae2a3cc76a80fc6e67b923f3edd87027b3783e7e56fc5c32',
+                  'outcomeId': 'native-result-195755a54c84c6e1d0c6902960ff9432672deb29666c9a9a2725a24e0621c5c8',
+                  'output':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'source': 'brief.md',
+                            'text': 'A user with project status settings access can save and remove number and date rules for a selected status. Reloading retains the saved rules. Invalid field types, fields from other projects, and unauthorized edits are rejected.',
+                          },
+                          {
+                            'id': 'A2',
+                            'source': 'brief.md',
+                            'text': 'After configuring ROLL, moving an eligible item to 已完成 saves `100` and the date of the transition in Asia/Taipei. The saved values appear in work item details and the custom field API after reload. The weight value is preserved.',
+                          },
+                          {
+                            'id': 'A3',
+                            'source': 'brief.md',
+                            'text': 'Matching transitions from detail, table, Kanban, API, and the delivery workflow apply the same rules. Rejected transitions and edits that retain the same status preserve the stored field values.',
+                          },
+                          {
+                            'id': 'A4',
+                            'source': 'brief.md',
+                            'text': "Reopening a completed item restores its original number, including a blank value, and clears the date written by the completion rule. The next completion writes its own date. The plan recalculates from the reopened item's effective progress.",
+                          },
+                          {
+                            'id': 'A5',
+                            'source': 'brief.md',
+                            'text': 'Enabling a rule leaves existing data as stored until a matching transition occurs. Projects without rules retain their current behavior.',
+                          },
+                        ],
+                      'children': null,
+                      'specChanges':
+                        [
+                          {
+                            'capability': 'status-custom-field-writeback',
+                            'operation': 'create',
+                            'source': 'specs/status-custom-field-writeback/spec.md',
+                          },
+                        ],
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '31b265966311141ac302f7d94937236a288ba7f8746a119c4f4861d1ecf9cae5',
+                    'outcomeId': 'native-result-195755a54c84c6e1d0c6902960ff9432672deb29666c9a9a2725a24e0621c5c8',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-shape-prepare',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'status-custom-field-writeback',
+              'status': 'succeeded',
+              'stepId': 'shape.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a2100e-bfe6-7d13-a98c-03b6137a680c',
+                  'token': 'portable-5f7697dbd97497cc5c29967508bc80f034ec826d377b1d379db6f7772f9b5125',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'status-custom-field-writeback:3',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'status-custom-field-writeback',
+                      'task': '按理来说, 如果我更改状态为已完成, 这两个数据要给我回写的, 虽然是自定义字段, 但至少要支持可配置吧, 比如说自带的状态属性更改时, 自定义字段怎么处理, 这种功能是可以加的吧, 原生支持吗?',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '803d6150e94d6ed4c36b8fa88f0d3afc3d7ef18cf0332d2315b423977f09307e',
+              'outcome':
+                {
+                  'actionId': 'status-custom-field-writeback:3',
+                  'attempt': 1,
+                  'claimToken': 'portable-5f7697dbd97497cc5c29967508bc80f034ec826d377b1d379db6f7772f9b5125',
+                  'inputHash': '803d6150e94d6ed4c36b8fa88f0d3afc3d7ef18cf0332d2315b423977f09307e',
+                  'outcomeId': 'native-result-1265484e112c6683cddc31db8fc0585bb727eb449d3a036e7117fd59806a529c',
+                  'output':
+                    {
+                      'addressedAcceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                      'checks':
+                        [
+                          {
+                            'acceptanceIds': ['A2', 'A3', 'A4', 'A5'],
+                            'name': 'PostgreSQL migration',
+                            'note': 'From /Users/poco/Projects/itsaplan, SKIP_PRE_MIGRATION_BACKUP=1 bun --env-file=/tmp/itsaplan-status-fields-final.env packages/db/src/migrate.ts applied 0201 on a fresh isolated PostgreSQL 17 test database.',
+                            'result': 'passed',
+                          },
+                          {
+                            'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                            'name': 'API integration regressions',
+                            'note': 'From apps/api, ran bun test --env-file=/tmp/itsaplan-status-fields-final.env --timeout 15000 for columns, delivery, issue moves and sharing with isolated PostgreSQL and RustFS. 142 passed, 0 failed. Log /tmp/itsaplan-status-fields-api.log.',
+                            'result': 'passed',
+                          },
+                          {
+                            'acceptanceIds': ['A3', 'A4'],
+                            'name': 'Web table, Kanban and plan regressions',
+                            'note': 'From apps/web, bun test for TableRowSubtasks.test.tsx, IssueCardSubtasks.test.tsx and InitiativeDeliveryProgress.test.tsx. 6 passed, 0 failed. Log /tmp/itsaplan-status-fields-web.log.',
+                            'result': 'passed',
+                          },
+                          {
+                            'acceptanceIds': ['A1', 'A2', 'A3', 'A4'],
+                            'name': 'Chrome extension acceptance',
+                            'note': 'In the isolated local project at localhost:3101, saved and reloaded the Done rules for progress 100 and Asia/Taipei. The test issue moved from In Progress to Done and back. Detail values were 60/empty/40, then 100/Nov 25, 2026/40, then 60/empty/40.',
+                            'result': 'passed',
+                          },
+                          {
+                            'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                            'name': 'Workspace validation',
+                            'note': 'From repository root, bun run typecheck, bun run lint, Prettier on changed source and locale files, and git diff --check passed. Logs /tmp/itsaplan-status-fields-typecheck.log and /tmp/itsaplan-status-fields-lint.log.',
+                            'result': 'passed',
+                          },
+                          {
+                            'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                            'name': 'Focused code and security review',
+                            'note': 'Checked workflow entry paths, migration trigger order, atomic restore, permission guards, typed project-scoped field validation and public link redaction. No unresolved findings in the reviewed changes.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'knownLimits':
+                        [
+                          'Verification used a disposable local ROLL project. Deployment and historical backfill are outside this change.',
+                        ],
+                      'requireIndependentReview': false,
+                      'summary': 'Project status settings save number and local-date rules. PostgreSQL applies them on status transitions and restores captured values when reopening. API, browser and repository checks passed.',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '64591ed2f177cef8bc6c259bbb870421363c141a6b74189588860b8cddb71fd9',
+                    'outcomeId': 'native-result-1265484e112c6683cddc31db8fc0585bb727eb449d3a036e7117fd59806a529c',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-builder',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'status-custom-field-writeback',
+              'status': 'succeeded',
+              'stepId': 'build.builder',
+              'type': 'handoff',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'native-host',
+                  'sessionId': '01a2100e-bfe6-7d13-a98c-03b6137a680c',
+                  'token': 'portable-bf95f9690485dd34d8782341356b5fd9bf9128743b01649f0c2e3cf46d368aa5',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'status-custom-field-writeback:4',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'status-custom-field-writeback',
+                      'task': '按理来说, 如果我更改状态为已完成, 这两个数据要给我回写的, 虽然是自定义字段, 但至少要支持可配置吧, 比如说自带的状态属性更改时, 自定义字段怎么处理, 这种功能是可以加的吧, 原生支持吗?',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': 'acc2f38baa07caa9dbca707c3cc9ce4e5ee12d1038732b0ce69b692a6c3baebf',
+              'outcome':
+                {
+                  'actionId': 'status-custom-field-writeback:4',
+                  'attempt': 1,
+                  'claimToken': 'portable-bf95f9690485dd34d8782341356b5fd9bf9128743b01649f0c2e3cf46d368aa5',
+                  'inputHash': 'acc2f38baa07caa9dbca707c3cc9ce4e5ee12d1038732b0ce69b692a6c3baebf',
+                  'outcomeId': 'native-result-6518fce1c1f18a8b334235b765de726553a5c261758614cd2ff9d3913d28e72e',
+                  'output':
+                    {
+                      'candidateId': 'status-custom-field-writeback:3',
+                      'checks':
+                        [
+                          {
+                            'acceptanceIds': ['A2', 'A3', 'A4', 'A5'],
+                            'name': 'PostgreSQL migration',
+                            'note': 'From /Users/poco/Projects/itsaplan, SKIP_PRE_MIGRATION_BACKUP=1 bun --env-file=/tmp/itsaplan-status-fields-final.env packages/db/src/migrate.ts applied 0201 on a fresh isolated PostgreSQL 17 test database.',
+                            'result': 'passed',
+                          },
+                          {
+                            'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                            'name': 'API integration regressions',
+                            'note': 'From apps/api, ran bun test --env-file=/tmp/itsaplan-status-fields-final.env --timeout 15000 for columns, delivery, issue moves and sharing with isolated PostgreSQL and RustFS. 142 passed, 0 failed. Log /tmp/itsaplan-status-fields-api.log.',
+                            'result': 'passed',
+                          },
+                          {
+                            'acceptanceIds': ['A3', 'A4'],
+                            'name': 'Web table, Kanban and plan regressions',
+                            'note': 'From apps/web, bun test for TableRowSubtasks.test.tsx, IssueCardSubtasks.test.tsx and InitiativeDeliveryProgress.test.tsx. 6 passed, 0 failed. Log /tmp/itsaplan-status-fields-web.log.',
+                            'result': 'passed',
+                          },
+                          {
+                            'acceptanceIds': ['A1', 'A2', 'A3', 'A4'],
+                            'name': 'Chrome extension acceptance',
+                            'note': 'In the isolated local project at localhost:3101, saved and reloaded the Done rules for progress 100 and Asia/Taipei. The test issue moved from In Progress to Done and back. Detail values were 60/empty/40, then 100/Nov 25, 2026/40, then 60/empty/40.',
+                            'result': 'passed',
+                          },
+                          {
+                            'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                            'name': 'Workspace validation',
+                            'note': 'From repository root, bun run typecheck, bun run lint, Prettier on changed source and locale files, and git diff --check passed. Logs /tmp/itsaplan-status-fields-typecheck.log and /tmp/itsaplan-status-fields-lint.log.',
+                            'result': 'passed',
+                          },
+                          {
+                            'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                            'name': 'Focused code and security review',
+                            'note': 'Checked workflow entry paths, migration trigger order, atomic restore, permission guards, typed project-scoped field validation and public link redaction. No unresolved findings in the reviewed changes.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'response':
+                        {
+                          'kind': 'final-result',
+                          'result':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'reason': 'Chrome saved and reloaded the two rules. PostgreSQL-backed API tests cover clearing rules, wrong field type, foreign field, duplicate rule, invalid timezone and a 403 for a nonmember.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'reason': "The Chrome test project's item detail showed progress 100, local completion date Nov 25, 2026, and unchanged weight 40 after completion. API detail independently returned the stored number and date.",
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'reason': 'Single and bulk API edits and automatic delivery parent completion persisted the configured values. Detail, table and board status edits reach the same service and SQL transition. Tests cover rejected managed completion and saving an unchanged status. Chrome verified the detail transition.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A4',
+                                    'reason': 'Chrome reopened the item and showed 60 and a blank date. API regressions restored both 60 and an initially blank value, refreshed the date on a later close, and verified the weighted plan returned to 0% after reopening its formerly blank node.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'id': 'A5',
+                                    'reason': 'The no-config delivery and state regressions passed. An issue completed before configuration retained both null fields after configuration and a same-status edit. The trigger applies only to actual same-project status transitions.',
+                                    'result': 'passed',
+                                  },
+                                ],
+                              'attempt': 1,
+                              'iteration': 1,
+                              'requestReview':
+                                {
+                                  'reason': 'The original request asks for configurable status-driven custom field writes. The approved Shape specifies number and date actions, restoration and date clearing on reopening, and prospective rules. The status settings dialog, persisted field updates and tests cover that scope.',
+                                  'result': 'aligned',
+                                },
+                              'risks':
+                                [
+                                  'Verification used desktop Chrome and disposable local test data. Deployment and historical backfill are outside the approved scope.',
+                                ],
+                              'summary': 'All five criteria passed. The isolated Chrome scenario confirmed saved rules and 60 → 100 → 60, a completion date only while completed, and preserved weight 40. The API and web regression suites passed.',
+                              'verdict': 'pass',
+                            },
+                        },
+                      'verifierExecutionRef': '01a2100e-bfe6-7d13-a98c-03b6137a680c',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': 'efd3350f3c8041444a25e72db5b31b80119239b83a3eae21b3cfb31f65d22fef',
+                    'outcomeId': 'native-result-6518fce1c1f18a8b334235b765de726553a5c261758614cd2ff9d3913d28e72e',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-verifier',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'status-custom-field-writeback',
+              'status': 'succeeded',
+              'stepId': 'verify.verifier',
+              'type': 'handoff',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-preflight',
+                  'token': 'portable-e2ecd1a3a0e7945f5504466296ba04c74e43380cbadc29c90558ddaccdccc78d',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'status-custom-field-writeback:6',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'status-custom-field-writeback',
+                      'task': '按理来说, 如果我更改状态为已完成, 这两个数据要给我回写的, 虽然是自定义字段, 但至少要支持可配置吧, 比如说自带的状态属性更改时, 自定义字段怎么处理, 这种功能是可以加的吧, 原生支持吗?',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': 'a3dde5d0c057fd72268e194f047757695475f1a60d13b07246f5adc813850661',
+              'outcome':
+                {
+                  'actionId': 'status-custom-field-writeback:6',
+                  'attempt': 1,
+                  'claimToken': 'portable-e2ecd1a3a0e7945f5504466296ba04c74e43380cbadc29c90558ddaccdccc78d',
+                  'inputHash': 'a3dde5d0c057fd72268e194f047757695475f1a60d13b07246f5adc813850661',
+                  'outcomeId': 'status-custom-field-writeback:6:1:executor-result',
+                  'output':
+                    {
+                      'archiveDirRef': 'docs/comet/archive/2026-11-25-status-custom-field-writeback',
+                      'blockers': [],
+                      'candidateId': 'status-custom-field-writeback:3',
+                      'capabilityPeers': [],
+                      'ready': true,
+                      'reportRef': 'docs/comet/changes/status-custom-field-writeback/verification.md',
+                      'reportStateVersion': 6,
+                      'requiresReverification': false,
+                      'specPreview':
+                        [
+                          {
+                            'capability': 'status-custom-field-writeback',
+                            'operation': 'create',
+                            'source': 'specs/status-custom-field-writeback/spec.md',
+                          },
+                        ],
+                      'stateVersion': 7,
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '69997934141735f3ab1ca3145e031b8dd26d0a77085907852d46df0c8fb9a474',
+                    'outcomeId': 'status-custom-field-writeback:6:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive-preflight',
+              'requiredCapabilities': [],
+              'retry': 'idempotent',
+              'runId': 'status-custom-field-writeback',
+              'status': 'succeeded',
+              'stepId': 'archive.prepare',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-apply',
+                  'token': 'portable-beda25edea960998513538f4d3fe9d0f38d984b4fea1e70eb4fda21ee2861c7e',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'status-custom-field-writeback:7',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'status-custom-field-writeback',
+                      'task': '按理来说, 如果我更改状态为已完成, 这两个数据要给我回写的, 虽然是自定义字段, 但至少要支持可配置吧, 比如说自带的状态属性更改时, 自定义字段怎么处理, 这种功能是可以加的吧, 原生支持吗?',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '1297ec383d30c282ea7477fd962361549453246201450db1081eb580823e9ec2',
+              'outcome':
+                {
+                  'actionId': 'status-custom-field-writeback:7',
+                  'attempt': 1,
+                  'claimToken': 'portable-beda25edea960998513538f4d3fe9d0f38d984b4fea1e70eb4fda21ee2861c7e',
+                  'inputHash': '1297ec383d30c282ea7477fd962361549453246201450db1081eb580823e9ec2',
+                  'outcomeId': 'status-custom-field-writeback:7:1:executor-result',
+                  'output':
+                    {
+                      'archiveRef': '2026-11-25-status-custom-field-writeback',
+                      'specCount': 1,
+                      'stateVersion': 7,
+                      'transactionId': 'a57ca9ea-e753-4443-a36f-55befb16b137',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '4109f754683795bf6ee9b6f4a5b721028d20f8f1efcfa8ac8fcc13a8cb1cb1f7',
+                    'outcomeId': 'status-custom-field-writeback:7:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'status-custom-field-writeback',
+              'status': 'succeeded',
+              'stepId': 'archive.execute',
+              'type': 'call_tool',
+            },
+            {
+              'attempt': 1,
+              'claim':
+                {
+                  'executorId': 'comet-native-archive-finalize',
+                  'token': 'portable-cb6dea6b5c414360c1cd8af33063937cb950ff2698c9ec27fd29f7ff2a9c5fb1',
+                },
+              'executionOrigin':
+                {
+                  'workflow':
+                    {
+                      'hash': 'a4e64ffbd76a550331a69bca1a149bcae73b6fabe8117152be4bfc1abf28d8eb',
+                      'id': 'comet-native',
+                      'version': '4',
+                    },
+                },
+              'id': 'status-custom-field-writeback:8',
+              'input':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'status-custom-field-writeback',
+                      'task': '按理来说, 如果我更改状态为已完成, 这两个数据要给我回写的, 虽然是自定义字段, 但至少要支持可配置吧, 比如说自带的状态属性更改时, 自定义字段怎么处理, 这种功能是可以加的吧, 原生支持吗?',
+                    },
+                  'outputs': {},
+                },
+              'inputHash': '73293ac9c5e2bd209ac02de9c814f9f0f65bdc79de66675983fa27835e4ff8f6',
+              'outcome':
+                {
+                  'actionId': 'status-custom-field-writeback:8',
+                  'attempt': 1,
+                  'claimToken': 'portable-cb6dea6b5c414360c1cd8af33063937cb950ff2698c9ec27fd29f7ff2a9c5fb1',
+                  'inputHash': '73293ac9c5e2bd209ac02de9c814f9f0f65bdc79de66675983fa27835e4ff8f6',
+                  'outcomeId': 'status-custom-field-writeback:8:1:executor-result',
+                  'output':
+                    {
+                      'archiveRef': '2026-11-25-status-custom-field-writeback',
+                      'change': 'status-custom-field-writeback',
+                      'runId': 'status-custom-field-writeback',
+                      'specs':
+                        [{ 'capability': 'status-custom-field-writeback', 'operation': 'create' }],
+                      'stateVersion': 8,
+                      'transactionId': 'a57ca9ea-e753-4443-a36f-55befb16b137',
+                    },
+                  'status': 'succeeded',
+                },
+              'protocolVersion': 1,
+              'receipts':
+                [
+                  {
+                    'hash': '1c99b308b8f0cd2456f08dd31752891d97de860f75938c574b9a2f5cfab0b622',
+                    'outcomeId': 'status-custom-field-writeback:8:1:executor-result',
+                  },
+                ],
+              'reconciliations': [],
+              'ref': 'native-archive-finalize',
+              'requiredCapabilities': [],
+              'retry': 'manual',
+              'runId': 'status-custom-field-writeback',
+              'status': 'succeeded',
+              'stepId': 'archive.finalize',
+              'type': 'call_tool',
+            },
+          ],
+        'actionContexts':
+          {
+            'status-custom-field-writeback:1': { 'results': {}, 'sequence': 1 },
+            'status-custom-field-writeback:3': { 'results': {}, 'sequence': 3 },
+            'status-custom-field-writeback:4': { 'results': {}, 'sequence': 4 },
+            'status-custom-field-writeback:6': { 'results': {}, 'sequence': 6 },
+            'status-custom-field-writeback:7': { 'results': {}, 'sequence': 7 },
+            'status-custom-field-writeback:8': { 'results': {}, 'sequence': 8 },
+          },
+        'waits':
+          [
+            {
+              'id': 'status-custom-field-writeback:2',
+              'stepId': 'shape.confirm',
+              'sequence': 2,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'status-custom-field-writeback',
+                      'task': '按理来说, 如果我更改状态为已完成, 这两个数据要给我回写的, 虽然是自定义字段, 但至少要支持可配置吧, 比如说自带的状态属性更改时, 自定义字段怎么处理, 这种功能是可以加的吧, 原生支持吗?',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'A user with project status settings access can save and remove number and date rules for a selected status. Reloading retains the saved rules. Invalid field types, fields from other projects, and unauthorized edits are rejected.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'After configuring ROLL, moving an eligible item to 已完成 saves `100` and the date of the transition in Asia/Taipei. The saved values appear in work item details and the custom field API after reload. The weight value is preserved.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'Matching transitions from detail, table, Kanban, API, and the delivery workflow apply the same rules. Rejected transitions and edits that retain the same status preserve the stored field values.',
+                              },
+                              {
+                                'id': 'A4',
+                                'source': 'brief.md',
+                                'text': "Reopening a completed item restores its original number, including a blank value, and clears the date written by the completion rule. The next completion writes its own date. The plan recalculates from the reopened item's effective progress.",
+                              },
+                              {
+                                'id': 'A5',
+                                'source': 'brief.md',
+                                'text': 'Enabling a rule leaves existing data as stored until a matching transition occurs. Projects without rules retain their current behavior.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges':
+                            [
+                              {
+                                'capability': 'status-custom-field-writeback',
+                                'operation': 'create',
+                                'source': 'specs/status-custom-field-writeback/spec.md',
+                              },
+                            ],
+                        },
+                    },
+                },
+              'proposalHash': 'fc31483024159425b240f1f0fb9d35f4296a85c3edbfc368f620ba49d92e4ed5',
+              'choices': ['approved', 'rejected'],
+              'results': {},
+              'decision':
+                {
+                  'id': '12b03283ec670571ea9d270184460fac8c75ef2348124c27333846141998042e',
+                  'choice': 'approved',
+                  'proposalHash': 'fc31483024159425b240f1f0fb9d35f4296a85c3edbfc368f620ba49d92e4ed5',
+                },
+            },
+            {
+              'id': 'status-custom-field-writeback:5',
+              'stepId': 'verify.confirm',
+              'sequence': 5,
+              'status': 'resolved',
+              'proposal':
+                {
+                  'activation':
+                    {
+                      'report':
+                        {
+                          'attempt': 1,
+                          'candidateId': 'status-custom-field-writeback:3',
+                          'iteration': 1,
+                          'reportRef': 'docs/comet/changes/status-custom-field-writeback/verification.md',
+                          'stateVersion': 6,
+                        },
+                    },
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'status-custom-field-writeback',
+                      'task': '按理来说, 如果我更改状态为已完成, 这两个数据要给我回写的, 虽然是自定义字段, 但至少要支持可配置吧, 比如说自带的状态属性更改时, 自定义字段怎么处理, 这种功能是可以加的吧, 原生支持吗?',
+                    },
+                  'outputs':
+                    {
+                      'verify.verifier':
+                        {
+                          'candidateId': 'status-custom-field-writeback:3',
+                          'checks':
+                            [
+                              {
+                                'acceptanceIds': ['A2', 'A3', 'A4', 'A5'],
+                                'name': 'PostgreSQL migration',
+                                'note': 'From /Users/poco/Projects/itsaplan, SKIP_PRE_MIGRATION_BACKUP=1 bun --env-file=/tmp/itsaplan-status-fields-final.env packages/db/src/migrate.ts applied 0201 on a fresh isolated PostgreSQL 17 test database.',
+                                'result': 'passed',
+                              },
+                              {
+                                'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                                'name': 'API integration regressions',
+                                'note': 'From apps/api, ran bun test --env-file=/tmp/itsaplan-status-fields-final.env --timeout 15000 for columns, delivery, issue moves and sharing with isolated PostgreSQL and RustFS. 142 passed, 0 failed. Log /tmp/itsaplan-status-fields-api.log.',
+                                'result': 'passed',
+                              },
+                              {
+                                'acceptanceIds': ['A3', 'A4'],
+                                'name': 'Web table, Kanban and plan regressions',
+                                'note': 'From apps/web, bun test for TableRowSubtasks.test.tsx, IssueCardSubtasks.test.tsx and InitiativeDeliveryProgress.test.tsx. 6 passed, 0 failed. Log /tmp/itsaplan-status-fields-web.log.',
+                                'result': 'passed',
+                              },
+                              {
+                                'acceptanceIds': ['A1', 'A2', 'A3', 'A4'],
+                                'name': 'Chrome extension acceptance',
+                                'note': 'In the isolated local project at localhost:3101, saved and reloaded the Done rules for progress 100 and Asia/Taipei. The test issue moved from In Progress to Done and back. Detail values were 60/empty/40, then 100/Nov 25, 2026/40, then 60/empty/40.',
+                                'result': 'passed',
+                              },
+                              {
+                                'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                                'name': 'Workspace validation',
+                                'note': 'From repository root, bun run typecheck, bun run lint, Prettier on changed source and locale files, and git diff --check passed. Logs /tmp/itsaplan-status-fields-typecheck.log and /tmp/itsaplan-status-fields-lint.log.',
+                                'result': 'passed',
+                              },
+                              {
+                                'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                                'name': 'Focused code and security review',
+                                'note': 'Checked workflow entry paths, migration trigger order, atomic restore, permission guards, typed project-scoped field validation and public link redaction. No unresolved findings in the reviewed changes.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'response':
+                            {
+                              'kind': 'final-result',
+                              'result':
+                                {
+                                  'acceptance':
+                                    [
+                                      {
+                                        'id': 'A1',
+                                        'reason': 'Chrome saved and reloaded the two rules. PostgreSQL-backed API tests cover clearing rules, wrong field type, foreign field, duplicate rule, invalid timezone and a 403 for a nonmember.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A2',
+                                        'reason': "The Chrome test project's item detail showed progress 100, local completion date Nov 25, 2026, and unchanged weight 40 after completion. API detail independently returned the stored number and date.",
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A3',
+                                        'reason': 'Single and bulk API edits and automatic delivery parent completion persisted the configured values. Detail, table and board status edits reach the same service and SQL transition. Tests cover rejected managed completion and saving an unchanged status. Chrome verified the detail transition.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A4',
+                                        'reason': 'Chrome reopened the item and showed 60 and a blank date. API regressions restored both 60 and an initially blank value, refreshed the date on a later close, and verified the weighted plan returned to 0% after reopening its formerly blank node.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A5',
+                                        'reason': 'The no-config delivery and state regressions passed. An issue completed before configuration retained both null fields after configuration and a same-status edit. The trigger applies only to actual same-project status transitions.',
+                                        'result': 'passed',
+                                      },
+                                    ],
+                                  'attempt': 1,
+                                  'iteration': 1,
+                                  'requestReview':
+                                    {
+                                      'reason': 'The original request asks for configurable status-driven custom field writes. The approved Shape specifies number and date actions, restoration and date clearing on reopening, and prospective rules. The status settings dialog, persisted field updates and tests cover that scope.',
+                                      'result': 'aligned',
+                                    },
+                                  'risks':
+                                    [
+                                      'Verification used desktop Chrome and disposable local test data. Deployment and historical backfill are outside the approved scope.',
+                                    ],
+                                  'summary': 'All five criteria passed. The isolated Chrome scenario confirmed saved rules and 60 → 100 → 60, a completion date only while completed, and preserved weight 40. The API and web regression suites passed.',
+                                  'verdict': 'pass',
+                                },
+                            },
+                          'verifierExecutionRef': '01a2100e-bfe6-7d13-a98c-03b6137a680c',
+                        },
+                    },
+                },
+              'proposalHash': 'a1ba9c4f1443d4ff05f3f366b397728b0888be02f6736447ebe7bc9465deb504',
+              'choices': ['approved', 'rejected', 'reverify'],
+              'results': {},
+              'decision':
+                {
+                  'id': 'c55a4476ada0c8fdf750a2ef31edb83fba88dfa2f2f8dc50b9ba042a982ac771',
+                  'choice': 'approved',
+                  'proposalHash': 'a1ba9c4f1443d4ff05f3f366b397728b0888be02f6736447ebe7bc9465deb504',
+                  'reason': '用户明确接受 5 项验收结果，并授权归档、提交 PR、检查通过后合并和本地部署。',
+                },
+            },
+          ],
+        'ready': [],
+        'joins': {},
+        'outputs': {},
+        'children': [],
+        'lineage': [],
+      },
+    'sourceRevision': 15,
+    'sourceHash': 'ffed40ccbdeb32838cfb7cb520bbd79e1eb996eff33121a67af82d2fd4f19ff2',
+    'pool':
+      {
+        'version': 3,
+        'values':
+          [
+            {
+              'choice': 'approved',
+              'proposal':
+                {
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'status-custom-field-writeback',
+                      'task': '按理来说, 如果我更改状态为已完成, 这两个数据要给我回写的, 虽然是自定义字段, 但至少要支持可配置吧, 比如说自带的状态属性更改时, 自定义字段怎么处理, 这种功能是可以加的吧, 原生支持吗?',
+                    },
+                  'outputs':
+                    {
+                      'shape.prepare':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'source': 'brief.md',
+                                'text': 'A user with project status settings access can save and remove number and date rules for a selected status. Reloading retains the saved rules. Invalid field types, fields from other projects, and unauthorized edits are rejected.',
+                              },
+                              {
+                                'id': 'A2',
+                                'source': 'brief.md',
+                                'text': 'After configuring ROLL, moving an eligible item to 已完成 saves `100` and the date of the transition in Asia/Taipei. The saved values appear in work item details and the custom field API after reload. The weight value is preserved.',
+                              },
+                              {
+                                'id': 'A3',
+                                'source': 'brief.md',
+                                'text': 'Matching transitions from detail, table, Kanban, API, and the delivery workflow apply the same rules. Rejected transitions and edits that retain the same status preserve the stored field values.',
+                              },
+                              {
+                                'id': 'A4',
+                                'source': 'brief.md',
+                                'text': "Reopening a completed item restores its original number, including a blank value, and clears the date written by the completion rule. The next completion writes its own date. The plan recalculates from the reopened item's effective progress.",
+                              },
+                              {
+                                'id': 'A5',
+                                'source': 'brief.md',
+                                'text': 'Enabling a rule leaves existing data as stored until a matching transition occurs. Projects without rules retain their current behavior.',
+                              },
+                            ],
+                          'children': null,
+                          'specChanges':
+                            [
+                              {
+                                'capability': 'status-custom-field-writeback',
+                                'operation': 'create',
+                                'source': 'specs/status-custom-field-writeback/spec.md',
+                              },
+                            ],
+                        },
+                    },
+                },
+            },
+            {
+              'acceptance':
+                [
+                  {
+                    'id': 'A1',
+                    'source': 'brief.md',
+                    'text': 'A user with project status settings access can save and remove number and date rules for a selected status. Reloading retains the saved rules. Invalid field types, fields from other projects, and unauthorized edits are rejected.',
+                  },
+                  {
+                    'id': 'A2',
+                    'source': 'brief.md',
+                    'text': 'After configuring ROLL, moving an eligible item to 已完成 saves `100` and the date of the transition in Asia/Taipei. The saved values appear in work item details and the custom field API after reload. The weight value is preserved.',
+                  },
+                  {
+                    'id': 'A3',
+                    'source': 'brief.md',
+                    'text': 'Matching transitions from detail, table, Kanban, API, and the delivery workflow apply the same rules. Rejected transitions and edits that retain the same status preserve the stored field values.',
+                  },
+                  {
+                    'id': 'A4',
+                    'source': 'brief.md',
+                    'text': "Reopening a completed item restores its original number, including a blank value, and clears the date written by the completion rule. The next completion writes its own date. The plan recalculates from the reopened item's effective progress.",
+                  },
+                  {
+                    'id': 'A5',
+                    'source': 'brief.md',
+                    'text': 'Enabling a rule leaves existing data as stored until a matching transition occurs. Projects without rules retain their current behavior.',
+                  },
+                ],
+              'children': null,
+              'specChanges':
+                [
+                  {
+                    'capability': 'status-custom-field-writeback',
+                    'operation': 'create',
+                    'source': 'specs/status-custom-field-writeback/spec.md',
+                  },
+                ],
+            },
+            {
+              'addressedAcceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+              'checks':
+                [
+                  {
+                    'acceptanceIds': ['A2', 'A3', 'A4', 'A5'],
+                    'name': 'PostgreSQL migration',
+                    'note': 'From /Users/poco/Projects/itsaplan, SKIP_PRE_MIGRATION_BACKUP=1 bun --env-file=/tmp/itsaplan-status-fields-final.env packages/db/src/migrate.ts applied 0201 on a fresh isolated PostgreSQL 17 test database.',
+                    'result': 'passed',
+                  },
+                  {
+                    'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                    'name': 'API integration regressions',
+                    'note': 'From apps/api, ran bun test --env-file=/tmp/itsaplan-status-fields-final.env --timeout 15000 for columns, delivery, issue moves and sharing with isolated PostgreSQL and RustFS. 142 passed, 0 failed. Log /tmp/itsaplan-status-fields-api.log.',
+                    'result': 'passed',
+                  },
+                  {
+                    'acceptanceIds': ['A3', 'A4'],
+                    'name': 'Web table, Kanban and plan regressions',
+                    'note': 'From apps/web, bun test for TableRowSubtasks.test.tsx, IssueCardSubtasks.test.tsx and InitiativeDeliveryProgress.test.tsx. 6 passed, 0 failed. Log /tmp/itsaplan-status-fields-web.log.',
+                    'result': 'passed',
+                  },
+                  {
+                    'acceptanceIds': ['A1', 'A2', 'A3', 'A4'],
+                    'name': 'Chrome extension acceptance',
+                    'note': 'In the isolated local project at localhost:3101, saved and reloaded the Done rules for progress 100 and Asia/Taipei. The test issue moved from In Progress to Done and back. Detail values were 60/empty/40, then 100/Nov 25, 2026/40, then 60/empty/40.',
+                    'result': 'passed',
+                  },
+                  {
+                    'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                    'name': 'Workspace validation',
+                    'note': 'From repository root, bun run typecheck, bun run lint, Prettier on changed source and locale files, and git diff --check passed. Logs /tmp/itsaplan-status-fields-typecheck.log and /tmp/itsaplan-status-fields-lint.log.',
+                    'result': 'passed',
+                  },
+                  {
+                    'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                    'name': 'Focused code and security review',
+                    'note': 'Checked workflow entry paths, migration trigger order, atomic restore, permission guards, typed project-scoped field validation and public link redaction. No unresolved findings in the reviewed changes.',
+                    'result': 'passed',
+                  },
+                ],
+              'knownLimits':
+                [
+                  'Verification used a disposable local ROLL project. Deployment and historical backfill are outside this change.',
+                ],
+              'requireIndependentReview': false,
+              'summary': 'Project status settings save number and local-date rules. PostgreSQL applies them on status transitions and restores captured values when reopening. API, browser and repository checks passed.',
+            },
+            {
+              'choice': 'approved',
+              'proposal':
+                {
+                  'activation':
+                    {
+                      'report':
+                        {
+                          'attempt': 1,
+                          'candidateId': 'status-custom-field-writeback:3',
+                          'iteration': 1,
+                          'reportRef': 'docs/comet/changes/status-custom-field-writeback/verification.md',
+                          'stateVersion': 6,
+                        },
+                    },
+                  'input':
+                    {
+                      'artifactRootRef': 'docs',
+                      'name': 'status-custom-field-writeback',
+                      'task': '按理来说, 如果我更改状态为已完成, 这两个数据要给我回写的, 虽然是自定义字段, 但至少要支持可配置吧, 比如说自带的状态属性更改时, 自定义字段怎么处理, 这种功能是可以加的吧, 原生支持吗?',
+                    },
+                  'outputs':
+                    {
+                      'verify.verifier':
+                        {
+                          'candidateId': 'status-custom-field-writeback:3',
+                          'checks':
+                            [
+                              {
+                                'acceptanceIds': ['A2', 'A3', 'A4', 'A5'],
+                                'name': 'PostgreSQL migration',
+                                'note': 'From /Users/poco/Projects/itsaplan, SKIP_PRE_MIGRATION_BACKUP=1 bun --env-file=/tmp/itsaplan-status-fields-final.env packages/db/src/migrate.ts applied 0201 on a fresh isolated PostgreSQL 17 test database.',
+                                'result': 'passed',
+                              },
+                              {
+                                'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                                'name': 'API integration regressions',
+                                'note': 'From apps/api, ran bun test --env-file=/tmp/itsaplan-status-fields-final.env --timeout 15000 for columns, delivery, issue moves and sharing with isolated PostgreSQL and RustFS. 142 passed, 0 failed. Log /tmp/itsaplan-status-fields-api.log.',
+                                'result': 'passed',
+                              },
+                              {
+                                'acceptanceIds': ['A3', 'A4'],
+                                'name': 'Web table, Kanban and plan regressions',
+                                'note': 'From apps/web, bun test for TableRowSubtasks.test.tsx, IssueCardSubtasks.test.tsx and InitiativeDeliveryProgress.test.tsx. 6 passed, 0 failed. Log /tmp/itsaplan-status-fields-web.log.',
+                                'result': 'passed',
+                              },
+                              {
+                                'acceptanceIds': ['A1', 'A2', 'A3', 'A4'],
+                                'name': 'Chrome extension acceptance',
+                                'note': 'In the isolated local project at localhost:3101, saved and reloaded the Done rules for progress 100 and Asia/Taipei. The test issue moved from In Progress to Done and back. Detail values were 60/empty/40, then 100/Nov 25, 2026/40, then 60/empty/40.',
+                                'result': 'passed',
+                              },
+                              {
+                                'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                                'name': 'Workspace validation',
+                                'note': 'From repository root, bun run typecheck, bun run lint, Prettier on changed source and locale files, and git diff --check passed. Logs /tmp/itsaplan-status-fields-typecheck.log and /tmp/itsaplan-status-fields-lint.log.',
+                                'result': 'passed',
+                              },
+                              {
+                                'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                                'name': 'Focused code and security review',
+                                'note': 'Checked workflow entry paths, migration trigger order, atomic restore, permission guards, typed project-scoped field validation and public link redaction. No unresolved findings in the reviewed changes.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'response':
+                            {
+                              'kind': 'final-result',
+                              'result':
+                                {
+                                  'acceptance':
+                                    [
+                                      {
+                                        'id': 'A1',
+                                        'reason': 'Chrome saved and reloaded the two rules. PostgreSQL-backed API tests cover clearing rules, wrong field type, foreign field, duplicate rule, invalid timezone and a 403 for a nonmember.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A2',
+                                        'reason': "The Chrome test project's item detail showed progress 100, local completion date Nov 25, 2026, and unchanged weight 40 after completion. API detail independently returned the stored number and date.",
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A3',
+                                        'reason': 'Single and bulk API edits and automatic delivery parent completion persisted the configured values. Detail, table and board status edits reach the same service and SQL transition. Tests cover rejected managed completion and saving an unchanged status. Chrome verified the detail transition.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A4',
+                                        'reason': 'Chrome reopened the item and showed 60 and a blank date. API regressions restored both 60 and an initially blank value, refreshed the date on a later close, and verified the weighted plan returned to 0% after reopening its formerly blank node.',
+                                        'result': 'passed',
+                                      },
+                                      {
+                                        'id': 'A5',
+                                        'reason': 'The no-config delivery and state regressions passed. An issue completed before configuration retained both null fields after configuration and a same-status edit. The trigger applies only to actual same-project status transitions.',
+                                        'result': 'passed',
+                                      },
+                                    ],
+                                  'attempt': 1,
+                                  'iteration': 1,
+                                  'requestReview':
+                                    {
+                                      'reason': 'The original request asks for configurable status-driven custom field writes. The approved Shape specifies number and date actions, restoration and date clearing on reopening, and prospective rules. The status settings dialog, persisted field updates and tests cover that scope.',
+                                      'result': 'aligned',
+                                    },
+                                  'risks':
+                                    [
+                                      'Verification used desktop Chrome and disposable local test data. Deployment and historical backfill are outside the approved scope.',
+                                    ],
+                                  'summary': 'All five criteria passed. The isolated Chrome scenario confirmed saved rules and 60 → 100 → 60, a completion date only while completed, and preserved weight 40. The API and web regression suites passed.',
+                                  'verdict': 'pass',
+                                },
+                            },
+                          'verifierExecutionRef': '01a2100e-bfe6-7d13-a98c-03b6137a680c',
+                        },
+                    },
+                },
+            },
+            {
+              'candidateId': 'status-custom-field-writeback:3',
+              'checks':
+                [
+                  {
+                    'acceptanceIds': ['A2', 'A3', 'A4', 'A5'],
+                    'name': 'PostgreSQL migration',
+                    'note': 'From /Users/poco/Projects/itsaplan, SKIP_PRE_MIGRATION_BACKUP=1 bun --env-file=/tmp/itsaplan-status-fields-final.env packages/db/src/migrate.ts applied 0201 on a fresh isolated PostgreSQL 17 test database.',
+                    'result': 'passed',
+                  },
+                  {
+                    'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                    'name': 'API integration regressions',
+                    'note': 'From apps/api, ran bun test --env-file=/tmp/itsaplan-status-fields-final.env --timeout 15000 for columns, delivery, issue moves and sharing with isolated PostgreSQL and RustFS. 142 passed, 0 failed. Log /tmp/itsaplan-status-fields-api.log.',
+                    'result': 'passed',
+                  },
+                  {
+                    'acceptanceIds': ['A3', 'A4'],
+                    'name': 'Web table, Kanban and plan regressions',
+                    'note': 'From apps/web, bun test for TableRowSubtasks.test.tsx, IssueCardSubtasks.test.tsx and InitiativeDeliveryProgress.test.tsx. 6 passed, 0 failed. Log /tmp/itsaplan-status-fields-web.log.',
+                    'result': 'passed',
+                  },
+                  {
+                    'acceptanceIds': ['A1', 'A2', 'A3', 'A4'],
+                    'name': 'Chrome extension acceptance',
+                    'note': 'In the isolated local project at localhost:3101, saved and reloaded the Done rules for progress 100 and Asia/Taipei. The test issue moved from In Progress to Done and back. Detail values were 60/empty/40, then 100/Nov 25, 2026/40, then 60/empty/40.',
+                    'result': 'passed',
+                  },
+                  {
+                    'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                    'name': 'Workspace validation',
+                    'note': 'From repository root, bun run typecheck, bun run lint, Prettier on changed source and locale files, and git diff --check passed. Logs /tmp/itsaplan-status-fields-typecheck.log and /tmp/itsaplan-status-fields-lint.log.',
+                    'result': 'passed',
+                  },
+                  {
+                    'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                    'name': 'Focused code and security review',
+                    'note': 'Checked workflow entry paths, migration trigger order, atomic restore, permission guards, typed project-scoped field validation and public link redaction. No unresolved findings in the reviewed changes.',
+                    'result': 'passed',
+                  },
+                ],
+              'response':
+                {
+                  'kind': 'final-result',
+                  'result':
+                    {
+                      'acceptance':
+                        [
+                          {
+                            'id': 'A1',
+                            'reason': 'Chrome saved and reloaded the two rules. PostgreSQL-backed API tests cover clearing rules, wrong field type, foreign field, duplicate rule, invalid timezone and a 403 for a nonmember.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A2',
+                            'reason': "The Chrome test project's item detail showed progress 100, local completion date Nov 25, 2026, and unchanged weight 40 after completion. API detail independently returned the stored number and date.",
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A3',
+                            'reason': 'Single and bulk API edits and automatic delivery parent completion persisted the configured values. Detail, table and board status edits reach the same service and SQL transition. Tests cover rejected managed completion and saving an unchanged status. Chrome verified the detail transition.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A4',
+                            'reason': 'Chrome reopened the item and showed 60 and a blank date. API regressions restored both 60 and an initially blank value, refreshed the date on a later close, and verified the weighted plan returned to 0% after reopening its formerly blank node.',
+                            'result': 'passed',
+                          },
+                          {
+                            'id': 'A5',
+                            'reason': 'The no-config delivery and state regressions passed. An issue completed before configuration retained both null fields after configuration and a same-status edit. The trigger applies only to actual same-project status transitions.',
+                            'result': 'passed',
+                          },
+                        ],
+                      'attempt': 1,
+                      'iteration': 1,
+                      'requestReview':
+                        {
+                          'reason': 'The original request asks for configurable status-driven custom field writes. The approved Shape specifies number and date actions, restoration and date clearing on reopening, and prospective rules. The status settings dialog, persisted field updates and tests cover that scope.',
+                          'result': 'aligned',
+                        },
+                      'risks':
+                        [
+                          'Verification used desktop Chrome and disposable local test data. Deployment and historical backfill are outside the approved scope.',
+                        ],
+                      'summary': 'All five criteria passed. The isolated Chrome scenario confirmed saved rules and 60 → 100 → 60, a completion date only while completed, and preserved weight 40. The API and web regression suites passed.',
+                      'verdict': 'pass',
+                    },
+                },
+              'verifierExecutionRef': '01a2100e-bfe6-7d13-a98c-03b6137a680c',
+            },
+            {
+              'archiveDirRef': 'docs/comet/archive/2026-11-25-status-custom-field-writeback',
+              'blockers': [],
+              'candidateId': 'status-custom-field-writeback:3',
+              'capabilityPeers': [],
+              'ready': true,
+              'reportRef': 'docs/comet/changes/status-custom-field-writeback/verification.md',
+              'reportStateVersion': 6,
+              'requiresReverification': false,
+              'specPreview':
+                [
+                  {
+                    'capability': 'status-custom-field-writeback',
+                    'operation': 'create',
+                    'source': 'specs/status-custom-field-writeback/spec.md',
+                  },
+                ],
+              'stateVersion': 7,
+            },
+            {
+              'archiveRef': '2026-11-25-status-custom-field-writeback',
+              'specCount': 1,
+              'stateVersion': 7,
+              'transactionId': 'a57ca9ea-e753-4443-a36f-55befb16b137',
+            },
+            {
+              'sequence': 2,
+              'value':
+                {
+                  'choice': 'approved',
+                  'proposal':
+                    {
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'status-custom-field-writeback',
+                          'task': '按理来说, 如果我更改状态为已完成, 这两个数据要给我回写的, 虽然是自定义字段, 但至少要支持可配置吧, 比如说自带的状态属性更改时, 自定义字段怎么处理, 这种功能是可以加的吧, 原生支持吗?',
+                        },
+                      'outputs':
+                        {
+                          'shape.prepare':
+                            {
+                              'acceptance':
+                                [
+                                  {
+                                    'id': 'A1',
+                                    'source': 'brief.md',
+                                    'text': 'A user with project status settings access can save and remove number and date rules for a selected status. Reloading retains the saved rules. Invalid field types, fields from other projects, and unauthorized edits are rejected.',
+                                  },
+                                  {
+                                    'id': 'A2',
+                                    'source': 'brief.md',
+                                    'text': 'After configuring ROLL, moving an eligible item to 已完成 saves `100` and the date of the transition in Asia/Taipei. The saved values appear in work item details and the custom field API after reload. The weight value is preserved.',
+                                  },
+                                  {
+                                    'id': 'A3',
+                                    'source': 'brief.md',
+                                    'text': 'Matching transitions from detail, table, Kanban, API, and the delivery workflow apply the same rules. Rejected transitions and edits that retain the same status preserve the stored field values.',
+                                  },
+                                  {
+                                    'id': 'A4',
+                                    'source': 'brief.md',
+                                    'text': "Reopening a completed item restores its original number, including a blank value, and clears the date written by the completion rule. The next completion writes its own date. The plan recalculates from the reopened item's effective progress.",
+                                  },
+                                  {
+                                    'id': 'A5',
+                                    'source': 'brief.md',
+                                    'text': 'Enabling a rule leaves existing data as stored until a matching transition occurs. Projects without rules retain their current behavior.',
+                                  },
+                                ],
+                              'children': null,
+                              'specChanges':
+                                [
+                                  {
+                                    'capability': 'status-custom-field-writeback',
+                                    'operation': 'create',
+                                    'source': 'specs/status-custom-field-writeback/spec.md',
+                                  },
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 1,
+              'value':
+                {
+                  'acceptance':
+                    [
+                      {
+                        'id': 'A1',
+                        'source': 'brief.md',
+                        'text': 'A user with project status settings access can save and remove number and date rules for a selected status. Reloading retains the saved rules. Invalid field types, fields from other projects, and unauthorized edits are rejected.',
+                      },
+                      {
+                        'id': 'A2',
+                        'source': 'brief.md',
+                        'text': 'After configuring ROLL, moving an eligible item to 已完成 saves `100` and the date of the transition in Asia/Taipei. The saved values appear in work item details and the custom field API after reload. The weight value is preserved.',
+                      },
+                      {
+                        'id': 'A3',
+                        'source': 'brief.md',
+                        'text': 'Matching transitions from detail, table, Kanban, API, and the delivery workflow apply the same rules. Rejected transitions and edits that retain the same status preserve the stored field values.',
+                      },
+                      {
+                        'id': 'A4',
+                        'source': 'brief.md',
+                        'text': "Reopening a completed item restores its original number, including a blank value, and clears the date written by the completion rule. The next completion writes its own date. The plan recalculates from the reopened item's effective progress.",
+                      },
+                      {
+                        'id': 'A5',
+                        'source': 'brief.md',
+                        'text': 'Enabling a rule leaves existing data as stored until a matching transition occurs. Projects without rules retain their current behavior.',
+                      },
+                    ],
+                  'children': null,
+                  'specChanges':
+                    [
+                      {
+                        'capability': 'status-custom-field-writeback',
+                        'operation': 'create',
+                        'source': 'specs/status-custom-field-writeback/spec.md',
+                      },
+                    ],
+                },
+            },
+            {
+              'sequence': 3,
+              'value':
+                {
+                  'addressedAcceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                  'checks':
+                    [
+                      {
+                        'acceptanceIds': ['A2', 'A3', 'A4', 'A5'],
+                        'name': 'PostgreSQL migration',
+                        'note': 'From /Users/poco/Projects/itsaplan, SKIP_PRE_MIGRATION_BACKUP=1 bun --env-file=/tmp/itsaplan-status-fields-final.env packages/db/src/migrate.ts applied 0201 on a fresh isolated PostgreSQL 17 test database.',
+                        'result': 'passed',
+                      },
+                      {
+                        'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                        'name': 'API integration regressions',
+                        'note': 'From apps/api, ran bun test --env-file=/tmp/itsaplan-status-fields-final.env --timeout 15000 for columns, delivery, issue moves and sharing with isolated PostgreSQL and RustFS. 142 passed, 0 failed. Log /tmp/itsaplan-status-fields-api.log.',
+                        'result': 'passed',
+                      },
+                      {
+                        'acceptanceIds': ['A3', 'A4'],
+                        'name': 'Web table, Kanban and plan regressions',
+                        'note': 'From apps/web, bun test for TableRowSubtasks.test.tsx, IssueCardSubtasks.test.tsx and InitiativeDeliveryProgress.test.tsx. 6 passed, 0 failed. Log /tmp/itsaplan-status-fields-web.log.',
+                        'result': 'passed',
+                      },
+                      {
+                        'acceptanceIds': ['A1', 'A2', 'A3', 'A4'],
+                        'name': 'Chrome extension acceptance',
+                        'note': 'In the isolated local project at localhost:3101, saved and reloaded the Done rules for progress 100 and Asia/Taipei. The test issue moved from In Progress to Done and back. Detail values were 60/empty/40, then 100/Nov 25, 2026/40, then 60/empty/40.',
+                        'result': 'passed',
+                      },
+                      {
+                        'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                        'name': 'Workspace validation',
+                        'note': 'From repository root, bun run typecheck, bun run lint, Prettier on changed source and locale files, and git diff --check passed. Logs /tmp/itsaplan-status-fields-typecheck.log and /tmp/itsaplan-status-fields-lint.log.',
+                        'result': 'passed',
+                      },
+                      {
+                        'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                        'name': 'Focused code and security review',
+                        'note': 'Checked workflow entry paths, migration trigger order, atomic restore, permission guards, typed project-scoped field validation and public link redaction. No unresolved findings in the reviewed changes.',
+                        'result': 'passed',
+                      },
+                    ],
+                  'knownLimits':
+                    [
+                      'Verification used a disposable local ROLL project. Deployment and historical backfill are outside this change.',
+                    ],
+                  'requireIndependentReview': false,
+                  'summary': 'Project status settings save number and local-date rules. PostgreSQL applies them on status transitions and restores captured values when reopening. API, browser and repository checks passed.',
+                },
+            },
+            {
+              'sequence': 5,
+              'value':
+                {
+                  'choice': 'approved',
+                  'proposal':
+                    {
+                      'activation':
+                        {
+                          'report':
+                            {
+                              'attempt': 1,
+                              'candidateId': 'status-custom-field-writeback:3',
+                              'iteration': 1,
+                              'reportRef': 'docs/comet/changes/status-custom-field-writeback/verification.md',
+                              'stateVersion': 6,
+                            },
+                        },
+                      'input':
+                        {
+                          'artifactRootRef': 'docs',
+                          'name': 'status-custom-field-writeback',
+                          'task': '按理来说, 如果我更改状态为已完成, 这两个数据要给我回写的, 虽然是自定义字段, 但至少要支持可配置吧, 比如说自带的状态属性更改时, 自定义字段怎么处理, 这种功能是可以加的吧, 原生支持吗?',
+                        },
+                      'outputs':
+                        {
+                          'verify.verifier':
+                            {
+                              'candidateId': 'status-custom-field-writeback:3',
+                              'checks':
+                                [
+                                  {
+                                    'acceptanceIds': ['A2', 'A3', 'A4', 'A5'],
+                                    'name': 'PostgreSQL migration',
+                                    'note': 'From /Users/poco/Projects/itsaplan, SKIP_PRE_MIGRATION_BACKUP=1 bun --env-file=/tmp/itsaplan-status-fields-final.env packages/db/src/migrate.ts applied 0201 on a fresh isolated PostgreSQL 17 test database.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                                    'name': 'API integration regressions',
+                                    'note': 'From apps/api, ran bun test --env-file=/tmp/itsaplan-status-fields-final.env --timeout 15000 for columns, delivery, issue moves and sharing with isolated PostgreSQL and RustFS. 142 passed, 0 failed. Log /tmp/itsaplan-status-fields-api.log.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'acceptanceIds': ['A3', 'A4'],
+                                    'name': 'Web table, Kanban and plan regressions',
+                                    'note': 'From apps/web, bun test for TableRowSubtasks.test.tsx, IssueCardSubtasks.test.tsx and InitiativeDeliveryProgress.test.tsx. 6 passed, 0 failed. Log /tmp/itsaplan-status-fields-web.log.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'acceptanceIds': ['A1', 'A2', 'A3', 'A4'],
+                                    'name': 'Chrome extension acceptance',
+                                    'note': 'In the isolated local project at localhost:3101, saved and reloaded the Done rules for progress 100 and Asia/Taipei. The test issue moved from In Progress to Done and back. Detail values were 60/empty/40, then 100/Nov 25, 2026/40, then 60/empty/40.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                                    'name': 'Workspace validation',
+                                    'note': 'From repository root, bun run typecheck, bun run lint, Prettier on changed source and locale files, and git diff --check passed. Logs /tmp/itsaplan-status-fields-typecheck.log and /tmp/itsaplan-status-fields-lint.log.',
+                                    'result': 'passed',
+                                  },
+                                  {
+                                    'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                                    'name': 'Focused code and security review',
+                                    'note': 'Checked workflow entry paths, migration trigger order, atomic restore, permission guards, typed project-scoped field validation and public link redaction. No unresolved findings in the reviewed changes.',
+                                    'result': 'passed',
+                                  },
+                                ],
+                              'response':
+                                {
+                                  'kind': 'final-result',
+                                  'result':
+                                    {
+                                      'acceptance':
+                                        [
+                                          {
+                                            'id': 'A1',
+                                            'reason': 'Chrome saved and reloaded the two rules. PostgreSQL-backed API tests cover clearing rules, wrong field type, foreign field, duplicate rule, invalid timezone and a 403 for a nonmember.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A2',
+                                            'reason': "The Chrome test project's item detail showed progress 100, local completion date Nov 25, 2026, and unchanged weight 40 after completion. API detail independently returned the stored number and date.",
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A3',
+                                            'reason': 'Single and bulk API edits and automatic delivery parent completion persisted the configured values. Detail, table and board status edits reach the same service and SQL transition. Tests cover rejected managed completion and saving an unchanged status. Chrome verified the detail transition.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A4',
+                                            'reason': 'Chrome reopened the item and showed 60 and a blank date. API regressions restored both 60 and an initially blank value, refreshed the date on a later close, and verified the weighted plan returned to 0% after reopening its formerly blank node.',
+                                            'result': 'passed',
+                                          },
+                                          {
+                                            'id': 'A5',
+                                            'reason': 'The no-config delivery and state regressions passed. An issue completed before configuration retained both null fields after configuration and a same-status edit. The trigger applies only to actual same-project status transitions.',
+                                            'result': 'passed',
+                                          },
+                                        ],
+                                      'attempt': 1,
+                                      'iteration': 1,
+                                      'requestReview':
+                                        {
+                                          'reason': 'The original request asks for configurable status-driven custom field writes. The approved Shape specifies number and date actions, restoration and date clearing on reopening, and prospective rules. The status settings dialog, persisted field updates and tests cover that scope.',
+                                          'result': 'aligned',
+                                        },
+                                      'risks':
+                                        [
+                                          'Verification used desktop Chrome and disposable local test data. Deployment and historical backfill are outside the approved scope.',
+                                        ],
+                                      'summary': 'All five criteria passed. The isolated Chrome scenario confirmed saved rules and 60 → 100 → 60, a completion date only while completed, and preserved weight 40. The API and web regression suites passed.',
+                                      'verdict': 'pass',
+                                    },
+                                },
+                              'verifierExecutionRef': '01a2100e-bfe6-7d13-a98c-03b6137a680c',
+                            },
+                        },
+                    },
+                },
+            },
+            {
+              'sequence': 4,
+              'value':
+                {
+                  'candidateId': 'status-custom-field-writeback:3',
+                  'checks':
+                    [
+                      {
+                        'acceptanceIds': ['A2', 'A3', 'A4', 'A5'],
+                        'name': 'PostgreSQL migration',
+                        'note': 'From /Users/poco/Projects/itsaplan, SKIP_PRE_MIGRATION_BACKUP=1 bun --env-file=/tmp/itsaplan-status-fields-final.env packages/db/src/migrate.ts applied 0201 on a fresh isolated PostgreSQL 17 test database.',
+                        'result': 'passed',
+                      },
+                      {
+                        'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                        'name': 'API integration regressions',
+                        'note': 'From apps/api, ran bun test --env-file=/tmp/itsaplan-status-fields-final.env --timeout 15000 for columns, delivery, issue moves and sharing with isolated PostgreSQL and RustFS. 142 passed, 0 failed. Log /tmp/itsaplan-status-fields-api.log.',
+                        'result': 'passed',
+                      },
+                      {
+                        'acceptanceIds': ['A3', 'A4'],
+                        'name': 'Web table, Kanban and plan regressions',
+                        'note': 'From apps/web, bun test for TableRowSubtasks.test.tsx, IssueCardSubtasks.test.tsx and InitiativeDeliveryProgress.test.tsx. 6 passed, 0 failed. Log /tmp/itsaplan-status-fields-web.log.',
+                        'result': 'passed',
+                      },
+                      {
+                        'acceptanceIds': ['A1', 'A2', 'A3', 'A4'],
+                        'name': 'Chrome extension acceptance',
+                        'note': 'In the isolated local project at localhost:3101, saved and reloaded the Done rules for progress 100 and Asia/Taipei. The test issue moved from In Progress to Done and back. Detail values were 60/empty/40, then 100/Nov 25, 2026/40, then 60/empty/40.',
+                        'result': 'passed',
+                      },
+                      {
+                        'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                        'name': 'Workspace validation',
+                        'note': 'From repository root, bun run typecheck, bun run lint, Prettier on changed source and locale files, and git diff --check passed. Logs /tmp/itsaplan-status-fields-typecheck.log and /tmp/itsaplan-status-fields-lint.log.',
+                        'result': 'passed',
+                      },
+                      {
+                        'acceptanceIds': ['A1', 'A2', 'A3', 'A4', 'A5'],
+                        'name': 'Focused code and security review',
+                        'note': 'Checked workflow entry paths, migration trigger order, atomic restore, permission guards, typed project-scoped field validation and public link redaction. No unresolved findings in the reviewed changes.',
+                        'result': 'passed',
+                      },
+                    ],
+                  'response':
+                    {
+                      'kind': 'final-result',
+                      'result':
+                        {
+                          'acceptance':
+                            [
+                              {
+                                'id': 'A1',
+                                'reason': 'Chrome saved and reloaded the two rules. PostgreSQL-backed API tests cover clearing rules, wrong field type, foreign field, duplicate rule, invalid timezone and a 403 for a nonmember.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A2',
+                                'reason': "The Chrome test project's item detail showed progress 100, local completion date Nov 25, 2026, and unchanged weight 40 after completion. API detail independently returned the stored number and date.",
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A3',
+                                'reason': 'Single and bulk API edits and automatic delivery parent completion persisted the configured values. Detail, table and board status edits reach the same service and SQL transition. Tests cover rejected managed completion and saving an unchanged status. Chrome verified the detail transition.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A4',
+                                'reason': 'Chrome reopened the item and showed 60 and a blank date. API regressions restored both 60 and an initially blank value, refreshed the date on a later close, and verified the weighted plan returned to 0% after reopening its formerly blank node.',
+                                'result': 'passed',
+                              },
+                              {
+                                'id': 'A5',
+                                'reason': 'The no-config delivery and state regressions passed. An issue completed before configuration retained both null fields after configuration and a same-status edit. The trigger applies only to actual same-project status transitions.',
+                                'result': 'passed',
+                              },
+                            ],
+                          'attempt': 1,
+                          'iteration': 1,
+                          'requestReview':
+                            {
+                              'reason': 'The original request asks for configurable status-driven custom field writes. The approved Shape specifies number and date actions, restoration and date clearing on reopening, and prospective rules. The status settings dialog, persisted field updates and tests cover that scope.',
+                              'result': 'aligned',
+                            },
+                          'risks':
+                            [
+                              'Verification used desktop Chrome and disposable local test data. Deployment and historical backfill are outside the approved scope.',
+                            ],
+                          'summary': 'All five criteria passed. The isolated Chrome scenario confirmed saved rules and 60 → 100 → 60, a completion date only while completed, and preserved weight 40. The API and web regression suites passed.',
+                          'verdict': 'pass',
+                        },
+                    },
+                  'verifierExecutionRef': '01a2100e-bfe6-7d13-a98c-03b6137a680c',
+                },
+            },
+            {
+              'sequence': 6,
+              'value':
+                {
+                  'archiveDirRef': 'docs/comet/archive/2026-11-25-status-custom-field-writeback',
+                  'blockers': [],
+                  'candidateId': 'status-custom-field-writeback:3',
+                  'capabilityPeers': [],
+                  'ready': true,
+                  'reportRef': 'docs/comet/changes/status-custom-field-writeback/verification.md',
+                  'reportStateVersion': 6,
+                  'requiresReverification': false,
+                  'specPreview':
+                    [
+                      {
+                        'capability': 'status-custom-field-writeback',
+                        'operation': 'create',
+                        'source': 'specs/status-custom-field-writeback/spec.md',
+                      },
+                    ],
+                  'stateVersion': 7,
+                },
+            },
+            {
+              'sequence': 7,
+              'value':
+                {
+                  'archiveRef': '2026-11-25-status-custom-field-writeback',
+                  'specCount': 1,
+                  'stateVersion': 7,
+                  'transactionId': 'a57ca9ea-e753-4443-a36f-55befb16b137',
+                },
+            },
+            {
+              'sequence': 8,
+              'value':
+                {
+                  'archiveRef': '2026-11-25-status-custom-field-writeback',
+                  'change': 'status-custom-field-writeback',
+                  'runId': 'status-custom-field-writeback',
+                  'specs':
+                    [{ 'capability': 'status-custom-field-writeback', 'operation': 'create' }],
+                  'stateVersion': 8,
+                  'transactionId': 'a57ca9ea-e753-4443-a36f-55befb16b137',
+                },
+            },
+          ],
+        'nodes':
+          [
+            { 'key': 'shape.prepare', 'value': 1, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': null, 'right': 0, 'height': 2 },
+            { 'key': 'build.builder', 'value': 2, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 2, 'right': 0, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 1, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 4, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.confirm', 'value': 3, 'left': 4, 'right': 5, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 2, 'right': 6, 'height': 3 },
+            { 'key': 'archive.prepare', 'value': 5, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 2, 'left': 8, 'right': null, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 9, 'right': 6, 'height': 3 },
+            { 'key': 'archive.execute', 'value': 6, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 2, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.prepare', 'value': 5, 'left': 11, 'right': 12, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 0, 'left': 13, 'right': 6, 'height': 3 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': null, 'right': 15, 'height': 2 },
+            { 'key': 'build.builder', 'value': 9, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 17, 'right': 15, 'height': 2 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 11, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.confirm', 'value': 10, 'left': 19, 'right': 20, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 17, 'right': 21, 'height': 3 },
+            { 'key': 'archive.prepare', 'value': 12, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 9, 'left': 23, 'right': null, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 24, 'right': 21, 'height': 3 },
+            { 'key': 'archive.execute', 'value': 13, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 9, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.prepare', 'value': 12, 'left': 26, 'right': 27, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 28, 'right': 21, 'height': 3 },
+            { 'key': 'archive.finalize', 'value': 14, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'archive.execute', 'value': 13, 'left': null, 'right': 30, 'height': 2 },
+            { 'key': 'archive.prepare', 'value': 12, 'left': 31, 'right': 27, 'height': 3 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 32, 'right': 21, 'height': 4 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'build.builder', 'value': 9, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'verify.verifier', 'value': 11, 'left': null, 'right': null, 'height': 1 },
+            { 'key': 'shape.prepare', 'value': 8, 'left': null, 'right': 36, 'height': 2 },
+            { 'key': 'shape.confirm', 'value': 7, 'left': 35, 'right': 37, 'height': 3 },
+          ],
+        'maps': [null, 1, 3, 7, 10, 14, 16, 18, 22, 25, 29, 33, 34, 38],
+        'bindings':
+          [
+            { 'path': ['actions', '0', 'input', 'outputs'], 'map': 0 },
+            { 'path': ['actions', '1', 'input', 'outputs'], 'map': 1 },
+            { 'path': ['actions', '2', 'input', 'outputs'], 'map': 2 },
+            { 'path': ['actions', '3', 'input', 'outputs'], 'map': 3 },
+            { 'path': ['actions', '4', 'input', 'outputs'], 'map': 4 },
+            { 'path': ['actions', '5', 'input', 'outputs'], 'map': 5 },
+            { 'path': ['actionContexts', 'status-custom-field-writeback:1', 'results'], 'map': 0 },
+            { 'path': ['actionContexts', 'status-custom-field-writeback:3', 'results'], 'map': 6 },
+            { 'path': ['actionContexts', 'status-custom-field-writeback:4', 'results'], 'map': 7 },
+            { 'path': ['actionContexts', 'status-custom-field-writeback:6', 'results'], 'map': 8 },
+            { 'path': ['actionContexts', 'status-custom-field-writeback:7', 'results'], 'map': 9 },
+            { 'path': ['actionContexts', 'status-custom-field-writeback:8', 'results'], 'map': 10 },
+            { 'path': ['outputs'], 'map': 11 },
+            { 'path': ['waits', '0', 'results'], 'map': 12 },
+            { 'path': ['waits', '1', 'results'], 'map': 13 },
+          ],
+      },
+    'storageHash': 'a44c99ef68babfaea4959c540265a3f27f039c543642a5f71d2a95a493f38147',
+  }

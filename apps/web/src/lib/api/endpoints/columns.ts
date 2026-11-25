@@ -2,6 +2,10 @@ import { request } from '@/lib/api/core/client';
 
 export type StateType = 'backlog' | 'unstarted' | 'started' | 'completed' | 'canceled';
 
+export type StatusFieldUpdate =
+  | { type: 'number'; fieldId: number; value: number }
+  | { type: 'date'; fieldId: number; timeZone: string };
+
 export interface Column {
   id: number;
   projectId: number;
@@ -16,6 +20,7 @@ export interface Column {
   // The member every issue entering this column is assigned to, replacing whoever
   // held it.
   autoAssignUserId: string | null;
+  fieldUpdates?: StatusFieldUpdate[];
 }
 
 export type WipMode = 'soft' | 'hard';
@@ -29,6 +34,7 @@ export const createColumn = (
     wipLimit?: number | null;
     wipMode?: WipMode;
     autoAssignUserId?: string | null;
+    fieldUpdates?: StatusFieldUpdate[];
   },
 ) =>
   request<Column>(`/projects/${projectKey}/columns`, {
@@ -48,6 +54,7 @@ export const updateColumn = (
     wipMode?: WipMode;
     // null clears the automatic assignment; absent leaves it as it is.
     autoAssignUserId?: string | null;
+    fieldUpdates?: StatusFieldUpdate[];
   },
 ) =>
   request<Column>(`/projects/${projectKey}/columns/${columnId}`, {
