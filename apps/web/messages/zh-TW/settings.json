@@ -198,6 +198,15 @@
     "days": "天"
   },
   "states": {
+    "fieldUpdates": {
+      "title": "更新欄位",
+      "description": "工作項目進入「{name}」時，自動更新所選欄位。",
+      "add": "新增自訂欄位",
+      "remove": "移除「{name}」",
+      "number": "固定數值",
+      "timeZone": "狀態變更日期的時區",
+      "empty": "請先在「自訂欄位」中新增數字或日期欄位。"
+    },
     "addState": "新增{type}狀態",
     "emptyTitle": "暫無{type}狀態",
     "emptyHint": "為此分組新增工作流程狀態。",

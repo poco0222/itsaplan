@@ -1,5 +1,6 @@
 import {
   db,
+  customField,
   project,
   projectColumn,
   issue,
@@ -7,6 +8,7 @@ import {
   issueFieldValue,
   issueFieldOption,
   lockIssueTree,
+  type StatusFieldUpdate,
 } from '@repo/db';
 import { and, eq, inArray, isNull, sql } from 'drizzle-orm';
 import { HttpError } from '#shared/lib';
@@ -19,6 +21,7 @@ import { recordStatusChange } from '#modules/issues/status-history';
 import { hasUnfinishedStatusRuns, queueStatusRuns } from '#modules/agents/schedules/issue-runs';
 import { pushLinkedIssueState } from '#modules/git/issue-sync';
 import { deleteThreadsWhere } from '#modules/agents/core/runtime/memory';
+import { readDeliverySettings } from '#modules/delivery-workflow/service';
 
 export interface ColumnRow {
   id: number;
@@ -30,6 +33,7 @@ export interface ColumnRow {
   wipLimit: number | null;
   wipMode: string;
   autoAssignUserId: string | null;
+  fieldUpdates: StatusFieldUpdate[];
 }
 
 function mapColumn(row: typeof projectColumn.$inferSelect): ColumnRow {
@@ -43,6 +47,7 @@ function mapColumn(row: typeof projectColumn.$inferSelect): ColumnRow {
     wipLimit: row.wipLimit,
     wipMode: row.wipMode,
     autoAssignUserId: row.autoAssignUserId,
+    fieldUpdates: row.fieldUpdates,
   };
 }
 
@@ -128,6 +133,51 @@ export async function listColumns(projectId: number): Promise<ColumnRow[]> {
   return rows.map(mapColumn);
 }
 
+async function assertFieldUpdates(projectId: number, updates: StatusFieldUpdate[]): Promise<void> {
+  if (updates.length === 0) return;
+  const fieldIds = updates.map(({ fieldId }) => fieldId);
+  if (new Set(fieldIds).size !== fieldIds.length) {
+    throw new HttpError(400, 'Configure each field only once per status');
+  }
+  const fields = await db
+    .select({ id: customField.id, type: customField.fieldType })
+    .from(customField)
+    .where(and(eq(customField.projectId, projectId), inArray(customField.id, fieldIds)));
+  const typeById = new Map(fields.map(({ id, type }) => [id, type]));
+  if (updates.some(({ fieldId, type }) => typeById.get(fieldId) !== type)) {
+    throw new HttpError(400, 'Field updates require matching custom fields from this project');
+  }
+  const outsidePercentageRange = updates.flatMap((update) =>
+    update.type === 'number' && (update.value < 0 || update.value > 100) ? [update.fieldId] : [],
+  );
+  if (outsidePercentageRange.length) {
+    const delivery = await readDeliverySettings(projectId);
+    if (
+      delivery &&
+      [
+        delivery.nodeProgressId,
+        delivery.taskProgressId,
+        delivery.nodeWeightId,
+        delivery.taskWeightId,
+      ].some((fieldId) => outsidePercentageRange.includes(fieldId))
+    ) {
+      throw new HttpError(400, 'Delivery progress and weight must be between 0 and 100');
+    }
+  }
+  const zones = new Set(
+    updates.flatMap((update) => (update.type === 'date' ? [update.timeZone] : [])),
+  );
+  if (zones.size === 0) return;
+  const matches = await db.execute<{ name: string }>(sql`
+    SELECT name FROM pg_timezone_names
+    WHERE name IN (${sql.join(
+      [...zones].map((zone) => sql`${zone}`),
+      sql`, `,
+    )})
+  `);
+  if (matches.length !== zones.size) throw new HttpError(400, 'Invalid time zone');
+}
+
 export async function createColumn(input: {
   projectId: number;
   name: string;
@@ -136,8 +186,11 @@ export async function createColumn(input: {
   wipLimit?: number | null;
   wipMode?: string;
   autoAssignUserId?: string | null;
+  fieldUpdates?: StatusFieldUpdate[];
 }): Promise<ColumnRow> {
   await assertAssignableMember(input.projectId, input.autoAssignUserId, undefined, 'Auto-assignee');
+  const fieldUpdates = input.fieldUpdates ?? [];
+  await assertFieldUpdates(input.projectId, fieldUpdates);
   const [{ pos }] = await db
     .select({ pos: sql<number>`COALESCE(MAX(${projectColumn.position}), -1) + 1` })
     .from(projectColumn)
@@ -153,6 +206,7 @@ export async function createColumn(input: {
       wipLimit: input.wipLimit ?? null,
       wipMode: input.wipMode ?? 'soft',
       autoAssignUserId: input.autoAssignUserId ?? null,
+      fieldUpdates,
     })
     .returning();
   return mapColumn(row);
@@ -177,6 +231,7 @@ export async function updateColumn(
     wipMode?: string;
     // null clears the automatic assignment; absent leaves it as it is.
     autoAssignUserId?: string | null;
+    fieldUpdates?: StatusFieldUpdate[];
   },
 ): Promise<ColumnRow | null> {
   const scope = and(eq(projectColumn.id, id), eq(projectColumn.projectId, projectId));
@@ -199,6 +254,10 @@ export async function updateColumn(
   if (patch.wipLimit !== undefined) set.wipLimit = patch.wipLimit;
   if (patch.wipMode !== undefined) set.wipMode = patch.wipMode;
   if (patch.autoAssignUserId !== undefined) set.autoAssignUserId = patch.autoAssignUserId;
+  if (patch.fieldUpdates !== undefined) {
+    await assertFieldUpdates(projectId, patch.fieldUpdates);
+    set.fieldUpdates = patch.fieldUpdates;
+  }
   if (Object.keys(set).length === 0) {
     const rows = await db.select().from(projectColumn).where(scope);
     return rows[0] ? mapColumn(rows[0]) : null;

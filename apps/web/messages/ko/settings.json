@@ -198,6 +198,15 @@
     "days": "일"
   },
   "states": {
+    "fieldUpdates": {
+      "title": "필드 업데이트",
+      "description": "작업 항목이 {name} 상태로 바뀌면 선택한 필드를 업데이트합니다.",
+      "add": "사용자 지정 필드 추가",
+      "remove": "{name} 제거",
+      "number": "고정 숫자",
+      "timeZone": "상태 변경 날짜의 시간대",
+      "empty": "먼저 사용자 지정 필드에서 숫자 또는 날짜 필드를 추가하세요."
+    },
     "addState": "{type} 상태 추가",
     "emptyTitle": "{type} 상태 없음",
     "emptyHint": "이 그룹에 워크플로 상태를 추가하세요.",

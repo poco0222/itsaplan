@@ -198,6 +198,15 @@
     "days": "hari"
   },
   "states": {
+    "fieldUpdates": {
+      "title": "Perbarui kolom",
+      "description": "Perbarui kolom yang dipilih saat item pekerjaan masuk ke status {name}.",
+      "add": "Tambahkan kolom khusus",
+      "remove": "Hapus {name}",
+      "number": "Angka tetap",
+      "timeZone": "Zona waktu tanggal perubahan status",
+      "empty": "Tambahkan kolom angka atau tanggal di Kolom khusus terlebih dahulu."
+    },
     "addState": "Tambah status {type}",
     "emptyTitle": "Tidak ada status {type}",
     "emptyHint": "Tambahkan status alur kerja untuk grup ini.",

@@ -198,6 +198,15 @@
     "days": "días"
   },
   "states": {
+    "fieldUpdates": {
+      "title": "Actualizar campos",
+      "description": "Actualiza los campos seleccionados cuando un elemento pasa a {name}.",
+      "add": "Añadir un campo personalizado",
+      "remove": "Quitar {name}",
+      "number": "Número fijo",
+      "timeZone": "Zona horaria de la fecha del cambio",
+      "empty": "Añade primero un campo de número o fecha en Campos personalizados."
+    },
     "addState": "Añadir un estado {type}",
     "emptyTitle": "Sin estados {type}",
     "emptyHint": "Añade un estado de flujo de trabajo para este grupo.",

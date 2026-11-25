@@ -108,10 +108,27 @@ test('counts blank progress on directly tracked plan nodes as zero', async () =>
     const fields = (await item(node).get()).data?.fields;
     expect(fields?.find((field) => field.fieldId === settings.nodeProgressId)?.value).toBeNull();
   }
+  expect(
+    (
+      await project.columns({ columnId: done }).patch({
+        fieldUpdates: [{ type: 'number', fieldId: settings.nodeProgressId, value: 100 }],
+      })
+    ).status,
+  ).toBe(200);
   expect((await item(nodes[0]).patch({ columnId: done })).status).toBe(200);
   expect((await detail.get()).data?.delivery?.progress).toBe(40);
+  expect((await item(nodes[0]).get()).data?.fields).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({ fieldId: settings.nodeProgressId, value: 100 }),
+    ]),
+  );
   expect((await item(nodes[0]).patch({ columnId: started })).status).toBe(200);
   expect((await detail.get()).data?.delivery?.progress).toBe(0);
+  expect((await item(nodes[0]).get()).data?.fields).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({ fieldId: settings.nodeProgressId, value: null }),
+    ]),
+  );
   await set(nodes[0], settings.nodeProgressId, 25);
   expect((await detail.get()).data?.delivery?.progress).toBe(10);
 });
@@ -430,6 +447,7 @@ test('enrolls existing issues and applies the hierarchy with exact weighted prog
 
 test('recalculates completion and status after reopening and cancellation', async () => {
   const {
+    project,
     settings: s,
     add,
     get,
@@ -451,17 +469,48 @@ test('recalculates completion and status after reopening and cancellation', asyn
   await set(a, weight, 80);
   await set(b, weight, 20);
   await set(a, progress, 50);
+  expect(
+    (
+      await project.columns({ columnId: done }).patch({
+        fieldUpdates: [{ type: 'number', fieldId: progress, value: 101 }],
+      })
+    ).status,
+  ).toBe(400);
+  const date = (await project['custom-fields'].post({ name: 'Actual date', fieldType: 'date' }))
+    .data!.id;
+  expect(
+    (
+      await project.columns({ columnId: done }).patch({
+        fieldUpdates: [
+          { type: 'number', fieldId: progress, value: 100 },
+          { type: 'date', fieldId: date, timeZone: 'Asia/Taipei' },
+        ],
+      })
+    ).status,
+  ).toBe(200);
+  expect((await item(node).patch({ columnId: done })).status).toBe(409);
+  expect(
+    (await item(node).get()).data?.fields.find((field) => field.fieldId === date)?.value,
+  ).toBeNull();
   expect((await item(a).patch({ columnId: done })).status).toBe(200);
   expect((await item(b).patch({ columnId: canceled })).status).toBe(200);
   expect((await get(node)).problem).toBe('weights');
   expect((await item(module).get()).data?.columnId).toBe(started);
   await set(a, weight, 100);
-  expect((await item(node).get()).data?.columnId).toBe(done);
+  const completedNode = (await item(node).get()).data;
+  expect(completedNode?.columnId).toBe(done);
+  expect(completedNode?.fields.find((field) => field.fieldId === progress)?.value).toBe(100);
+  expect<unknown>(completedNode?.fields.find((field) => field.fieldId === date)?.value).toEqual(
+    new Date(`${new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Taipei' }).format()}T00:00:00Z`),
+  );
   expect((await item(module).get()).data?.columnId).toBe(done);
   expect((await item(b).get()).data?.columnId).toBe(canceled);
   expect((await item(a).patch({ columnId: started })).status).toBe(200);
   expect(await get(a)).toMatchObject({ progress: 50, progressReadOnly: false });
-  expect((await item(node).get()).data?.columnId).toBe(started);
+  const reopenedNode = (await item(node).get()).data;
+  expect(reopenedNode?.columnId).toBe(started);
+  expect(reopenedNode?.fields.find((field) => field.fieldId === progress)?.value).toBeNull();
+  expect(reopenedNode?.fields.find((field) => field.fieldId === date)?.value).toBeNull();
   expect((await item(module).get()).data?.columnId).toBe(started);
   expect(await get(module)).toMatchObject({ progress: 50, completedAt: null });
 });

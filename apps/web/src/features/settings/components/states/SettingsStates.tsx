@@ -24,6 +24,7 @@ import {
 } from '../../services/settings.service';
 import { SettingsStateRow } from './SettingsStateRow';
 import SettingsDeleteStateDialog from './SettingsDeleteStateDialog';
+import SettingsStateFieldUpdatesDialog from './SettingsStateFieldUpdatesDialog';
 
 // The workflow states, grouped by state type. Each group has its own inline add;
 // states are reordered within their group by drag, edited inline, and deleted.
@@ -40,6 +41,7 @@ export default function SettingsStates({ project }: { project: ProjectDetail }) 
   });
   const [editAutoAssign, setEditAutoAssign] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<Column | null>(null);
+  const [editingFieldUpdates, setEditingFieldUpdates] = useState<Column | null>(null);
   const t = useTranslations('settings.states');
   const tCommon = useTranslations('common');
   const tStateType = useTranslations('display.stateTypes');
@@ -197,6 +199,7 @@ export default function SettingsStates({ project }: { project: ProjectDetail }) 
                             (a) => a.userId === c.autoAssignUserId,
                           )}
                           onEdit={() => startEdit(c)}
+                          onEditFieldUpdates={() => setEditingFieldUpdates(c)}
                           onDelete={() => setDeleting(c)}
                         />
                       ),
@@ -225,6 +228,13 @@ export default function SettingsStates({ project }: { project: ProjectDetail }) 
           column={deleting}
           issueCount={issueCount(deleting.id)}
           onClose={() => setDeleting(null)}
+        />
+      )}
+      {editingFieldUpdates && (
+        <SettingsStateFieldUpdatesDialog
+          project={project}
+          column={editingFieldUpdates}
+          onClose={() => setEditingFieldUpdates(null)}
         />
       )}
     </div>

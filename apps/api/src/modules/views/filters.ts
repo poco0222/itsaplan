@@ -180,7 +180,7 @@ function matchCondition(
 export function applyFilters(
   issues: IssueRow[],
   rawFilters: unknown,
-  columns: ColumnRow[],
+  columns: Pick<ColumnRow, 'id' | 'stateType'>[],
 ): IssueRow[] {
   const active = toFilterSet(rawFilters).conditions.filter(isEffectiveCondition);
   if (active.length === 0) return issues;

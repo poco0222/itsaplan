@@ -198,6 +198,15 @@
     "days": "gün"
   },
   "states": {
+    "fieldUpdates": {
+      "title": "Alanları güncelle",
+      "description": "Bir iş öğesi {name} durumuna geçtiğinde seçilen alanları güncelle.",
+      "add": "Özel alan ekle",
+      "remove": "{name} alanını kaldır",
+      "number": "Sabit sayı",
+      "timeZone": "Geçiş tarihinin saat dilimi",
+      "empty": "Önce Özel alanlar bölümüne bir sayı veya tarih alanı ekleyin."
+    },
     "addState": "{type} durumu ekle",
     "emptyTitle": "{type} durumları yok",
     "emptyHint": "Bu grup için bir iş akışı durumu ekleyin.",

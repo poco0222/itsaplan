@@ -504,6 +504,10 @@ export const teamInvite = pgTable(
   ],
 );
 
+export type StatusFieldUpdate =
+  | { type: 'number'; fieldId: number; value: number }
+  | { type: 'date'; fieldId: number; timeZone: string };
+
 export const projectColumn = pgTable(
   'project_column',
   {
@@ -526,6 +530,7 @@ export const projectColumn = pgTable(
     autoAssignUserId: text('auto_assign_user_id').references(() => user.id, {
       onDelete: 'set null',
     }),
+    fieldUpdates: jsonb('field_updates').$type<StatusFieldUpdate[]>().notNull().default([]),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
@@ -2010,6 +2015,8 @@ export const issueFieldValue = pgTable(
     // member fields. Deleting the user clears the field rather than the row, so the
     // issue keeps the rest of its values.
     valueUserId: text('value_user_id').references(() => user.id, { onDelete: 'set null' }),
+    restoreOnReopen: boolean('restore_on_reopen').notNull().default(false),
+    numberBeforeCompletion: numeric('number_before_completion'),
   },
   (t) => [unique().on(t.issueId, t.fieldId)],
 );
